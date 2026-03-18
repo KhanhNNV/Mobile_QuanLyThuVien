@@ -1,8 +1,11 @@
 package com.example.quanlythuvien
 
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupWithNavController
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity() {
 
@@ -35,5 +38,23 @@ class MainActivity : AppCompatActivity() {
 
         // Áp dụng Graph đã được thiết lập điểm bắt đầu cho NavController
         navController.graph = navGraph
+
+        // 1. Kết nối Bottom Navigation với NavController
+        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation)
+        bottomNavigationView.setupWithNavController(navController)
+
+        // 2. Lắng nghe sự thay đổi màn hình để Ẩn/Hiện Bottom Navigation
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            when (destination.id) {
+                R.id.welcomeFragment -> {
+                    // Nếu đang ở Onboarding/Welcome thì giấu thanh điều hướng đi
+                    bottomNavigationView.visibility = View.GONE
+                }
+                else -> {
+                    // Ở các màn hình khác (Dashboard, Sách) thì hiện lên
+                    bottomNavigationView.visibility = View.VISIBLE
+                }
+            }
+        }
     }
 }

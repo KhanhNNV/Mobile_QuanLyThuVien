@@ -28,4 +28,10 @@
         android:label="Dashboard"
         tools:layout="@layout/fragment_dashboard" />
 
+    <fragment
+        android:id="@+id/bookListFragment"
+        android:name="com.example.quanlythuvien.ui.books.BookListFragment"
+        android:label="Kho Sách"
+        tools:layout="@layout/fragment_book_list" />
+
 </navigation>

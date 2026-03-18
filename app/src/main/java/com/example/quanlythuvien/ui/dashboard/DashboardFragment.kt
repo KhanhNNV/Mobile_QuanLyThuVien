@@ -44,14 +44,14 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
                 }
 
                 // Xử lý hiển thị danh sách Sách
-                if (books.isNotEmpty()) {
-                    // Nối các sách thành 1 chuỗi
-                    tvBookInfo.text = books.joinToString(separator = "\n\n") {
-                        "📚 [ID: ${it.bookId}] ${it.title} (CateID: ${it.categoryId})\n✍️ Tác giả: ${it.author}\n📦 Số lượng: ${it.totalQuantity}"
-                    }
-                } else {
-                    tvBookInfo.text = "Chưa có sách nào"
-                }
+//                if (books.isNotEmpty()) {
+//                    // Nối các sách thành 1 chuỗi
+//                    tvBookInfo.text = books.joinToString(separator = "\n\n") {
+//                        "📚 [ID: ${it.bookId}] ${it.title} (CateID: ${it.categoryId})\n✍️ Tác giả: ${it.author}\n📦 Số lượng: ${it.totalQuantity}"
+//                    }
+//                } else {
+//                    tvBookInfo.text = "Chưa có sách nào"
+//                }
             }
         }
 

@@ -1,5 +1,6 @@
 package com.example.quanlythuvien.data.dao
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -25,6 +26,7 @@ interface LibraryDao {
     @Query("SELECT * FROM categories")
     suspend fun getAllCategories(): List<Category>
 
+    //    Dùng LiveData ở đây thì Room sẽ tự động chạy trên luồng nền và tự động cập nhật UI mỗi khi cơ sở dữ liệu có sự thay đổi
     @Query("SELECT * FROM books")
-    suspend fun getAllBooks(): List<Book>
+    fun getAllBooks(): LiveData<List<Book>>
 }
