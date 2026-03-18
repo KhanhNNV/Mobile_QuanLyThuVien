@@ -1,3 +1,26 @@
 <resources>
     <string name="app_name">QuanLyThuVien</string>
+
+    <!--    Welcome    -->
+    <string name="txt_titleWelcome">Chào mừng đến với Thư Viện</string>
+    <string name="txt_des">Quản lý sách và độc giả của bạn một cách dễ dàng và chuyên nghiệp. Hãy bắt đầu bằng việc thiết lập không gian của bạn.</string>
+    <string name="txt_buttonStart">Bắt đầu tạo thư viện</string>
+
+    <!--    Category welcome   -->
+    <string name="txt_titleCreateCate">Tạo Thể Loại Đầu Tiên</string>
+    <string name="txt_desCate">Hãy phân loại sách của bạn (Ví dụ: Công nghệ thông tin, Văn học, Khoa học...)</string>
+    <string name="hint_nameCate">Tên thể loại (*)</string>
+    <string name="hint_desCate">Mô tả ngắn</string>
+    <string name="txt_buttonNextCate">Tiếp tục</string>
+
+    <!--    Book welcome   -->
+    <string name="txt_titleCreateBook">Thêm Cuốn Sách Đầu Tiên</string>
+    <string name="hint_nameBook">Tên sách (*)</string>
+    <string name="hint_nameAuthor">Tác giả</string>
+    <string name="hint_quantity">Số lượng</string>
+    <string name="txt_hardQuantity">1</string>
+    <string name="txt_buttonCompletedAddBook">Hoàn tất và vào Thư Viện</string>
+
+
+
 </resources>

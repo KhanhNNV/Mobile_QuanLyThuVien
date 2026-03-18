@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph">
+
+    <fragment
+        android:id="@+id/welcomeFragment"
+        android:name="com.example.quanlythuvien.ui.welcome.WelcomeFragment"
+        android:label="Welcome"
+        tools:layout="@layout/fragment_welcome" />
+
+    <fragment
+        android:id="@+id/createCategoryFragment"
+        android:name="com.example.quanlythuvien.ui.welcome.CreateCategoryFragment"
+        android:label="Create Category"
+        tools:layout="@layout/fragment_create_category" />
+
+    <fragment
+        android:id="@+id/createBookFragment"
+        android:name="com.example.quanlythuvien.ui.welcome.CreateBookFragment"
+        android:label="Create Book"
+        tools:layout="@layout/fragment_create_book" />
+
+    <fragment
+        android:id="@+id/dashboardFragment"
+        android:name="com.example.quanlythuvien.ui.dashboard.DashboardFragment"
+        android:label="Dashboard"
+        tools:layout="@layout/fragment_dashboard" />
+
+</navigation>
