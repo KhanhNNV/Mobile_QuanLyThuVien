@@ -9,4 +9,9 @@
         android:id="@+id/bookListFragment"
         android:icon="@android:drawable/ic_menu_agenda"
         android:title="Kho Sách" />
+
+    <item
+        android:id="@+id/readerListFragment"
+        android:icon="@android:drawable/ic_menu_myplaces"
+        android:title="Độc giả" />
 </menu>

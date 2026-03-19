@@ -34,4 +34,11 @@
         android:label="Kho Sách"
         tools:layout="@layout/fragment_book_list" />
 
+    <fragment
+        android:id="@+id/readerListFragment"
+        android:name="com.example.quanlythuvien.ui.readers.ReaderListFragment"
+        android:label="Độc giả"
+        tools:layout="@layout/fragment_reader_list" />
+
+
 </navigation>
