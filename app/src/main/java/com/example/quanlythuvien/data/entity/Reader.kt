@@ -26,7 +26,7 @@ data class Reader (
     */
 
     @ColumnInfo(name = "expiration_date")
-    val expirationDate: Long? // có thể null vì người dùng có thể chưa mượn 
+    val expirationDate: Long? // có thể null vì người dùng có thể chưa mượn
     )
 
 

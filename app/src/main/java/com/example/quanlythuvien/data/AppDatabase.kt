@@ -10,12 +10,18 @@ import com.example.quanlythuvien.data.dao.LibraryDao
 import com.example.quanlythuvien.data.entity.Book
 import com.example.quanlythuvien.data.entity.Category
 import com.example.quanlythuvien.data.entity.Reader
+import com.example.quanlythuvien.data.dao.BookDao
+import com.example.quanlythuvien.data.dao.CategoryDao
+import com.example.quanlythuvien.data.dao.ReaderDao
 
 @Database(entities = [Category::class, Book::class, Reader::class],
     version = 1, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun libraryDao(): LibraryDao
+    abstract fun bookDao():BookDao
+    abstract fun categoryDao():CategoryDao
+    abstract fun readerDao():ReaderDao
 
     companion object {
         @Volatile
