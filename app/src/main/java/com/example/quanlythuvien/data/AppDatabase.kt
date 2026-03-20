@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
+import com.example.quanlythuvien.data.converter.Converters
 import com.example.quanlythuvien.data.dao.LibraryDao
 import com.example.quanlythuvien.data.entity.Book
 import com.example.quanlythuvien.data.entity.Category
@@ -16,6 +18,7 @@ import com.example.quanlythuvien.data.entity.Notification
     entities = [
         Category::class,
         Book::class,
+        Reader::class,
         Loan::class,
         LoanDetail::class,
         FeeNotice::class,
@@ -26,6 +29,9 @@ import com.example.quanlythuvien.data.entity.Notification
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun libraryDao(): LibraryDao
+    abstract fun bookDao():BookDao
+    abstract fun categoryDao():CategoryDao
+    abstract fun readerDao():ReaderDao
 
     companion object {
         @Volatile

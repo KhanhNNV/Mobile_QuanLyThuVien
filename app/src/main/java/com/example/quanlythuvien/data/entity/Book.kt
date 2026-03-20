@@ -15,7 +15,8 @@ import androidx.room.PrimaryKey
             childColumns = ["category_id"],
             onDelete = ForeignKey.RESTRICT // Không cho xóa Category nếu đang có Book
         )
-    ]
+    ],
+    indices = [Index(value = ["isbn_code"], unique = true)] //Cột isbnCode không được trùng
 )
 data class Book(
     @PrimaryKey(autoGenerate = true)
@@ -26,7 +27,8 @@ data class Book(
     val categoryId: Int, // Khóa ngoại liên kết với Category
 
     @ColumnInfo(name = "isbn_code",)
-    val isbnCode: String?,
+
+    val isbnCode: String,
 
     val title: String,
     val author: String,

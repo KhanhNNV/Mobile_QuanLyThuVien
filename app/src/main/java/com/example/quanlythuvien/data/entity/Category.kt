@@ -8,7 +8,7 @@ import androidx.room.PrimaryKey
 data class Category(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "category_id")
-    val categoryId: Int = 0, // Để 0 thì Room tự động tăng
+    val categoryId: Int = 0,
 
     val name: String,
     val description: String
