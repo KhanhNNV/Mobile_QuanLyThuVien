@@ -9,14 +9,24 @@ import com.example.quanlythuvien.data.converter.Converters
 import com.example.quanlythuvien.data.dao.LibraryDao
 import com.example.quanlythuvien.data.entity.Book
 import com.example.quanlythuvien.data.entity.Category
-import com.example.quanlythuvien.data.entity.Reader
-import com.example.quanlythuvien.data.dao.BookDao
-import com.example.quanlythuvien.data.dao.CategoryDao
-import com.example.quanlythuvien.data.dao.ReaderDao
+import com.example.quanlythuvien.data.entity.FeeNotice
+import com.example.quanlythuvien.data.entity.Loan
+import com.example.quanlythuvien.data.entity.LoanDetail
+import com.example.quanlythuvien.data.entity.Notification
 
-@Database(entities = [Category::class, Book::class, Reader::class],
-    version = 1, exportSchema = false)
-@TypeConverters(Converters::class)
+@Database(
+    entities = [
+        Category::class,
+        Book::class,
+        Reader::class,
+        Loan::class,
+        LoanDetail::class,
+        FeeNotice::class,
+        Notification::class
+    ],
+    version = 2,
+    exportSchema = false
+)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun libraryDao(): LibraryDao
     abstract fun bookDao():BookDao
@@ -33,7 +43,10 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "library_database"
-                ).build()
+                )
+                    // TODO: Thay bằng Migration thực tế khi lên production
+                    .fallbackToDestructiveMigration()
+                    .build()
                 INSTANCE = instance
                 instance
             }
