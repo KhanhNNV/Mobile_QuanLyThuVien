@@ -22,12 +22,14 @@ class CreateBookFragment : Fragment(R.layout.fragment_create_book) {
         val etBookName = view.findViewById<TextInputEditText>(R.id.etBookName)
         val etBookAuthor = view.findViewById<TextInputEditText>(R.id.etBookAuthor)
         val etBookQuantity = view.findViewById<TextInputEditText>(R.id.etBookQuantity)
+        val etBookCode= view.findViewById<TextInputEditText>(R.id.etBookCode)
         val btnFinishSetup = view.findViewById<Button>(R.id.btnFinishSetup)
 
         btnFinishSetup.setOnClickListener {
             val title = etBookName.text.toString().trim()
             val author = etBookAuthor.text.toString().trim()
             val quantity = etBookQuantity.text.toString().toIntOrNull() ?: 1
+            val isbnCode = etBookCode.text.toString().trim()
 
             if (title.isEmpty()) {
                 Toast.makeText(requireContext(), "Vui lòng nhập tên sách", Toast.LENGTH_SHORT).show()
@@ -35,7 +37,7 @@ class CreateBookFragment : Fragment(R.layout.fragment_create_book) {
             }
 
             // Gọi ViewModel lưu sách vào Room DB
-            viewModel.saveBook(title, author, quantity) {
+            viewModel.saveBook(title, author, quantity,isbnCode) {
                 // 1. Cập nhật cờ là đã hoàn tất Onboarding
                 val prefs = requireActivity().getSharedPreferences("LibraryAppPrefs", Context.MODE_PRIVATE)
                 prefs.edit().putBoolean("IS_FIRST_LAUNCH", false).apply()

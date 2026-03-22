@@ -19,6 +19,7 @@
     <string name="hint_nameAuthor">Tác giả</string>
     <string name="hint_quantity">Số lượng</string>
     <string name="txt_hardQuantity">1</string>
+    <string name="hint_bookCode">Mã sách</string>
     <string name="txt_buttonCompletedAddBook">Hoàn tất và vào Thư Viện</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

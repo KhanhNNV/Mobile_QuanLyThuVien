@@ -30,7 +30,7 @@ class OnboardingViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
-    fun saveBook(title: String, author: String, quantity: Int, onSaved: () -> Unit) {
+    fun saveBook(title: String, author: String, quantity: Int,isbnCode: String, onSaved: () -> Unit) {
         viewModelScope.launch {
             val book = Book(
                 categoryId = currentCategoryId, // Lấy ID đã lưu từ bước trước
@@ -38,7 +38,7 @@ class OnboardingViewModel(application: Application) : AndroidViewModel(applicati
                 author = author,
                 totalQuantity = quantity,
                 availableQuantity = quantity,
-                isbnCode = null // Bỏ qua ở bước setup đầu tiên
+                isbnCode = isbnCode
             )
             repository.insertBook(book)
             onSaved() // Báo cho UI biết để nhảy vào Dashboard

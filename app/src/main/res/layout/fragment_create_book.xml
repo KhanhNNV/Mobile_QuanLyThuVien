@@ -65,6 +65,22 @@
             android:text="@string/txt_hardQuantity" />
     </com.google.android.material.textfield.TextInputLayout>
 
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilBookCode"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:hint="@string/hint_bookCode"
+        app:layout_constraintTop_toBottomOf="@+id/tilBookQuantity">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etBookCode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text" />
+    </com.google.android.material.textfield.TextInputLayout>
+
     <Button
         android:id="@+id/btnFinishSetup"
         android:layout_width="300dp"
