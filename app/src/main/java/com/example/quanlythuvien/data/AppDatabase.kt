@@ -28,7 +28,7 @@ import com.example.quanlythuvien.data.entity.Reader
         FeeNotice::class,
         Notification::class
     ],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

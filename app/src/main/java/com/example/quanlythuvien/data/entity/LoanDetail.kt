@@ -3,6 +3,7 @@ package com.example.quanlythuvien.data.entity
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import com.example.quanlythuvien.data.entity.enums.LoanDetailStatus
 
 /**
  * Chi tiết phiếu mượn (quan hệ nhiều-nhiều giữa Loan và Book)
@@ -37,5 +38,5 @@ data class LoanDetail(
     @ColumnInfo(name = "return_date")
     val returnDate: Long? = null,      // Timestamp (ms), nullable khi chưa trả
 
-    val status: String = "BORROWING"   // BORROWING | RETURNED | LOST
+    val status: LoanDetailStatus = LoanDetailStatus.BORROWING
 )
