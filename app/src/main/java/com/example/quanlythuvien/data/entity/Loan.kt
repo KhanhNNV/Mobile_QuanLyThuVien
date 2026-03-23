@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import com.example.quanlythuvien.data.entity.enums.LoanStatus
 
 /**
  * Phiếu mượn sách
@@ -34,5 +35,5 @@ data class Loan(
     @ColumnInfo(name = "due_date")
     val dueDate: Long,                // Timestamp (ms)
 
-    val status: String = "BORROWING" // BORROWING | RETURNED
+    val status: LoanStatus = LoanStatus.BORROWING
 )
