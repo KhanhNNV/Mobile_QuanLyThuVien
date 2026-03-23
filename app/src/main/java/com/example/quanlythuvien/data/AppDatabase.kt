@@ -31,6 +31,7 @@ import com.example.quanlythuvien.data.entity.Reader
     version = 2,
     exportSchema = false
 )
+@TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun libraryDao(): LibraryDao
     abstract fun bookDao(): BookDao

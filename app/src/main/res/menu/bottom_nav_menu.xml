@@ -2,11 +2,17 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/dashboardFragment"
-        android:icon="@android:drawable/ic_menu_compass"
+        android:icon="@drawable/ic_home"
         android:title="Trang chủ" />
 
     <item
         android:id="@+id/bookListFragment"
         android:icon="@android:drawable/ic_menu_agenda"
         android:title="Kho Sách" />
+
+
+    <item
+        android:id="@+id/borrowPayListFragment"
+        android:icon="@drawable/ic_borrow_pay"
+        android:title="Mượn/Trả" />
 </menu>
