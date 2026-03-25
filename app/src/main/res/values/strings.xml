@@ -21,8 +21,16 @@
     <string name="txt_hardQuantity">1</string>
     <string name="hint_bookCode">Mã sách</string>
     <string name="txt_buttonCompletedAddBook">Hoàn tất và vào Thư Viện</string>
-    <!-- TODO: Remove or change this placeholder text -->
+    <!-- Import Book -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_book">NHẬP SÁCH MỚI</string>
+    <string name="vui_l_ng_nh_p_y_th_ng_tin">Vui lòng nhập đầy đủ thông tin !</string>
+    <string name="book_name">TÊN SÁCH</string>
+    <string name="hint_book">Nhập tên sách đầy đủ</string>
+    <string name="Author">TÁC GIẢ</string>
+    <string name="Name_Auth">Tên tác giả/Dịch giả</string>
+    <string name="nxb">NHÀ XUẤT BẢN</string>
+    <string name="hint_nxb">NXB..</string>
 
 
 </resources>

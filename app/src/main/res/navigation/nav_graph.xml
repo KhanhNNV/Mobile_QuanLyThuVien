@@ -33,5 +33,10 @@
         android:name="com.example.quanlythuvien.ui.books.BookListFragment"
         android:label="Kho Sách"
         tools:layout="@layout/fragment_book_list" />
+    <fragment
+        android:id="@+id/bookImportFragment"
+        android:name="com.example.quanlythuvien.ui.books.BookImportFragment"
+        android:label="Kho Sách"
+        tools:layout="@layout/fragment_book_import" />
 
 </navigation>
