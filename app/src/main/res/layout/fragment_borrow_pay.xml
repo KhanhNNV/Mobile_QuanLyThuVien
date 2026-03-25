@@ -1,19 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:paddingStart="38dp"
+    android:paddingEnd="38dp"
+    android:paddingTop="16dp"
+    android:paddingBottom="16dp"
+    android:fitsSystemWindows="true">
 
-    <!-- Header -->
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:backgroundTint="#80D8FF"
         android:gravity="center_vertical"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:paddingBottom="8dp">
 
-        <!-- BÊN TRÁI -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -25,80 +29,160 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/screen_title"
-                android:textColor="#8C9EFF"
-                android:textSize="24sp"
+                android:textColor="#5C93F1"
+                android:textSize="22sp"
                 android:textStyle="bold" />
-
             <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:orientation="horizontal">
 
                 <TextView
-                    android:id="@+id/tvTotal"
+                    android:id="@+id/tvSoPhieu"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/total_ticket"
                     android:textColor="#6A7385"
-                    android:textSize="14sp" />
-
+                    android:textSize="13sp" />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/dot"
                     android:textColor="#6A7385"
-                    android:textSize="14sp" />
+                    android:textSize="13sp" />
 
                 <TextView
-                    android:id="@+id/tvLate"
+                    android:id="@+id/tvTreHan"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/late_ticket"
                     android:textColor="#6A7385"
-                    android:textSize="14sp" />
+                    android:textSize="13sp" />
             </LinearLayout>
+
         </LinearLayout>
 
-        <!-- BÊN PHẢI -->
         <Button
             android:id="@+id/btnAddTicket"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
             android:text="@string/add_ticket"
             android:textAllCaps="false"
             android:textColor="#FFFFFF"
-            android:textSize="14sp"
-            android:backgroundTint="#2196F3"/>
+            android:backgroundTint="#42A5F5" />
     </LinearLayout>
 
-    <!-- Search + Spinner -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="8dp"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:layout_marginTop="8dp">
 
         <AutoCompleteTextView
             android:id="@+id/autoSearch"
             android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:layout_weight="3"
+            android:layout_height="48dp"
+            android:layout_weight="1"
             android:hint="@string/search_hint"
             android:drawableStart="@drawable/ic_search"
-            android:drawablePadding="8dp"
+            android:drawablePadding="6dp"
             android:background="@drawable/bg_search"
             android:padding="10dp" />
 
-        <Spinner
-            android:id="@+id/spinner"
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:layout_weight="1"
-            android:layout_marginStart="8dp" />
+        <ImageView
+            android:id="@+id/btnToggleFilter"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="8dp"
+            android:padding="12dp"
+            android:background="@drawable/bg_search"
+            app:srcCompat="@drawable/ic_angles_down"
+            android:contentDescription="Mở bộ lọc" />
     </LinearLayout>
 
-    <!-- RecyclerView -->
+    <LinearLayout
+        android:id="@+id/layoutFilterContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="10dp"
+        android:padding="12dp"
+        android:background="@drawable/bg_list_container"
+        android:visibility="gone"> <RadioGroup
+        android:id="@+id/rgStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal"
+        android:layout_marginBottom="12dp">
+
+        <RadioButton android:id="@+id/rbOption1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Tất cả" android:checked="true" android:layout_marginEnd="8dp"/>
+        <RadioButton android:id="@+id/rbOption2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Đang mượn" android:layout_marginEnd="8dp"/>
+        <RadioButton android:id="@+id/rbOption3" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Trễ hạn" />
+    </RadioGroup>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/edtFromDate"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:hint="Từ ngày"
+                android:focusable="false"
+                android:clickable="true"
+                android:cursorVisible="false"
+                android:inputType="none" />
+
+            <View
+                android:layout_width="8dp"
+                android:layout_height="1dp"/>
+
+            <EditText
+                android:id="@+id/edtToDate"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:hint="Đến ngày"
+                android:focusable="false"
+                android:clickable="true"
+                android:cursorVisible="false"
+                android:inputType="none" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnResetFilter"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:text="Đặt lại"
+                android:textColor="#6A7385"
+                app:strokeColor="#D5D8DC" />
+
+            <Button
+                android:id="@+id/btnConfirmFilter"
+                style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:backgroundTint="#5C93F1"
+                android:text="Xác nhận" />
+        </LinearLayout>
+
+    </LinearLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"

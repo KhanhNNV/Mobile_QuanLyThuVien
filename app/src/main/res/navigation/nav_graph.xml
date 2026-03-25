@@ -35,7 +35,7 @@
         tools:layout="@layout/fragment_book_list" />
 
     <fragment
-        android:id="@+id/borrowPayFragment"
+        android:id="@+id/borrowPayListFragment"
         android:name="com.example.quanlythuvien.ui.borrow_pay.BorrowPayFragment"
         android:label="Mượn Trả"
         tools:layout="@layout/fragment_borrow_pay" />
