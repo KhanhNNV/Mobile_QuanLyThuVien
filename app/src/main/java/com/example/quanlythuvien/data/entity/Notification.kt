@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import com.example.quanlythuvien.data.entity.enums.NotificationType
 
 /**
  * Thông báo dành cho thủ thư
@@ -38,7 +39,7 @@ data class Notification(
     val feeId: Long? = null,            // FK -> FeeNotice (nullable)
 
     /** OVERDUE | DUE_SOON | FEE_UNPAID | CARD_EXPIRY | LOST_BOOK */
-    val type: String,
+    val type: NotificationType,
 
     val message: String,
 
