@@ -27,38 +27,26 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvCategoryTitle" />
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/tilCategoryName"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+    <EditText
+        android:id="@+id/etCategoryName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:minHeight="48dp"
         android:layout_marginTop="32dp"
         android:hint="@string/hint_nameCate"
-        app:layout_constraintTop_toBottomOf="@+id/tvCategorySubtitle">
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etCategoryName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="text" />
-    </com.google.android.material.textfield.TextInputLayout>
+        android:inputType="text"
+        app:layout_constraintTop_toBottomOf="@+id/tvCategorySubtitle" />
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/tilCategoryDesc"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+    <EditText
+        android:id="@+id/etCategoryDesc"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:hint="@string/hint_desCate"
-        app:layout_constraintTop_toBottomOf="@+id/tilCategoryName">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etCategoryDesc"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:lines="3"
-            android:gravity="top"
-            android:inputType="textMultiLine" />
-    </com.google.android.material.textfield.TextInputLayout>
+        android:lines="3"
+        android:gravity="top"
+        android:inputType="textMultiLine"
+        app:layout_constraintTop_toBottomOf="@+id/etCategoryName" />
 
     <Button
         android:id="@+id/btnNextToBook"
