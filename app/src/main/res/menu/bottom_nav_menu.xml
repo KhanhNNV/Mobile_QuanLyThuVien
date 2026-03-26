@@ -11,6 +11,10 @@
         android:title="Kho Sách" />
     <item
         android:id="@+id/bookImportFragment"
-        android:icon="@android:drawable/ic_menu_agenda"
+        android:icon="@android:drawable/ic_menu_add"
         android:title="Nhập sách" />
+    <item
+        android:id="@+id/readerAddFragment"
+        android:icon="@android:drawable/ic_menu_edit"
+        android:title="Độc giả" />
 </menu>

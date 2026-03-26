@@ -43,6 +43,15 @@
     <string name="gi_nh_p_vn">GIÁ NHẬP (vnđ)</string>
     <string name="l_u_s_ch">Lưu sách</string>
     <string name="huy">Hủy</string>
+    <string name="title_add">Thêm Độc Giả</string>
+    <string name="h_v_t_n">HỌ VÀ TÊN *</string>
+    <string name="nh_p_h_t_n_y">Nhập họ tên đầy đủ...</string>
+    <string name="s_i_n_tho_i">SỐ ĐIỆN THOẠI *</string>
+    <string name="_09">09...</string>
+    <string name="lo_i_c_gi">LOẠI ĐỘC GIẢ *</string>
+    <string name="coice">Chọn...</string>
+    <string name="huyy">Hủy</string>
+    <string name="save_reader">Lưu Độc Giả</string>
 
 
 </resources>
