@@ -26,5 +26,18 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
+    <!--    custom-header-->
+    <string name="tvHeaderTitle">Tiêu đề chính</string>
+    <string name="tvHeaderSubtitle">Tiêu đề phụ</string>
+    <!--    dashboard-->
+    <string name="tvTempQuantity">0</string>
+    <string name="tvTitleTotalBookQuantity">Tổng đầu sách</string>
+    <string name="tvTitleTotalBookBorrowing">Tổng đang mượn</string>
+    <string name="tvTitleTotalBookDelayed">Trả trễ hạn</string>
+    <string name="tvTitleTotalReader">Trả trễ hạn</string>
+
+    <string name="tvTitleWarning">CẢNH BÁO</string>
+
+    <string name="tvTitleQuickAccess"> TRUY CẬP NHANH</string>
 
 </resources>

@@ -34,4 +34,10 @@
         android:label="Kho Sách"
         tools:layout="@layout/fragment_book_list" />
 
+    <fragment
+        android:id="@+id/notificationFragment"
+        android:name="com.example.quanlythuvien.ui.notifications.NotificationFragment"
+        android:label="Thông Báo"
+        tools:layout="@layout/fragment_notification"/>
+
 </navigation>
