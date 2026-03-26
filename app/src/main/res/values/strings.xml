@@ -31,6 +31,18 @@
     <string name="Name_Auth">Tên tác giả/Dịch giả</string>
     <string name="nxb">NHÀ XUẤT BẢN</string>
     <string name="hint_nxb">NXB..</string>
+    <string name="isbn">ISBN</string>
+    <string name="hint_isbn">978-...</string>
+    <string name="year_xb">NĂM XB</string>
+    <string name="the_loai">THỂ LOẠI</string>
+    <string name="ch_n">Chọn...</string>
+    <string name="_1">1</string>
+    <string name="s_l_ng">SỐ LƯỢNG *</string>
+    <string name="note">GHI CHÚ</string>
+    <string name="note_them">Ghi chú thêm (không bắt buộc)</string>
+    <string name="gi_nh_p_vn">GIÁ NHẬP (vnđ)</string>
+    <string name="l_u_s_ch">Lưu sách</string>
+    <string name="huy">Hủy</string>
 
 
 </resources>
