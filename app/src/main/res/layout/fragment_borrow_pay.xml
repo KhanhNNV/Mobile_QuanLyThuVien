@@ -4,64 +4,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:paddingStart="38dp"
-    android:paddingEnd="38dp"
-    android:paddingTop="16dp"
-    android:paddingBottom="16dp"
     android:fitsSystemWindows="true">
-
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
+        android:gravity="end|center_vertical"
         android:orientation="horizontal"
         android:paddingBottom="8dp">
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/tvScreenTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/screen_title"
-                android:textColor="#5C93F1"
-                android:textSize="22sp"
-                android:textStyle="bold" />
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/tvSoPhieu"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/total_ticket"
-                    android:textColor="#6A7385"
-                    android:textSize="13sp" />
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/dot"
-                    android:textColor="#6A7385"
-                    android:textSize="13sp" />
-
-                <TextView
-                    android:id="@+id/tvTreHan"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/late_ticket"
-                    android:textColor="#6A7385"
-                    android:textSize="13sp" />
-            </LinearLayout>
-
-        </LinearLayout>
-
         <Button
             android:id="@+id/btnAddTicket"
             android:layout_width="wrap_content"
@@ -109,18 +59,20 @@
         android:layout_marginTop="10dp"
         android:padding="12dp"
         android:background="@drawable/bg_list_container"
-        android:visibility="gone"> <RadioGroup
-        android:id="@+id/rgStatus"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:orientation="horizontal"
-        android:layout_marginBottom="12dp">
+        android:visibility="gone">
 
-        <RadioButton android:id="@+id/rbOption1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Tất cả" android:checked="true" android:layout_marginEnd="8dp"/>
-        <RadioButton android:id="@+id/rbOption2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Đang mượn" android:layout_marginEnd="8dp"/>
-        <RadioButton android:id="@+id/rbOption3" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Trễ hạn" />
-    </RadioGroup>
+        <RadioGroup
+            android:id="@+id/rgStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal"
+            android:layout_marginBottom="12dp">
+
+            <RadioButton android:id="@+id/rbOption1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Tất cả" android:checked="true" android:layout_marginEnd="8dp"/>
+            <RadioButton android:id="@+id/rbOption2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Đang mượn" android:layout_marginEnd="8dp"/>
+            <RadioButton android:id="@+id/rbOption3" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Trễ hạn" />
+        </RadioGroup>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -153,6 +105,7 @@
                 android:cursorVisible="false"
                 android:inputType="none" />
         </LinearLayout>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

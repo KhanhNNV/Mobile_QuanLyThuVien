@@ -42,16 +42,6 @@ class BorrowPayFragment :Fragment(){
         )
     }
 
-    //View layout chính của borrow pay
-    private lateinit var tvScreenTitle: TextView
-// Tiêu đề màn hình (ví dụ: "Quản lý mượn/trả")
-
-    private lateinit var tvSoPhieu: TextView
-// Hiển thị tổng số phiếu mượn
-
-    private lateinit var tvTreHan: TextView
-// Hiển thị số phiếu trễ hạn
-
     private lateinit var btnAddTicket: Button
 // Nút thêm phiếu mượn mới
 
@@ -108,11 +98,6 @@ class BorrowPayFragment :Fragment(){
         return inflater.inflate(R.layout.fragment_borrow_pay, container, false)
     }
     private fun initViews(view: View) {
-
-        tvScreenTitle = view.findViewById(R.id.tvScreenTitle)
-        tvSoPhieu = view.findViewById(R.id.tvSoPhieu)
-        tvTreHan = view.findViewById(R.id.tvTreHan)
-
         btnAddTicket = view.findViewById(R.id.btnAddTicket)
 
         autoSearch = view.findViewById(R.id.autoSearch)
@@ -187,7 +172,7 @@ class BorrowPayFragment :Fragment(){
 
     }
 
-
+    //Hàm dùng để hiển thị DatePicker để chọn ngày
     private fun showDatePickerForFilter(editText: EditText) {
         val calendar = Calendar.getInstance()
         DatePickerDialog(requireContext(), { _, year, month, dayOfMonth ->
