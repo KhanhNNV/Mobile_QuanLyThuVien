@@ -12,6 +12,7 @@
     <string name="hint_nameCate">Tên thể loại (*)</string>
     <string name="hint_desCate">Mô tả ngắn</string>
     <string name="txt_buttonNextCate">Tiếp tục</string>
+    <string name="err_cateEmpty">Vui lòng nhập tên thể loại</string>
 
     <!--    Book welcome   -->
     <string name="txt_titleCreateBook">Thêm Cuốn Sách Đầu Tiên</string>
@@ -21,8 +22,22 @@
     <string name="txt_hardQuantity">1</string>
     <string name="hint_bookCode">Mã sách</string>
     <string name="txt_buttonCompletedAddBook">Hoàn tất và vào Thư Viện</string>
+    <string name="err_bookEmpty">Vui lòng nhập tên sách</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
+    <!--    custom-header-->
+    <string name="tvHeaderTitle">Tiêu đề chính</string>
+    <string name="tvHeaderSubtitle">Tiêu đề phụ</string>
+    <!--    dashboard-->
+    <string name="tvTempQuantity">0</string>
+    <string name="tvTitleTotalBookQuantity">Tổng đầu sách</string>
+    <string name="tvTitleTotalBookBorrowing">Tổng đang mượn</string>
+    <string name="tvTitleTotalBookDelayed">Trả trễ hạn</string>
+    <string name="tvTitleTotalReader">Trả trễ hạn</string>
+
+    <string name="tvTitleWarning">CẢNH BÁO</string>
+
+    <string name="tvTitleQuickAccess"> TRUY CẬP NHANH</string>
 
 </resources>
