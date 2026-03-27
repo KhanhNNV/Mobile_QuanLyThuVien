@@ -1,4 +1,4 @@
-package com.example.quanlythuvien.ui.borrow_pay
+package com.example.quanlythuvien.ui.borrow_pay.adapter
 
 import android.view.LayoutInflater
 import android.view.View
@@ -9,14 +9,15 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quanlythuvien.R
+import com.example.quanlythuvien.ui.borrow_pay.data.LoanItemData
 
 class BorrowPayAdapter(
-    private val onItemClick: (BorrowPayItem) -> Unit
-) : ListAdapter<BorrowPayItem, BorrowPayAdapter.BorrowPayViewHolder>(BorrowPayDiffCallback()) {
+    private val onItemClick: (LoanItemData) -> Unit
+) : ListAdapter<LoanItemData, BorrowPayAdapter.BorrowPayViewHolder>(BorrowPayDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BorrowPayViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_borrow_pay, parent, false) // Tên file XML của bạn
+            .inflate(R.layout.item_borrow_pay, parent, false)
         return BorrowPayViewHolder(view)
     }
 
@@ -31,7 +32,7 @@ class BorrowPayAdapter(
         private val tvLoanStatus: TextView = itemView.findViewById(R.id.tvLoanStatus)
         private val tvDueDate: TextView = itemView.findViewById(R.id.tvDueDate)
 
-        fun bind(item: BorrowPayItem) {
+        fun bind(item: LoanItemData) {
             tvName.text = item.readerName
             tvLoanId.text = "Mã phiếu: #${item.loanId}"
             tvDueDate.text = "Hạn trả: ${item.dueDate}"
@@ -54,12 +55,12 @@ class BorrowPayAdapter(
     }
 
     // DiffUtil giúp RecyclerView cập nhật danh sách cực nhanh và mượt
-    class BorrowPayDiffCallback : DiffUtil.ItemCallback<BorrowPayItem>() {
-        override fun areItemsTheSame(oldItem: BorrowPayItem, newItem: BorrowPayItem): Boolean {
+    class BorrowPayDiffCallback : DiffUtil.ItemCallback<LoanItemData>() {
+        override fun areItemsTheSame(oldItem: LoanItemData, newItem: LoanItemData): Boolean {
             return oldItem.loanId == newItem.loanId
         }
 
-        override fun areContentsTheSame(oldItem: BorrowPayItem, newItem: BorrowPayItem): Boolean {
+        override fun areContentsTheSame(oldItem: LoanItemData, newItem: LoanItemData): Boolean {
             return oldItem == newItem
         }
     }
