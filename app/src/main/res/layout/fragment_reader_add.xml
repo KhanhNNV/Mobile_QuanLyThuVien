@@ -3,7 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#121212"
     android:fillViewport="true">
 
     <LinearLayout
@@ -16,7 +15,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/title_add"
-            android:textColor="#FFFFFF"
             android:textSize="28sp"
             android:textStyle="bold"
             android:layout_marginBottom="24dp" />
@@ -24,8 +22,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/h_v_t_n"
-            android:textColor="#AAAAAA"
+            android:text="@string/m_th_c_gi"
             android:textSize="12sp"
             android:textStyle="bold" />
 
@@ -33,18 +30,35 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            app:hintEnabled="false"
-            app:boxBackgroundColor="#1E1E1E">
+            android:layout_marginBottom="16dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edtReaderCode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Nhập mã thẻ (VD: SV001)..."
+                android:inputType="textCapCharacters" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/h_v_t_n"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edtReaderName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/nh_p_h_t_n_y"
-                android:inputType="textPersonName"
-                android:textColor="#FFFFFF"
-                android:textColorHint="#666666" />
+                android:inputType="textPersonName" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <LinearLayout
@@ -65,16 +79,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/s_i_n_tho_i"
-                    android:textColor="#AAAAAA"
                     android:textSize="12sp"
                     android:textStyle="bold" />
 
                 <com.google.android.material.textfield.TextInputLayout
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:hintEnabled="false"
-                    app:boxBackgroundColor="#1E1E1E">
+                    android:layout_height="wrap_content">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/edtReaderPhone"
@@ -82,9 +93,7 @@
                         android:layout_height="wrap_content"
                         android:hint="@string/_09"
                         android:inputType="phone"
-                        android:maxLength="10"
-                        android:textColor="#FFFFFF"
-                        android:textColorHint="#666666" />
+                        android:maxLength="10" />
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
 
@@ -99,25 +108,20 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/lo_i_c_gi"
-                    android:textColor="#AAAAAA"
                     android:textSize="12sp"
                     android:textStyle="bold" />
 
                 <com.google.android.material.textfield.TextInputLayout
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:hintEnabled="false"
-                    app:boxBackgroundColor="#1E1E1E">
+                    android:layout_height="wrap_content">
 
                     <AutoCompleteTextView
                         android:id="@+id/spinnerReaderType"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="@string/coice"
-                        android:inputType="none"
-                        android:textColor="#FFFFFF"
-                        android:textColorHint="#666666"/>
+                        android:inputType="none" />
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
         </LinearLayout>
@@ -126,7 +130,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="32dp">
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="32dp">
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnCancelReader"
@@ -136,7 +141,7 @@
                 android:layout_weight="1"
                 android:layout_marginEnd="8dp"
                 android:text="@string/huyy"
-                android:textColor="#FFFFFF"
+                android:textColor="#555555"
                 app:strokeColor="#555555" />
 
             <com.google.android.material.button.MaterialButton
