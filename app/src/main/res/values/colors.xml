@@ -2,6 +2,43 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Dark Theme Base Colors -->
+    <color name="bg_dark">#0F1117</color>
+    <color name="bg_card">#1A1D27</color>
+    <color name="bg_card_secondary">#22253A</color>
+    <color name="bg_search">#1E2130</color>
+
+    <!-- Light Theme Support -->
+    <color name="bg_light">#F8F9FD</color>
+    <color name="bg_element_light">#F0F2F8</color>
+    <color name="text_black">#1A1D27</color>
+    <color name="text_gray">#646A86</color>
+    <color name="text_hint_light">#A0A4B8</color>
+
+    <!-- Text Colors -->
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#8B8FA8</color>
+    <color name="text_hint">#555870</color>
+
+    <!-- Accent Colors -->
+    <color name="accent_blue">#4C7CF7</color>
+    <color name="accent_blue_dark">#3A5FCC</color>
+    <color name="accent_blue_light">#D0DCFF</color>
+
+    <!-- Status Colors -->
+    <color name="status_available">#2ECC71</color>
+    <color name="status_available_bg">#1A3D2B</color>
+    <color name="status_low">#F39C12</color>
+    <color name="status_low_bg">#3D2E0F</color>
+    <color name="status_out">#E74C3C</color>
+    <color name="status_out_bg">#3D150F</color>
+
+    <!-- Divider -->
+    <color name="divider">#2C2F45</color>
+
+    <!-- Book cover placeholder -->
+    <color name="cover_placeholder">#252840</color>
     <color name="gray">#F5F5F5</color>
     <color name="gray2">#757575</color>
     <color name="light_black">#424242</color>
