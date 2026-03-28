@@ -2,4 +2,15 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="bg_main">#080c16</color>
+    <color name="bg_card">#0f1520</color>
+    <color name="bg_elevated">#161e30</color>
+    <color name="border_color">#1d2640</color>
+    <color name="text_primary">#eef0f8</color>
+    <color name="text_secondary">#8896b8</color>
+    <color name="text_tertiary">#4a5470</color>
+    <color name="brand_primary">#4f8ff8</color>
+    <color name="brand_success">#2dd4a0</color>
+    <color name="brand_danger">#f06b6b</color>
+    <color name="brand_warning">#f5b942</color>
 </resources>
