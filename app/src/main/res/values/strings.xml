@@ -22,9 +22,40 @@
     <string name="txt_hardQuantity">1</string>
     <string name="hint_bookCode">Mã sách</string>
     <string name="txt_buttonCompletedAddBook">Hoàn tất và vào Thư Viện</string>
+    <!-- Import Book -->
     <string name="err_bookEmpty">Vui lòng nhập tên sách</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_book">NHẬP SÁCH MỚI</string>
+    <string name="vui_l_ng_nh_p_y_th_ng_tin">Vui lòng nhập đầy đủ thông tin !</string>
+    <string name="book_name">TÊN SÁCH</string>
+    <string name="hint_book">Nhập tên sách đầy đủ</string>
+    <string name="Author">TÁC GIẢ</string>
+    <string name="Name_Auth">Tên tác giả/Dịch giả</string>
+    <string name="nxb">NHÀ XUẤT BẢN</string>
+    <string name="hint_nxb">NXB..</string>
+    <string name="isbn">ISBN</string>
+    <string name="hint_isbn">978-...</string>
+    <string name="year_xb">NĂM XB</string>
+    <string name="the_loai">THỂ LOẠI</string>
+    <string name="ch_n">Chọn...</string>
+    <string name="_1">1</string>
+    <string name="s_l_ng">SỐ LƯỢNG *</string>
+    <string name="note">GHI CHÚ</string>
+    <string name="note_them">Ghi chú thêm (không bắt buộc)</string>
+    <string name="gi_nh_p_vn">GIÁ NHẬP (vnđ)</string>
+    <string name="l_u_s_ch">Lưu sách</string>
+    <string name="huy">Hủy</string>
+    <string name="title_add">Thêm Độc Giả</string>
+    <string name="h_v_t_n">HỌ VÀ TÊN *</string>
+    <string name="nh_p_h_t_n_y">Nhập họ tên đầy đủ...</string>
+    <string name="s_i_n_tho_i">SỐ ĐIỆN THOẠI *</string>
+    <string name="_09">09...</string>
+    <string name="lo_i_c_gi">LOẠI ĐỘC GIẢ *</string>
+    <string name="coice">Chọn...</string>
+    <string name="huyy">Hủy</string>
+    <string name="save_reader">Lưu Độc Giả</string>
+    <string name="m_th_c_gi">MÃ THẺ ĐỘC GIẢ *</string>
 
     <!--    custom-header-->
     <string name="tvHeaderTitle">Tiêu đề chính</string>
