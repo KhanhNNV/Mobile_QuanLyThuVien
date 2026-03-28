@@ -16,70 +16,46 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/tilBookName"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+    <EditText
+        android:id="@+id/etBookName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:minHeight="48dp"
         android:layout_marginTop="24dp"
         android:hint="@string/hint_nameBook"
-        app:layout_constraintTop_toBottomOf="@+id/tvBookTitle">
+        android:inputType="text"
+        app:layout_constraintTop_toBottomOf="@+id/tvBookTitle" />
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etBookName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="text" />
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/tilBookAuthor"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+    <EditText
+        android:id="@+id/etBookAuthor"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:minHeight="48dp"
         android:layout_marginTop="16dp"
         android:hint="@string/hint_nameAuthor"
-        app:layout_constraintTop_toBottomOf="@+id/tilBookName">
+        android:inputType="textPersonName"
+        app:layout_constraintTop_toBottomOf="@+id/etBookName" />
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etBookAuthor"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textPersonName" />
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/tilBookQuantity"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+    <EditText
+        android:id="@+id/etBookQuantity"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:minHeight="48dp"
         android:layout_marginTop="16dp"
         android:hint="@string/hint_quantity"
-        app:layout_constraintTop_toBottomOf="@+id/tilBookAuthor">
+        android:inputType="number"
+        android:text="@string/txt_hardQuantity"
+        app:layout_constraintTop_toBottomOf="@+id/etBookAuthor" />
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etBookQuantity"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="number"
-            android:text="@string/txt_hardQuantity" />
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/tilBookCode"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+    <EditText
+        android:id="@+id/etBookCode"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:minHeight="48dp"
         android:layout_marginTop="16dp"
         android:hint="@string/hint_bookCode"
-        app:layout_constraintTop_toBottomOf="@+id/tilBookQuantity">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etBookCode"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="text" />
-    </com.google.android.material.textfield.TextInputLayout>
+        android:inputType="text"
+        app:layout_constraintTop_toBottomOf="@+id/etBookQuantity" />
 
     <Button
         android:id="@+id/btnFinishSetup"
