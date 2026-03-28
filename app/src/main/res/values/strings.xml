@@ -22,6 +22,29 @@
     <string name="txt_hardQuantity">1</string>
     <string name="hint_bookCode">Mã sách</string>
     <string name="txt_buttonCompletedAddBook">Hoàn tất và vào Thư Viện</string>
+
+    <!-- BorrowPay Layout -->
+    <string name="screen_title">Mượn / Trả</string>
+
+    <string name="total_ticket">Tổng số phiếu</string>
+    <string name="late_ticket">Tồng phiếu trễ hạn</string>
+    <string name="dot"> • </string>
+
+    <string name="add_ticket">+ Phiếu</string>
+
+    <string name="search_hint">Tìm kiếm...</string>
+    <!-- dialog layout  -->
+    <string name="borrowed_books_label">SÁCH ĐÃ MƯỢN:</string>
+    <string name="extend_action">Gia hạn</string>
+
+    <!-- Bộ lọc cho layout mượn trả -->
+    <string-array name="load_status">
+        <item>Tất cả</item>
+        <item>Đang mượn</item>
+        <item>Đã trả</item>
+    </string-array>
+
+
     <!-- Import Book -->
     <string name="err_bookEmpty">Vui lòng nhập tên sách</string>
     <!-- TODO: Remove or change this placeholder text -->

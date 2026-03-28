@@ -50,4 +50,10 @@
         android:label="Thông Báo"
         tools:layout="@layout/fragment_notification"/>
 
+    <fragment
+        android:id="@+id/borrowPayListFragment"
+        android:name="com.example.quanlythuvien.ui.borrow_pay.BorrowPayFragment"
+        android:label="Mượn Trả"
+        tools:layout="@layout/fragment_borrow_pay" />
+
 </navigation>
