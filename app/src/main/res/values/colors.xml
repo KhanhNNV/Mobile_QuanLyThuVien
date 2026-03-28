@@ -10,4 +10,15 @@
     <color name="green">#27F58B</color>
     <color name="blue">#2196F3</color>
     <color name="yellow">#FF9800</color>
+    <color name="bg_main">#080c16</color>
+    <color name="bg_card">#C0B9B9</color>
+    <color name="bg_elevated">#FFFFFF</color>
+    <color name="border_color">#1d2640</color>
+    <color name="text_primary">#eef0f8</color>
+    <color name="text_secondary">#8896b8</color>
+    <color name="text_tertiary">#4a5470</color>
+    <color name="brand_primary">#4f8ff8</color>
+    <color name="brand_success">#2dd4a0</color>
+    <color name="brand_danger">#f06b6b</color>
+    <color name="brand_warning">#f5b942</color>
 </resources>

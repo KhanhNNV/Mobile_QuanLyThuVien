@@ -56,4 +56,9 @@
         android:label="Mượn Trả"
         tools:layout="@layout/fragment_borrow_pay" />
 
+    <fragment
+        android:id="@+id/readerListFragment"
+        android:name="com.example.quanlythuvien.ui.reader.ReaderListFragment"
+        android:label="Độc Giả"
+        tools:layout="@layout/fragment_reader_list" />
 </navigation>
