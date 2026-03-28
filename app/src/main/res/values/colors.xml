@@ -9,6 +9,13 @@
     <color name="bg_card_secondary">#22253A</color>
     <color name="bg_search">#1E2130</color>
 
+    <!-- Light Theme Support -->
+    <color name="bg_light">#F8F9FD</color>
+    <color name="bg_element_light">#F0F2F8</color>
+    <color name="text_black">#1A1D27</color>
+    <color name="text_gray">#646A86</color>
+    <color name="text_hint_light">#A0A4B8</color>
+
     <!-- Text Colors -->
     <color name="text_primary">#FFFFFF</color>
     <color name="text_secondary">#8B8FA8</color>
