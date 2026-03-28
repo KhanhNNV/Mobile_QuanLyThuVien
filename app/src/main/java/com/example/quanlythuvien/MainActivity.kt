@@ -46,7 +46,7 @@ class MainActivity : AppCompatActivity() {
         // 2. Lắng nghe sự thay đổi màn hình để Ẩn/Hiện Bottom Navigation
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
-                R.id.welcomeFragment -> {
+                R.id.welcomeFragment,R.id.createBookFragment,R.id.createCategoryFragment -> {
                     // Nếu đang ở Onboarding/Welcome thì giấu thanh điều hướng đi
                     bottomNavigationView.visibility = View.GONE
                 }

@@ -12,6 +12,7 @@
     <string name="hint_nameCate">Tên thể loại (*)</string>
     <string name="hint_desCate">Mô tả ngắn</string>
     <string name="txt_buttonNextCate">Tiếp tục</string>
+    <string name="err_cateEmpty">Vui lòng nhập tên thể loại</string>
 
     <!--    Book welcome   -->
     <string name="txt_titleCreateBook">Thêm Cuốn Sách Đầu Tiên</string>
@@ -21,8 +22,76 @@
     <string name="txt_hardQuantity">1</string>
     <string name="hint_bookCode">Mã sách</string>
     <string name="txt_buttonCompletedAddBook">Hoàn tất và vào Thư Viện</string>
+
+    <!-- BorrowPay Layout -->
+    <string name="screen_title">Mượn / Trả</string>
+
+    <string name="total_ticket">Tổng số phiếu</string>
+    <string name="late_ticket">Tồng phiếu trễ hạn</string>
+    <string name="dot"> • </string>
+
+    <string name="add_ticket">+ Phiếu</string>
+
+    <string name="search_hint">Tìm kiếm...</string>
+    <!-- dialog layout  -->
+    <string name="borrowed_books_label">SÁCH ĐÃ MƯỢN:</string>
+    <string name="extend_action">Gia hạn</string>
+
+    <!-- Bộ lọc cho layout mượn trả -->
+    <string-array name="load_status">
+        <item>Tất cả</item>
+        <item>Đang mượn</item>
+        <item>Đã trả</item>
+    </string-array>
+
+
+    <!-- Import Book -->
+    <string name="err_bookEmpty">Vui lòng nhập tên sách</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_book">NHẬP SÁCH MỚI</string>
+    <string name="vui_l_ng_nh_p_y_th_ng_tin">Vui lòng nhập đầy đủ thông tin !</string>
+    <string name="book_name">TÊN SÁCH</string>
+    <string name="hint_book">Nhập tên sách đầy đủ</string>
+    <string name="Author">TÁC GIẢ</string>
+    <string name="Name_Auth">Tên tác giả/Dịch giả</string>
+    <string name="nxb">NHÀ XUẤT BẢN</string>
+    <string name="hint_nxb">NXB..</string>
+    <string name="isbn">ISBN</string>
+    <string name="hint_isbn">978-...</string>
+    <string name="year_xb">NĂM XB</string>
+    <string name="the_loai">THỂ LOẠI</string>
+    <string name="ch_n">Chọn...</string>
+    <string name="_1">1</string>
+    <string name="s_l_ng">SỐ LƯỢNG *</string>
+    <string name="note">GHI CHÚ</string>
+    <string name="note_them">Ghi chú thêm (không bắt buộc)</string>
+    <string name="gi_nh_p_vn">GIÁ NHẬP (vnđ)</string>
+    <string name="l_u_s_ch">Lưu sách</string>
+    <string name="huy">Hủy</string>
+    <string name="title_add">Thêm Độc Giả</string>
+    <string name="h_v_t_n">HỌ VÀ TÊN *</string>
+    <string name="nh_p_h_t_n_y">Nhập họ tên đầy đủ...</string>
+    <string name="s_i_n_tho_i">SỐ ĐIỆN THOẠI *</string>
+    <string name="_09">09...</string>
+    <string name="lo_i_c_gi">LOẠI ĐỘC GIẢ *</string>
+    <string name="coice">Chọn...</string>
+    <string name="huyy">Hủy</string>
+    <string name="save_reader">Lưu Độc Giả</string>
+    <string name="m_th_c_gi">MÃ THẺ ĐỘC GIẢ *</string>
 
+    <!--    custom-header-->
+    <string name="tvHeaderTitle">Tiêu đề chính</string>
+    <string name="tvHeaderSubtitle">Tiêu đề phụ</string>
+    <!--    dashboard-->
+    <string name="tvTempQuantity">0</string>
+    <string name="tvTitleTotalBookQuantity">Tổng đầu sách</string>
+    <string name="tvTitleTotalBookBorrowing">Tổng đang mượn</string>
+    <string name="tvTitleTotalBookDelayed">Trả trễ hạn</string>
+    <string name="tvTitleTotalReader">Trả trễ hạn</string>
+
+    <string name="tvTitleWarning">CẢNH BÁO</string>
+
+    <string name="tvTitleQuickAccess"> TRUY CẬP NHANH</string>
 
 </resources>

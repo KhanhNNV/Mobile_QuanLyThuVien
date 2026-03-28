@@ -33,5 +33,32 @@
         android:name="com.example.quanlythuvien.ui.books.BookListFragment"
         android:label="Kho Sách"
         tools:layout="@layout/fragment_book_list" />
+    <fragment
+        android:id="@+id/bookImportFragment"
+        android:name="com.example.quanlythuvien.ui.books.BookImportFragment"
+        android:label="Kho Sách"
+        tools:layout="@layout/fragment_book_import" />
+    <fragment
+        android:id="@+id/readerAddFragment"
+        android:name="com.example.quanlythuvien.ui.reader.ReaderAddFragment"
+        android:label="Kho Sách"
+        tools:layout="@layout/fragment_reader_add" />
 
+    <fragment
+        android:id="@+id/notificationFragment"
+        android:name="com.example.quanlythuvien.ui.notifications.NotificationFragment"
+        android:label="Thông Báo"
+        tools:layout="@layout/fragment_notification"/>
+
+    <fragment
+        android:id="@+id/borrowPayListFragment"
+        android:name="com.example.quanlythuvien.ui.borrow_pay.BorrowPayFragment"
+        android:label="Mượn Trả"
+        tools:layout="@layout/fragment_borrow_pay" />
+
+    <fragment
+        android:id="@+id/readerListFragment"
+        android:name="com.example.quanlythuvien.ui.reader.ReaderListFragment"
+        android:label="Độc Giả"
+        tools:layout="@layout/fragment_reader_list" />
 </navigation>
