@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:text="@string/tvHeaderSubtitle"
-        android:textColor="@color/gray2"
+        android:textColor="@color/gray"
         android:textSize="14sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvHeaderTitle" />
@@ -44,7 +44,7 @@
             android:layout_height="24dp"
             android:layout_gravity="center"
             android:src="@android:drawable/ic_popup_reminder"
-            app:tint="@color/light_black" />
+            app:tint="@color/gray" />
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cvNotificationBadge"

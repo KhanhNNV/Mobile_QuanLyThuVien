@@ -31,7 +31,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
                 android:layout_weight="1"
-                app:cardBackgroundColor="@color/white"
+                app:cardBackgroundColor="@color/bg_card"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="2dp"
                 app:contentPadding="16dp"
@@ -61,7 +61,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/tvTitleTotalBookQuantity"
-                        android:textColor="@color/gray2"
+                        android:textColor="@color/text_secondary"
                         android:textSize="12sp" />
 
 
@@ -74,7 +74,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_weight="1"
-                app:cardBackgroundColor="@color/white"
+                app:cardBackgroundColor="@color/bg_card"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="2dp"
                 app:contentPadding="16dp"
@@ -105,7 +105,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/tvTitleTotalBookBorrowing"
-                        android:textColor="@color/gray2"
+                        android:textColor="@color/text_secondary"
                         android:textSize="12sp" />
 
                 </LinearLayout>
@@ -127,7 +127,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
                 android:layout_weight="1"
-                app:cardBackgroundColor="@color/white"
+                app:cardBackgroundColor="@color/bg_card"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="2dp"
                 app:contentPadding="16dp"
@@ -158,7 +158,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/tvTitleTotalBookDelayed"
-                        android:textColor="@color/gray2"
+                        android:textColor="@color/text_secondary"
                         android:textSize="12sp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -169,7 +169,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_weight="1"
-                app:cardBackgroundColor="@color/white"
+                app:cardBackgroundColor="@color/bg_card"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="2dp"
                 app:contentPadding="16dp"
@@ -200,7 +200,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/tvTitleTotalReader"
-                        android:textColor="@color/gray2"
+                        android:textColor="@color/text_secondary"
                         android:textSize="12sp" />
 
                 </LinearLayout>
@@ -214,7 +214,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
             android:text="@string/tvTitleWarning"
-            android:textColor="@color/gray2"
+            android:textColor="@color/text_primary"
             android:textSize="12sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
@@ -238,7 +238,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
             android:text="@string/tvTitleQuickAccess"
-            android:textColor="@color/gray2"
+            android:textColor="@color/text_primary"
             android:textSize="12sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
@@ -259,7 +259,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
                 android:layout_weight="1"
-                app:cardBackgroundColor="@color/white"
+                app:cardBackgroundColor="@color/bg_card"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="2dp"
                 app:contentPadding="16dp"
@@ -295,7 +295,7 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginEnd="8dp"
                 android:layout_weight="1"
-                app:cardBackgroundColor="@color/white"
+                app:cardBackgroundColor="@color/bg_card"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="2dp"
                 app:contentPadding="16dp"
@@ -330,7 +330,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_weight="1"
-                app:cardBackgroundColor="@color/white"
+                app:cardBackgroundColor="@color/bg_card"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="2dp"
                 app:contentPadding="16dp"
