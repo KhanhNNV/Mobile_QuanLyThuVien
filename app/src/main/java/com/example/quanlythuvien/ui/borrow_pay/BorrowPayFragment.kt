@@ -279,7 +279,7 @@ class BorrowPayFragment :Fragment(){
         } else {
             tvStatus.text = "ĐÃ TRẢ"
             tvStatus.backgroundTintList = android.content.res.ColorStateList.valueOf(
-                androidx.core.content.ContextCompat.getColor(requireContext(), R.color.green)
+                androidx.core.content.ContextCompat.getColor(requireContext(), R.color.status_success)
             )
         }
     }

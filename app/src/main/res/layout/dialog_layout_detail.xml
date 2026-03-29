@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/white"
+    android:background="@color/bg_card"
     android:orientation="vertical">
 
     <LinearLayout
@@ -30,7 +30,7 @@
                     android:id="@+id/tvDialogReaderName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="#@color/text_primary"
+                    android:textColor="@color/text_primary"
                     android:textSize="20sp"
                     android:textStyle="bold" />
 
@@ -38,7 +38,7 @@
                     android:id="@+id/tvDialogReaderId"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/gray"
+                    android:textColor="@color/text_secondary"
                     android:textSize="14sp" />
             </LinearLayout>
 
@@ -47,7 +47,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_status_rounded"
-                android:backgroundTint="@color/status_warning"
                 android:paddingHorizontal="12dp"
                 android:paddingVertical="4dp"
                 android:textColor="@color/white"
@@ -71,7 +70,7 @@
                 android:id="@+id/tvDialogBorrowDate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/black"
+                android:textColor="@color/text_primary"
                 android:textSize="16sp" />
 
             <LinearLayout
@@ -86,7 +85,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:textColor="@color/red"
+                    android:textColor="@color/text_status_error"
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
@@ -124,7 +123,7 @@
             android:layout_marginBottom="12dp"
             android:letterSpacing="0.1"
             android:text="@string/borrowed_books_label"
-            android:textColor="@color/btn_primary"
+            android:textColor="@color/text_primary"
             android:textSize="18sp"
             android:textStyle="bold" />
 
@@ -134,7 +133,7 @@
             android:layout_height="320dp"
             android:fadeScrollbars="false"
             android:scrollbarSize="4dp"
-            android:scrollbarThumbVertical="@color/gray"
+            android:scrollbarThumbVertical="@color/text_tertiary"
             android:scrollbars="vertical" />
     </LinearLayout>
 </LinearLayout>

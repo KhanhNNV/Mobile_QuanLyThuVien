@@ -40,12 +40,10 @@ class BorrowPayAdapter(
             // Xử lý màu sắc cho trạng thái để dễ phân biệt
             if (item.overallStatus == "BORROWING") {
                 tvLoanStatus.text = "Đang mượn"
-                // Thường mượn thì để màu Xanh dương hoặc Cam, Trễ hạn mới để Đỏ
-                tvLoanStatus.setTextColor(ContextCompat.getColor(context, R.color.blue))
+                tvLoanStatus.setTextColor(ContextCompat.getColor(context, R.color.text_status_info))
             } else {
-                // Mặc định là RETURNED
                 tvLoanStatus.text = "Đã trả"
-                tvLoanStatus.setTextColor(ContextCompat.getColor(context, R.color.green))
+                tvLoanStatus.setTextColor(ContextCompat.getColor(context, R.color.text_status_success))
             }
             // Sự kiện click để mở Dialog (Nơi này sẽ hiện đầy đủ Tên sách, Tác giả...)
             itemView.setOnClickListener {
