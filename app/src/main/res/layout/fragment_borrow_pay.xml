@@ -11,21 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="end|center_vertical"
-        android:orientation="horizontal"
-        android:paddingBottom="8dp">
-        <Button
-            android:id="@+id/btnAddTicket"
-            android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:text="@string/add_ticket"
-            android:textAllCaps="false"
-            android:textColor="#FFFFFF"
-            android:backgroundTint="#42A5F5" />
-    </LinearLayout>
+
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -39,21 +25,37 @@
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_weight="1"
+            android:layout_marginEnd="8dp"
             android:hint="@string/search_hint"
             android:drawableStart="@drawable/ic_search"
             android:drawablePadding="6dp"
             android:background="@drawable/bg_search"
-            android:padding="10dp" />
+            android:padding="10dp"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_tertiary"/>
+
+        <Button
+            android:id="@+id/btnAddTicket"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_marginEnd="8dp"
+            android:text="@string/add_ticket"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:backgroundTint="@color/btn_primary"
+            android:insetTop="0dp"
+            android:insetBottom="0dp" />
 
         <ImageView
             android:id="@+id/btnToggleFilter"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_marginStart="8dp"
             android:padding="12dp"
             android:background="@drawable/bg_search"
             app:srcCompat="@drawable/ic_angles_down"
+            app:tint="@color/text_secondary"
             android:contentDescription="Mở bộ lọc" />
+
     </LinearLayout>
 
     <LinearLayout
@@ -74,9 +76,30 @@
             android:orientation="horizontal"
             android:layout_marginBottom="12dp">
 
-            <RadioButton android:id="@+id/rbOption1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Tất cả" android:checked="true" android:layout_marginEnd="8dp"/>
-            <RadioButton android:id="@+id/rbOption2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Đang mượn" android:layout_marginEnd="8dp"/>
-            <RadioButton android:id="@+id/rbOption3" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Trễ hạn" />
+            <RadioButton
+                android:id="@+id/rbOption1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tất cả"
+                android:checked="true"
+                android:layout_marginEnd="8dp"
+                android:textColor="@color/text_primary"
+                app:buttonTint="@color/btn_primary"/>
+            <RadioButton
+                android:id="@+id/rbOption2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Đang mượn"
+                android:layout_marginEnd="8dp"
+                android:textColor="@color/text_primary"
+                app:buttonTint="@color/btn_primary"/>
+            <RadioButton
+                android:id="@+id/rbOption3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Trễ hạn"
+                android:textColor="@color/text_primary"
+                app:buttonTint="@color/btn_primary"/>
         </RadioGroup>
 
         <LinearLayout
@@ -93,7 +116,11 @@
                 android:focusable="false"
                 android:clickable="true"
                 android:cursorVisible="false"
-                android:inputType="none" />
+                android:inputType="none"
+                android:background="@drawable/bg_search"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_tertiary"
+                android:padding="10dp"/>
 
             <View
                 android:layout_width="8dp"
@@ -108,7 +135,11 @@
                 android:focusable="false"
                 android:clickable="true"
                 android:cursorVisible="false"
-                android:inputType="none" />
+                android:inputType="none"
+                android:background="@drawable/bg_search"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_tertiary"
+                android:padding="10dp"/>
         </LinearLayout>
 
         <LinearLayout
@@ -125,8 +156,8 @@
                 android:layout_weight="1"
                 android:layout_marginEnd="8dp"
                 android:text="Đặt lại"
-                android:textColor="#6A7385"
-                app:strokeColor="#D5D8DC" />
+                android:textColor="@color/text_secondary"
+                app:strokeColor="@color/text_tertiary" />
 
             <Button
                 android:id="@+id/btnConfirmFilter"
@@ -135,7 +166,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginStart="8dp"
-                android:backgroundTint="#5C93F1"
+                android:backgroundTint="@color/btn_primary"
+                android:textColor="@color/white"
                 android:text="Xác nhận" />
         </LinearLayout>
 
@@ -146,6 +178,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:paddingTop="8dp"/>
+        android:paddingTop="8dp"
+        android:background="@color/bg_card"/>
 
 </LinearLayout>

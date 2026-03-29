@@ -274,12 +274,12 @@ class BorrowPayFragment :Fragment(){
         if (status == "BORROWING") {
             tvStatus.text = "ĐANG MƯỢN"
             tvStatus.backgroundTintList = android.content.res.ColorStateList.valueOf(
-                androidx.core.content.ContextCompat.getColor(requireContext(), android.R.color.holo_orange_dark)
+                androidx.core.content.ContextCompat.getColor(requireContext(), R.color.status_warning)
             )
         } else {
             tvStatus.text = "ĐÃ TRẢ"
             tvStatus.backgroundTintList = android.content.res.ColorStateList.valueOf(
-                androidx.core.content.ContextCompat.getColor(requireContext(), android.R.color.holo_green_dark)
+                androidx.core.content.ContextCompat.getColor(requireContext(), R.color.status_success)
             )
         }
     }
