@@ -31,7 +31,7 @@
                     android:id="@+id/tvName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="#FF6F61"
+                    android:textColor="@color/red"
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
@@ -39,7 +39,7 @@
                     android:id="@+id/tvLoanId"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="#6A7385"
+                    android:textColor="@color/gray"
                     android:textSize="13sp" />
             </LinearLayout>
 
@@ -48,7 +48,7 @@
                 android:id="@+id/tvLoanStatus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="#31B881"
+                android:textColor="@color/green"
                 android:textSize="12sp"
                 android:textStyle="bold" />
         </LinearLayout>

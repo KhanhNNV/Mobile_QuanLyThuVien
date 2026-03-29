@@ -47,9 +47,9 @@ class DialogBorrowPayAdapter(
             // Đổi màu nền cho Tag trạng thái
             val context = itemView.context
             val colorRes = when (currentStatus) {
-                LoanDetailStatus.RETURNED -> android.R.color.holo_green_dark
-                LoanDetailStatus.LOST -> android.R.color.holo_red_dark
-                else -> android.R.color.holo_blue_dark
+                LoanDetailStatus.RETURNED -> R.color.green
+                LoanDetailStatus.LOST -> R.color.red
+                else -> R.color.blue
             }
             tvStatus.backgroundTintList = ContextCompat.getColorStateList(context, colorRes)
 
