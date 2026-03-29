@@ -140,8 +140,8 @@
                 android:layout_weight="1"
                 android:layout_marginEnd="8dp"
                 android:text="@string/huyy"
-                android:textColor="#555555"
-                app:strokeColor="#555555" />
+                android:textColor="@color/text_secondary"
+                app:strokeColor="@color/text_secondary" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSaveReader"
@@ -150,8 +150,8 @@
                 android:layout_weight="1"
                 android:layout_marginStart="8dp"
                 android:text="@string/save_reader"
-                android:textColor="#FFFFFF"
-                app:backgroundTint="#4285F4" />
+                android:textColor="@color/white"
+                app:backgroundTint="@color/blue" />
         </LinearLayout>
 
     </LinearLayout>
