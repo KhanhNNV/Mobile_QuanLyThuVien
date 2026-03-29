@@ -23,14 +23,14 @@
             android:layout_width="52dp"
             android:layout_height="68dp"
             android:background="@drawable/bg_book_cover"
-            android:backgroundTint="@color/bg_element_light">
+            android:backgroundTint="@color/bg_card">
 
             <ImageView
                 android:layout_width="26dp"
                 android:layout_height="26dp"
                 android:layout_gravity="center"
                 android:src="@drawable/ic_book_outline"
-                app:tint="@color/accent_blue" />
+                app:tint="@color/btn_primary" />
         </FrameLayout>
 
 
@@ -48,7 +48,7 @@
                 android:id="@+id/tvBookTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="@color/text_black"
+                android:textColor="@color/text_primary"
                 android:textSize="15sp"
                 android:textStyle="bold"
                 android:maxLines="1"
@@ -60,7 +60,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:textColor="@color/text_gray"
+                android:textColor="@color/text_secondary"
                 android:textSize="12sp"
                 android:maxLines="1"
                 android:ellipsize="end" />
@@ -71,7 +71,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="1dp"
-                android:textColor="@color/text_hint_light"
+                android:textColor="@color/text_tertiary"
                 android:textSize="11sp"
                 android:maxLines="1"
                 android:ellipsize="end" />
@@ -92,8 +92,8 @@
                     android:gravity="center"
                     android:textSize="11sp"
                     android:textStyle="bold"
-                    android:textColor="@color/status_available"
-                    android:background="@drawable/bg_chip_green"
+                    android:textColor="@color/text_status_success"
+                    android:background="@color/status_success"
                     android:layout_marginEnd="6dp" />
 
                 <TextView
@@ -102,10 +102,9 @@
                     android:layout_height="24dp"
                     android:paddingHorizontal="10dp"
                     android:gravity="center"
-                    android:textColor="@color/accent_blue"
+                    android:textColor="@color/white"
                     android:textSize="11sp"
-                    android:background="@drawable/bg_chip_blue"
-                    android:backgroundTint="@color/accent_blue_light" />
+                    android:background="@color/bg_chip_primary" />
 
             </LinearLayout>
 
@@ -116,7 +115,7 @@
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:src="@drawable/ic_chevron_right"
-            app:tint="@color/text_hint_light" />
+            app:tint="@color/text_tertiary" />
 
     </LinearLayout>
 
@@ -125,7 +124,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="#EEEEEE"
+        android:background="@color/bg_card"
         android:layout_marginStart="80dp"/>
 
 </LinearLayout>
