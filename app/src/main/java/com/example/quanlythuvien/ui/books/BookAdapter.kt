@@ -34,26 +34,10 @@ class BookAdapter(
             tvAuthor.text = book.author
             tvIsbn.text = "ISBN: ${book.isbnCode}"
 
-            // Quantity chip
-            when {
-                book.availableQuantity <= 0 -> {
-                    tvQuantity.text = "Hết kho"
-                    tvQuantity.setTextColor(ContextCompat.getColor(context, R.color.status_out))
-                    tvQuantity.background = ContextCompat.getDrawable(context, R.drawable.bg_chip_red)
-                }
-                book.availableQuantity <= 2 -> {
-                    tvQuantity.text = "Còn ${book.availableQuantity} bản"
-                    tvQuantity.setTextColor(ContextCompat.getColor(context, R.color.status_low))
-                    tvQuantity.background = ContextCompat.getDrawable(context, R.drawable.bg_chip_orange)
-                }
-                else -> {
-                    tvQuantity.text = "Còn ${book.availableQuantity} bản"
-                    tvQuantity.setTextColor(ContextCompat.getColor(context, R.color.status_available))
-                    tvQuantity.background = ContextCompat.getDrawable(context, R.drawable.bg_chip_green)
-                }
-            }
+            // Nhãn số lượng sách hiện còn
+            tvQuantity.text = "Còn ${book.availableQuantity} bản"
 
-            // Category chip
+            // Nhãn tên thể loại
             val catName = categoryNames[book.categoryId] ?: "Danh mục"
             tvCategory.text = catName
         }
