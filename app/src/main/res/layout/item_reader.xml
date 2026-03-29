@@ -12,8 +12,7 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="16dp">
+        android:layout_height="match_parent">
 
         <TextView
             android:id="@+id/tvAvatar"
@@ -54,11 +53,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="250dp"
-            android:background="@drawable/bg_status"
+            android:background="@color/status_info"
             android:paddingHorizontal="8dp"
             android:paddingVertical="4dp"
             android:text="Đang mượn"
-            android:textColor="@color/brand_success"
+            android:textColor="@color/text_info"
             android:textSize="10sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"

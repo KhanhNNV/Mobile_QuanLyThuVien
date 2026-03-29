@@ -8,6 +8,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quanlythuvien.R
+import com.google.android.material.card.MaterialCardView
+
 class NotificationFragment : Fragment(R.layout.fragment_notification) {
 
     private lateinit var rvNotifications: RecyclerView

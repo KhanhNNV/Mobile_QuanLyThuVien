@@ -23,6 +23,7 @@ import com.example.quanlythuvien.R
 import com.example.quanlythuvien.data.AppDatabase
 import com.example.quanlythuvien.data.entity.Book
 import com.example.quanlythuvien.data.entity.Category
+import com.example.quanlythuvien.utils.setupCustomHeader
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
@@ -61,6 +62,12 @@ class BookListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        setupCustomHeader(
+            view = view,
+            title = "Kho sách",
+            subtitle = "*Lấy tổng số loại sách hiện tại"
+        )
         
         initViews(view)
         setupListeners()

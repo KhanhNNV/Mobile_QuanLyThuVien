@@ -10,8 +10,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end|bottom"
-        android:layout_marginEnd="40dp"
-        android:layout_marginBottom="30dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="15dp"
         android:backgroundTint="@color/brand_primary"
         android:contentDescription="Thêm đọc giả"
         android:src="@drawable/ic_person_add"
@@ -19,6 +19,5 @@
         app:elevation="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
-    />
 
 </merge>

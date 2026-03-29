@@ -13,6 +13,7 @@ import com.example.quanlythuvien.data.entity.enums.LoanDetailStatus
 import com.example.quanlythuvien.ui.borrow_pay.adapter.BorrowPayAdapter
 import com.example.quanlythuvien.ui.borrow_pay.data.LoanDetailItemData
 import com.example.quanlythuvien.ui.borrow_pay.data.LoanItemData
+import com.example.quanlythuvien.utils.setupCustomHeader
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.text.SimpleDateFormat
 import java.util.*
@@ -123,6 +124,11 @@ class BorrowPayFragment :Fragment(){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setupCustomHeader(
+            view = view,
+            title = "Mượn/Trả",
+            subtitle = "*Lấy tổng số phiếu - số trễ hạn"
+        )
 
         initViews(view)
         //Gán List data mẫu

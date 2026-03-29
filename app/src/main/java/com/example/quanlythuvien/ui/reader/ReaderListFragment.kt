@@ -7,6 +7,7 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quanlythuvien.R
+import com.example.quanlythuvien.utils.setupCustomHeader
 
 
 class ReaderListFragment : Fragment(R.layout.fragment_reader_list) {
@@ -17,6 +18,12 @@ class ReaderListFragment : Fragment(R.layout.fragment_reader_list) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        setupCustomHeader(
+            view = view,
+            title = "Độc giả",
+            subtitle = "*Lấy tổng số độc giả"
+        )
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.rvReaders)
 
