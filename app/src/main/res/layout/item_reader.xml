@@ -12,7 +12,9 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:padding="10dp"
+        >
 
         <TextView
             android:id="@+id/tvAvatar"
@@ -52,12 +54,13 @@
             android:id="@+id/tvReaderStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="250dp"
-            android:background="@color/status_info"
+            android:background="@drawable/bg_status"
+            android:layout_marginStart="276dp"
+            android:backgroundTint="@color/status_info"
             android:paddingHorizontal="8dp"
             android:paddingVertical="4dp"
             android:text="Đang mượn"
-            android:textColor="@color/text_secondary"
+            android:textColor="@color/text_status_info"
             android:textSize="10sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
@@ -69,10 +72,11 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:background="@drawable/bg_status"
+            android:backgroundTint="@color/bg_chip_primary"
             android:paddingHorizontal="8dp"
             android:paddingVertical="4dp"
             android:text="Tổng sách mượn:"
-            android:textColor="@color/text_secondary"
+            android:textColor="@color/chip_primary"
             android:textSize="11sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tvAvatar" />
@@ -81,6 +85,7 @@
             android:id="@+id/tvBorrowedValue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
             android:text="03 cuốn"
             android:textColor="@color/text_primary"
             android:textSize="11sp"
@@ -97,10 +102,11 @@
             android:layout_marginStart="10dp"
             android:layout_marginTop="16dp"
             android:background="@drawable/bg_status"
+            android:backgroundTint="@color/bg_chip_secondary"
             android:paddingHorizontal="8dp"
             android:paddingVertical="4dp"
             android:text="Nợ:"
-            android:textColor="@color/text_secondary"
+            android:textColor="@color/chip_secondary"
             android:textSize="11sp"
             app:layout_constraintStart_toEndOf="@+id/tvBorrowedValue"
             app:layout_constraintTop_toBottomOf="@+id/tvAvatar" />
@@ -109,27 +115,14 @@
             android:id="@+id/tvDebtValue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="200.000"
+            android:layout_marginStart="5dp"
+            android:text="200.000 VND"
             android:textColor="@color/text_primary"
             android:textSize="11sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@+id/tvDebtLabel"
             app:layout_constraintStart_toEndOf="@+id/tvDebtLabel"
             app:layout_constraintTop_toTopOf="@+id/tvDebtLabel"
-            app:layout_constraintVertical_bias="0.52" />
-
-        <TextView
-            android:id="@+id/tvDebtCurrency"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
-            android:text="VND"
-            android:textColor="@color/text_primary"
-            android:textSize="11sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@+id/tvDebtValue"
-            app:layout_constraintStart_toEndOf="@+id/tvDebtValue"
-            app:layout_constraintTop_toTopOf="@+id/tvDebtValue"
             app:layout_constraintVertical_bias="0.52" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
