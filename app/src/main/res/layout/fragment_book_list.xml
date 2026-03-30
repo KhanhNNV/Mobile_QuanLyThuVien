@@ -41,13 +41,13 @@
                 android:id="@+id/btnAddBook"
                 android:layout_width="wrap_content"
                 android:layout_height="48dp"
-                android:backgroundTint="@color/accent_blue"
+                android:backgroundTint="@color/btn_primary"
                 android:paddingHorizontal="16dp"
-                android:text="＋ Nhập"
+                android:text="@string/nhập"
                 android:textColor="@color/white"
                 android:textSize="13sp"
                 android:textStyle="bold"
-                app:cornerRadius="22dp" />
+                app:cornerRadius="22dp"/>
 
         </LinearLayout>
 
@@ -56,7 +56,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-
             android:paddingBottom="16dp"
             android:gravity="center_vertical">
 
@@ -65,27 +64,21 @@
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_weight="1"
-                android:background="@drawable/bg_element_light"
+                android:background="@color/bg_card"
                 android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingHorizontal="14dp">
-
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/ic_search"
-                    app:tint="@color/text_hint_light" />
-
+                android:orientation="horizontal">
                 <EditText
                     android:id="@+id/etSearch"
                     android:layout_width="0dp"
-                    android:layout_height="match_parent"
+                    android:layout_height="48dp"
                     android:layout_weight="1"
-                    android:layout_marginStart="8dp"
-                    android:background="@null"
+                    android:background="@drawable/bg_search"
+                    android:drawableStart="@drawable/ic_search"
+                    android:drawablePadding="8dp"
+                    android:drawableTint="@color/black"
                     android:hint="Tìm kiếm..."
-                    android:textColor="@color/text_black"
-                    android:textColorHint="@color/text_hint_light"
+                    android:paddingHorizontal="14dp"
+                    android:textColor="@color/text_primary"
                     android:textSize="14sp"
                     android:imeOptions="actionSearch"
                     android:inputType="text"
@@ -99,9 +92,10 @@
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_marginStart="10dp"
-                android:background="@drawable/bg_element_light"
+                android:background="@drawable/bg_search"
                 android:src="@drawable/ic_chevron_right"
-                app:tint="@color/text_black" />
+                android:contentDescription="Mở bộ lọc"
+                app:tint="@color/black" />
         </LinearLayout>
 
         <!-- Expanded Filters Container -->
@@ -110,6 +104,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            android:background="@drawable/bg_list_container"
             android:paddingHorizontal="20dp"
             android:paddingBottom="16dp"
             android:visibility="gone">
@@ -127,9 +122,8 @@
                     android:layout_height="wrap_content"
                     android:text="Tất cả"
                     android:checked="true"
-                    android:textColor="@color/text_black"
+                    android:textColor="@color/text_primary"
                     android:textSize="13sp"
-                    android:buttonTint="@color/accent_blue"
                     android:paddingStart="4dp" />
 
                 <RadioButton
@@ -137,10 +131,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Đang mượn"
-                    android:textColor="@color/text_black"
+                    android:textColor="@color/text_primary"
                     android:textSize="13sp"
                     android:layout_marginStart="16dp"
-                    android:buttonTint="@color/accent_blue"
                     android:paddingStart="4dp" />
 
                 <RadioButton
@@ -148,10 +141,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Đã mất"
-                    android:textColor="@color/text_black"
+                    android:textColor="@color/text_primary"
                     android:textSize="13sp"
                     android:layout_marginStart="16dp"
-                    android:buttonTint="@color/accent_blue"
                     android:paddingStart="4dp" />
             </RadioGroup>
 
@@ -161,7 +153,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:layout_marginTop="16dp"
-                android:background="@drawable/bg_element_light"
+                android:background="@drawable/bg_list_container"
                 android:paddingHorizontal="12dp" />
 
             <!-- Action Buttons -->
@@ -178,8 +170,8 @@
                     android:layout_height="54dp"
                     android:layout_weight="1"
                     android:text="ĐẶT LẠI"
-                    android:textColor="@color/text_gray"
-                    app:strokeColor="@color/divider"
+                    android:textColor="@color/text_primary"
+                    app:strokeColor="@color/blue"
                     android:layout_marginEnd="8dp" />
 
                 <com.google.android.material.button.MaterialButton
@@ -189,7 +181,7 @@
                     android:layout_weight="1"
                     android:text="XÁC NHẬN"
                     android:textColor="@color/white"
-                    app:backgroundTint="@color/accent_blue"
+                    app:backgroundTint="@color/btn_primary"
                     android:layout_marginStart="8dp" />
             </LinearLayout>
 
