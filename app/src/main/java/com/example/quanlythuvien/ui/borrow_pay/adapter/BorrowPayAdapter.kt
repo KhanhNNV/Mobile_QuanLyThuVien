@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quanlythuvien.R
 import com.example.quanlythuvien.ui.borrow_pay.data.LoanItemData
+import android.content.res.ColorStateList
 
 class BorrowPayAdapter(
     private val onItemClick: (LoanItemData) -> Unit
@@ -40,10 +41,20 @@ class BorrowPayAdapter(
             // Xử lý màu sắc cho trạng thái để dễ phân biệt
             if (item.overallStatus == "BORROWING") {
                 tvLoanStatus.text = "Đang mượn"
-                tvLoanStatus.setTextColor(ContextCompat.getColor(context, R.color.text_status_info))
+
+                val textColor = ContextCompat.getColor(context, R.color.text_status_info)
+                val bgColor = ContextCompat.getColor(context, R.color.status_info)
+
+                tvLoanStatus.setTextColor(textColor)
+                tvLoanStatus.backgroundTintList = ColorStateList.valueOf(bgColor)
             } else {
                 tvLoanStatus.text = "Đã trả"
-                tvLoanStatus.setTextColor(ContextCompat.getColor(context, R.color.text_status_success))
+
+                val textColor = ContextCompat.getColor(context, R.color.text_status_success)
+                val bgColor = ContextCompat.getColor(context, R.color.status_success)
+
+                tvLoanStatus.setTextColor(textColor)
+                tvLoanStatus.backgroundTintList = ColorStateList.valueOf(bgColor)
             }
             // Sự kiện click để mở Dialog (Nơi này sẽ hiện đầy đủ Tên sách, Tác giả...)
             itemView.setOnClickListener {

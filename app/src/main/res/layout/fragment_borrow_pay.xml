@@ -41,8 +41,8 @@
             android:layout_marginEnd="8dp"
             android:text="@string/add_ticket"
             android:textAllCaps="false"
-            android:textColor="@color/white"
-            android:backgroundTint="@color/btn_primary"
+            android:textColor="@color/chip_primary"
+            android:backgroundTint="@color/bg_chip_primary"
             android:insetTop="0dp"
             android:insetBottom="0dp" />
 
@@ -53,7 +53,7 @@
             android:padding="12dp"
             android:background="@drawable/bg_search"
             app:srcCompat="@drawable/ic_angles_down"
-            app:tint="@color/text_secondary"
+            app:tint="@color/chip_secondary"
             android:contentDescription="Mở bộ lọc" />
 
     </LinearLayout>

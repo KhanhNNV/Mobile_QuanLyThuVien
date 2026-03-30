@@ -17,6 +17,8 @@ import com.example.quanlythuvien.utils.setupCustomHeader
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.text.SimpleDateFormat
 import java.util.*
+import android.content.res.ColorStateList
+import androidx.core.content.ContextCompat
 
 class BorrowPayFragment :Fragment(){
 
@@ -271,16 +273,23 @@ class BorrowPayFragment :Fragment(){
 
     //Hàm dịch chỉnh hiệu ứng cho trạng thái của phiếu mượn
     private fun editStatusUI(status: String, tvStatus: TextView) {
+        val context = requireContext()
         if (status == "BORROWING") {
-            tvStatus.text = "ĐANG MƯỢN"
-            tvStatus.backgroundTintList = android.content.res.ColorStateList.valueOf(
-                androidx.core.content.ContextCompat.getColor(requireContext(), R.color.status_warning)
-            )
+            tvStatus.text = "Đang mượn"
+
+            val textColor = ContextCompat.getColor(context, R.color.text_status_info)
+            val bgColor = ContextCompat.getColor(context, R.color.status_info)
+
+            tvStatus.setTextColor(textColor)
+            tvStatus.backgroundTintList = ColorStateList.valueOf(bgColor)
         } else {
-            tvStatus.text = "ĐÃ TRẢ"
-            tvStatus.backgroundTintList = android.content.res.ColorStateList.valueOf(
-                androidx.core.content.ContextCompat.getColor(requireContext(), R.color.status_success)
-            )
+            tvStatus.text = "Đã trả"
+
+            val textColor = ContextCompat.getColor(context, R.color.text_status_success)
+            val bgColor = ContextCompat.getColor(context, R.color.status_success)
+
+            tvStatus.setTextColor(textColor)
+            tvStatus.backgroundTintList = ColorStateList.valueOf(bgColor)
         }
     }
 

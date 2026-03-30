@@ -24,21 +24,23 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:ellipsize="end"
-            android:id="@+id/tvTitle"
-            android:layout_width="0dp"
-            android:maxLines="1"
-            android:textColor="@color/text_primary"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+                android:text="Truyện ngắn"
+                android:id="@+id/tvTitle"
+                android:layout_width="0dp"
+                android:maxLines="1"
+                android:textColor="@color/text_primary"
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
             <ImageButton
                 android:id="@+id/ibtSet"
-                android:layout_width="48dp"          android:layout_height="48dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:padding="8dp"
                 android:scaleType="fitCenter"
                 app:srcCompat="@drawable/ic_circle_3_dots"
-                app:tint="@color/text_tertiary"
+                app:tint="@color/chip_primary"
                 android:contentDescription="Tùy chọn sách" />
         </LinearLayout>
 
@@ -50,6 +52,7 @@
 
             <TextView
                 android:id="@+id/tvAuthor"
+                android:text="Tác giả: Kim Đồng"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/text_secondary"
@@ -60,10 +63,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="8dp"
                 android:text="•"
-                android:textColor="@color/text_tertiary"/>
+                android:textColor="@color/text_secondary"/>
 
             <TextView
                 android:id="@+id/tvCatetory"
+                android:text="Thể loại: tiểu thuyết"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/text_secondary"
@@ -85,6 +89,7 @@
 
             <TextView
                 android:id="@+id/tvReturnDate"
+                android:text="Ngày trả: 25/3/2026"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -93,12 +98,14 @@
 
             <TextView
                 android:id="@+id/tvDetailStatus"
+                android:text="Đang mượn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_status_rounded"
                 android:paddingHorizontal="10dp"
                 android:paddingVertical="4dp"
-                android:textColor="@color/white"
+                android:textColor="@color/text_status_info"
+                android:backgroundTint="@color/status_info"
                 android:textSize="12sp"
                 android:textStyle="bold" />
         </LinearLayout>
