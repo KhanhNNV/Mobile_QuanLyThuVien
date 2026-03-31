@@ -67,25 +67,6 @@
                 android:hint="@string/Name_Auth" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/nxb"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/edtNXB"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/hint_nxb" />
-        </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
             android:layout_width="match_parent"
@@ -201,8 +182,8 @@
                 android:layout_weight="1"
                 android:layout_marginEnd="8dp"
                 android:text="@string/huy"
-                android:textColor="#555555"
-                app:strokeColor="#555555" />
+                android:textColor="@color/text_secondary"
+                app:strokeColor="@color/text_secondary" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSave"
@@ -211,8 +192,8 @@
                 android:layout_weight="1"
                 android:layout_marginStart="8dp"
                 android:text="@string/l_u_s_ch"
-                android:textColor="#FFFFFF"
-                app:backgroundTint="#4285F4" />
+                android:textColor="@color/white"
+                app:backgroundTint="@color/btn_primary" />
         </LinearLayout>
 
     </LinearLayout>

@@ -16,15 +16,6 @@
         android:icon="@drawable/ic_borrow_pay"
         android:title="Mượn/Trả" />
     <item
-        android:id="@+id/bookImportFragment"
-        android:icon="@android:drawable/ic_menu_add"
-        android:title="Nhập sách" />
-    <item
-        android:id="@+id/readerAddFragment"
-        android:icon="@android:drawable/ic_menu_edit"
-        android:title="Thêm Độc giả" />
-
-    <item
         android:id="@+id/readerListFragment"
         android:icon="@drawable/ic_group"
         android:title="Độc Giả" />

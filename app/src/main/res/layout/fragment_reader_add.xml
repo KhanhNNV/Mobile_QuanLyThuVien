@@ -151,7 +151,7 @@
                 android:layout_marginStart="8dp"
                 android:text="@string/save_reader"
                 android:textColor="@color/white"
-                app:backgroundTint="@color/blue" />
+                app:backgroundTint="@color/btn_primary" />
         </LinearLayout>
 
     </LinearLayout>
