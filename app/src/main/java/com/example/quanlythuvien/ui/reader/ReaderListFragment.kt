@@ -4,10 +4,12 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quanlythuvien.R
 import com.example.quanlythuvien.utils.setupCustomHeader
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 
 class ReaderListFragment : Fragment(R.layout.fragment_reader_list) {
@@ -24,6 +26,12 @@ class ReaderListFragment : Fragment(R.layout.fragment_reader_list) {
             title = "Độc giả",
             subtitle = "*Lấy tổng số độc giả"
         )
+
+        val fasAddReader = view.findViewById<FloatingActionButton>(R.id.fasAddReader)
+        fasAddReader.setOnClickListener {
+            // Chuyển sang màn hình form nhập độc giả
+            findNavController().navigate(R.id.readerAddFragment)
+        }
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.rvReaders)
 
