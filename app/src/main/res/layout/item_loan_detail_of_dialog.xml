@@ -49,10 +49,18 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:orientation="horizontal">
+            <TextView
+                android:id="@+id/tvAuthorTitle"
+                android:text="@string/tacGia"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/chip_primary"
+                android:background="@color/bg_chip_primary"
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/tvAuthor"
-                android:text="Tác giả: Kim Đồng"
+                android:text="Kim Đồng"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/text_secondary"
@@ -64,10 +72,18 @@
                 android:layout_marginHorizontal="8dp"
                 android:text="•"
                 android:textColor="@color/text_secondary"/>
+            <TextView
+                android:id="@+id/tvCatetoryTitle"
+                android:text="@string/theLoai"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/chip_primary"
+                android:background="@color/bg_chip_primary"
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/tvCatetory"
-                android:text="Thể loại: tiểu thuyết"
+                android:text="tiểu thuyết"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/text_secondary"
@@ -88,8 +104,17 @@
             android:orientation="horizontal">
 
             <TextView
+                android:id="@+id/tvNgayTra"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/ngayTra"
+                android:textColor="@color/chip_primary"
+                android:background="@color/bg_chip_primary"
+                android:textSize="13sp" />
+
+            <TextView
                 android:id="@+id/tvReturnDate"
-                android:text="Ngày trả: 25/3/2026"
+                android:text="25/3/2026"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"

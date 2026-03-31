@@ -35,8 +35,8 @@ class BorrowPayAdapter(
 
         fun bind(item: LoanItemData) {
             tvName.text = item.readerName
-            tvLoanId.text = "Mã phiếu: #${item.loanId}"
-            tvDueDate.text = "Hạn trả: ${item.dueDate}"
+            tvLoanId.text = "${item.loanId}"
+            tvDueDate.text = item.dueDate
             val context = itemView.context
             // Xử lý màu sắc cho trạng thái để dễ phân biệt
             if (item.overallStatus == "BORROWING") {

@@ -79,7 +79,7 @@ class DialogBorrowPayAdapter(
             // Hiển thị ngày trả (nếu có)
             if (!item.returnDate.isNullOrEmpty()) {
                 tvReturnDate.visibility = View.VISIBLE
-                tvReturnDate.text = "Ngày trả: ${item.returnDate}"
+                tvReturnDate.text = item.returnDate
             } else {
                 tvReturnDate.visibility = View.GONE
             }
