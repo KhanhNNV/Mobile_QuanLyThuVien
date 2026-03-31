@@ -5,10 +5,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.Button
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.Spinner
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quanlythuvien.R
@@ -24,6 +26,8 @@ class BookListFragment : Fragment() {
     private lateinit var llFilterContainer: LinearLayout
     private var isFilterExpanded = false // Biến theo dõi trạng thái đang mở hay đóng
 
+    private lateinit var btnAddBook : Button
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -38,6 +42,12 @@ class BookListFragment : Fragment() {
         btnToggleFilter = view.findViewById(R.id.btnToggleFilter)
         llFilterContainer = view.findViewById(R.id.llFilterContainer)
         spinnerCategory = view.findViewById(R.id.spinnerCategory)
+
+        //set nut nhap
+        btnAddBook = view.findViewById(R.id.btnAddBook)
+        btnAddBook.setOnClickListener {
+            findNavController().navigate(R.id.bookImportFragment)
+        }
 
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         val dummyBooks = createDummyData()
