@@ -1,5 +1,6 @@
 package com.example.quanlythuvien.ui.borrow_pay
 
+import android.content.res.ColorStateList
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -46,17 +47,39 @@ class DialogBorrowPayAdapter(
 
             // Đổi màu nền cho Tag trạng thái
             val context = itemView.context
-            val colorRes = when (currentStatus) {
-                LoanDetailStatus.RETURNED -> R.color.text_status_success
-                LoanDetailStatus.LOST -> R.color.text_status_error
-                else -> R.color.text_status_info
+
+            val (text, textColorRes, bgColorRes) = when (currentStatus) {
+                LoanDetailStatus.BORROWING -> Triple(
+                    "Đang mượn",
+                    R.color.text_status_info,
+                    R.color.status_info
+                )
+                LoanDetailStatus.RETURNED -> Triple(
+                    "Đã trả",
+                    R.color.text_status_success,
+                    R.color.status_success
+                )
+                LoanDetailStatus.LOST -> Triple(
+                    "Bị mất",
+                    R.color.text_status_error,
+                    R.color.status_error
+                )
+                else -> Triple(
+                    "Không xác định",
+                    R.color.text_secondary,
+                    R.color.bg_card
+                )
             }
-            tvStatus.backgroundTintList = ContextCompat.getColorStateList(context, colorRes)
+
+            tvStatus.text = text
+            tvStatus.setTextColor(ContextCompat.getColor(context, textColorRes))
+            tvStatus.backgroundTintList =
+                ColorStateList.valueOf(ContextCompat.getColor(context, bgColorRes))
 
             // Hiển thị ngày trả (nếu có)
             if (!item.returnDate.isNullOrEmpty()) {
                 tvReturnDate.visibility = View.VISIBLE
-                tvReturnDate.text = "Ngày trả: ${item.returnDate}"
+                tvReturnDate.text = item.returnDate
             } else {
                 tvReturnDate.visibility = View.GONE
             }

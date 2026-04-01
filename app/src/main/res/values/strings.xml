@@ -33,9 +33,16 @@
     <string name="add_ticket">+ Phiếu</string>
 
     <string name="search_hint">Tìm kiếm...</string>
+
+    <string name="dueDate">Hạn trả: </string>
+    <string name="tacGia">Tác giả: </string>
+    <string name="theLoai">Thể loại: </string>
+    <string name="ngayTra">Ngày trả: </string>
+    <string name="loanId">Mã phiếu: </string>
     <!-- dialog layout  -->
     <string name="borrowed_books_label">SÁCH ĐÃ MƯỢN:</string>
     <string name="extend_action">Gia hạn</string>
+    <string name="ngayMuon">Ngày mượn: </string>
 
     <!-- Bộ lọc cho layout mượn trả -->
     <string-array name="load_status">

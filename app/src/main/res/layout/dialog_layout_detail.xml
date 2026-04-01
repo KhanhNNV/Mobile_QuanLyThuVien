@@ -28,18 +28,37 @@
 
                 <TextView
                     android:id="@+id/tvDialogReaderName"
+                    android:text="Nguyễn Văn A"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/text_primary"
                     android:textSize="20sp"
                     android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/tvDialogReaderId"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="14sp" />
+                    android:layout_marginTop="4dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:id="@+id/tvMa"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/loanId"
+                        android:background="@color/bg_chip_primary"
+                        android:textColor="@color/chip_primary"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:id="@+id/tvDialogLoanId"
+                        android:text="RV01"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
             </LinearLayout>
 
             <TextView
@@ -49,7 +68,9 @@
                 android:background="@drawable/bg_status_rounded"
                 android:paddingHorizontal="12dp"
                 android:paddingVertical="4dp"
-                android:textColor="@color/white"
+                android:text="Đang mượn"
+                android:textColor="@color/text_status_info"
+                android:backgroundTint="@color/status_info"
                 android:textSize="11sp"
                 android:textStyle="bold" />
         </LinearLayout>
@@ -65,13 +86,30 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/tvDialogBorrowDate"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="@color/text_primary"
-                android:textSize="16sp" />
+                android:layout_marginTop="4dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/tvDialogNM"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/ngayMuon"
+                    android:background="@color/bg_chip_primary"
+                    android:textColor="@color/chip_primary"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvDialogBorrowDate"
+                    android:text="20/06/2026"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/text_primary"
+                    android:textSize="16sp" />
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -81,11 +119,22 @@
                 android:orientation="horizontal">
 
                 <TextView
+                    android:id="@+id/tvDialogNT"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/dueDate"
+                    android:background="@color/bg_chip_primary"
+                    android:textColor="@color/chip_primary"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
                     android:id="@+id/tvDialogDueDate"
+                    android:text="20/06/2026"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:textColor="@color/text_status_error"
+                    android:textColor="@color/text_secondary"
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
@@ -95,15 +144,15 @@
                     android:layout_width="wrap_content"
                     android:layout_height="48dp"
                     android:text="@string/extend_action"
-                    android:textColor="@color/btn_primary"
+                    android:textColor="@color/chip_primary"
                     android:textSize="12sp"
-                    app:strokeColor="@color/btn_primary"
+                    app:strokeColor="@color/chip_primary"
                     app:strokeWidth="1dp"
                     app:cornerRadius="24dp"
                     app:icon="@android:drawable/ic_menu_edit"
                     app:iconSize="14dp"
                     app:iconPadding="4dp"
-                    app:iconTint="@color/btn_primary" />
+                    app:iconTint="@color/chip_primary" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

@@ -17,25 +17,28 @@ import com.example.quanlythuvien.utils.setupCustomHeader
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.text.SimpleDateFormat
 import java.util.*
+import android.content.res.ColorStateList
+import androidx.core.content.ContextCompat
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class BorrowPayFragment :Fragment(){
 
     private fun getSampleData(): List<LoanItemData> {
         return listOf(
             LoanItemData(
-                1, "10/03/2026", "20/03/2026", "BORROWING", "RD001", "Nguyễn Văn A",
+                1, "10/03/2026", "20/03/2026", "BORROWING", "Nguyễn Văn A",
                 mutableListOf(
                     LoanDetailItemData("Lập trình Java", "James Gosling", "Kỹ thuật", null, "BORROWING")
                 )
             ),
             LoanItemData(
-                2, "05/03/2026", "15/03/2026", "RETURNED", "RD002", "Trần Thị B",
+                2, "05/03/2026", "15/03/2026", "RETURNED", "Trần Thị B",
                 mutableListOf(
                     LoanDetailItemData("Android nâng cao", "Google", "Lập trình", "14/03/2026", "RETURNED")
                 )
             ),
             LoanItemData(
-                3, "01/03/2026", "10/03/2026", "BORROWING", "RD003", "Người Trễ Hạn",
+                3, "01/03/2026", "10/03/2026", "BORROWING", "Người Trễ Hạn",
                 mutableListOf(
                     LoanDetailItemData("Clean Code", "Robert C. Martin", "Kỹ thuật", null, "BORROWING")
                 )
@@ -43,7 +46,7 @@ class BorrowPayFragment :Fragment(){
         )
     }
 
-    private lateinit var btnAddTicket: Button
+    private lateinit var fasAddLoan: FloatingActionButton
 // Nút thêm phiếu mượn mới
 
     private lateinit var autoSearch: AutoCompleteTextView
@@ -99,7 +102,7 @@ class BorrowPayFragment :Fragment(){
         return inflater.inflate(R.layout.fragment_borrow_pay, container, false)
     }
     private fun initViews(view: View) {
-        btnAddTicket = view.findViewById(R.id.btnAddTicket)
+        fasAddLoan = view.findViewById(R.id.fasAddLoan)
 
         autoSearch = view.findViewById(R.id.autoSearch)
         btnToggleFilter = view.findViewById(R.id.btnToggleFilter)
@@ -146,14 +149,26 @@ class BorrowPayFragment :Fragment(){
         adapter.submitList(sampleDataList)
 
 
-        //Hiển ẩn bộ lọc
+        //Xử lý sự kiện nhấn nút lọc
         btnToggleFilter.setOnClickListener {
             if (layoutFilterContainer.visibility == View.GONE) {
+                //hiển thị bộ lọc
                 layoutFilterContainer.visibility = View.VISIBLE
-                btnToggleFilter.animate().rotation(180f).start()
+                //Đổi màu nút lọc
+                val activeIconColor = ContextCompat.getColor(requireContext(), R.color.bg_chip_primary)
+                btnToggleFilter.setColorFilter(activeIconColor)
+
+                val activeBgColor = ContextCompat.getColorStateList(requireContext(), R.color.chip_primary)
+                btnToggleFilter.backgroundTintList = activeBgColor
             } else {
+                //Ẩn bộ lọc
                 layoutFilterContainer.visibility = View.GONE
-                btnToggleFilter.animate().rotation(0f).start()
+                //Trả lại màu ban đầu cho bộ lọc
+                val defaultIconColor = ContextCompat.getColor(requireContext(), R.color.chip_primary)
+                btnToggleFilter.setColorFilter(defaultIconColor)
+
+                val defaultBgColor = ContextCompat.getColorStateList(requireContext(), R.color.bg_chip_primary)
+                btnToggleFilter.backgroundTintList = defaultBgColor
             }
         }
 
@@ -209,7 +224,7 @@ class BorrowPayFragment :Fragment(){
 
         //Ánh xạ các View trong Dialog Layout
         val tvReaderName = dialogView.findViewById<TextView>(R.id.tvDialogReaderName)
-        val tvReaderId = dialogView.findViewById<TextView>(R.id.tvDialogReaderId)
+        val tvLoanId = dialogView.findViewById<TextView>(R.id.tvDialogLoanId)
         val tvStatus = dialogView.findViewById<TextView>(R.id.tvDialogStatus)
         val tvBorrowDate = dialogView.findViewById<TextView>(R.id.tvDialogBorrowDate)
         val tvDueDate = dialogView.findViewById<TextView>(R.id.tvDialogDueDate)
@@ -218,9 +233,9 @@ class BorrowPayFragment :Fragment(){
 
 
         tvReaderName.text = item.readerName
-        tvReaderId.text = "Mã độc giả: ${item.readerId}"
-        tvBorrowDate.text = "Ngày mượn: ${item.borrowDate}"
-        tvDueDate.text = "Hạn trả: ${item.dueDate}"
+        tvLoanId.text = item.loanId.toString()
+        tvBorrowDate.text = item.borrowDate
+        tvDueDate.text = item.dueDate
         editStatusUI(item.overallStatus, tvStatus)
 
         val bookAdapter = DialogBorrowPayAdapter { book, newStatus ->
@@ -254,13 +269,14 @@ class BorrowPayFragment :Fragment(){
         }
 
     }
+
     //Hàm xử lý nút thay đổi trạng thái của sách
     private fun handleExtension(item: LoanItemData, tvUpdate: TextView) {
         val calendar = Calendar.getInstance()
         android.app.DatePickerDialog(requireContext(), { _, year, month, dayOfMonth ->
             val newDueDate = String.format("%02d/%02d/%d", dayOfMonth, month + 1, year)
             item.dueDate = newDueDate
-            tvUpdate.text = "Hạn trả: $newDueDate"
+            tvUpdate.text = newDueDate
 
             // Dùng applyFilter() để list tự làm mới lại theo bộ lọc
             applyFilter()
@@ -271,16 +287,23 @@ class BorrowPayFragment :Fragment(){
 
     //Hàm dịch chỉnh hiệu ứng cho trạng thái của phiếu mượn
     private fun editStatusUI(status: String, tvStatus: TextView) {
+        val context = requireContext()
         if (status == "BORROWING") {
-            tvStatus.text = "ĐANG MƯỢN"
-            tvStatus.backgroundTintList = android.content.res.ColorStateList.valueOf(
-                androidx.core.content.ContextCompat.getColor(requireContext(), R.color.status_warning)
-            )
+            tvStatus.text = "Đang mượn"
+
+            val textColor = ContextCompat.getColor(context, R.color.text_status_info)
+            val bgColor = ContextCompat.getColor(context, R.color.status_info)
+
+            tvStatus.setTextColor(textColor)
+            tvStatus.backgroundTintList = ColorStateList.valueOf(bgColor)
         } else {
-            tvStatus.text = "ĐÃ TRẢ"
-            tvStatus.backgroundTintList = android.content.res.ColorStateList.valueOf(
-                androidx.core.content.ContextCompat.getColor(requireContext(), R.color.status_success)
-            )
+            tvStatus.text = "Đã trả"
+
+            val textColor = ContextCompat.getColor(context, R.color.text_status_success)
+            val bgColor = ContextCompat.getColor(context, R.color.status_success)
+
+            tvStatus.setTextColor(textColor)
+            tvStatus.backgroundTintList = ColorStateList.valueOf(bgColor)
         }
     }
 
