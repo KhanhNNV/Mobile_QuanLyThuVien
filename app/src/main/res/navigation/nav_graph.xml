@@ -11,6 +11,13 @@
         tools:layout="@layout/fragment_welcome" />
 
     <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.example.quanlythuvien.ui.login.LoginFragment"
+        android:label="Login"
+        tools:layout="@layout/fragment_login">
+    </fragment>
+
+    <fragment
         android:id="@+id/createCategoryFragment"
         android:name="com.example.quanlythuvien.ui.welcome.CreateCategoryFragment"
         android:label="Create Category"

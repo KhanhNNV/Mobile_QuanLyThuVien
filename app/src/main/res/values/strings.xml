@@ -2,9 +2,16 @@
     <string name="app_name">QuanLyThuVien</string>
 
     <!--    Welcome    -->
-    <string name="txt_titleWelcome">Chào mừng đến với Thư Viện</string>
-    <string name="txt_des">Quản lý sách và độc giả của bạn một cách dễ dàng và chuyên nghiệp. Hãy bắt đầu bằng việc thiết lập không gian của bạn.</string>
-    <string name="txt_buttonStart">Bắt đầu tạo thư viện</string>
+    <string name="tvTitleWelcome">Chào mừng bạn</string>
+    <string name="tvDes">Nếu đã có tài khoản thủ thư hoặc tài khoản nhân viên hãy đăng nhập để tiếp tục. \n Nếu bạn muốn tạo một thư viện mới hãy nhấn nút bắt đầu để khởi tạo thư viện của bạn.</string>
+    <string name="btnStart">Bắt đầu tạo thư viện</string>
+    <string name="btnLogin">Đăng nhập</string>
+
+    <!--    Login    -->
+    <string name="tvLoginTitle">Nhập thông tin đăng nhập</string>
+    <string name="edtHintGmail">Nhập gmail</string>
+    <string name="edtHintPassword">Nhập password</string>
+
 
     <!--    Category welcome   -->
     <string name="txt_titleCreateCate">Tạo Thể Loại Đầu Tiên</string>

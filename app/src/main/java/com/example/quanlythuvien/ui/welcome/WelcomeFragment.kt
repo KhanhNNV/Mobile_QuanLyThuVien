@@ -9,14 +9,31 @@ import com.example.quanlythuvien.R
 
 class WelcomeFragment : Fragment(R.layout.fragment_welcome) {
 
+    private lateinit var btnCreateLibrary: Button
+    private lateinit var btnLogin: Button
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val btnStartSetup = view.findViewById<Button>(R.id.btnStartSetup)
+        initViews(view)
+        handleButtonCreateLibraryEvent()
+        handleButtonLoginEvent()
+    }
 
-        btnStartSetup.setOnClickListener {
-            // Chuyển sang màn hình Tạo Thể Loại
+    private fun initViews(view: View){
+        btnCreateLibrary = view.findViewById(R.id.btnCreateLibrary)
+        btnLogin=view.findViewById(R.id.btnLogin)
+    }
+
+    private fun handleButtonCreateLibraryEvent(){
+        btnCreateLibrary.setOnClickListener {
             findNavController().navigate(R.id.createCategoryFragment)
+        }
+    }
+
+    private fun handleButtonLoginEvent(){
+        btnLogin.setOnClickListener {
+            findNavController().navigate(R.id.loginFragment)
         }
     }
 }
