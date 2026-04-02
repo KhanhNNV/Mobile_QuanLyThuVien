@@ -19,5 +19,8 @@
         android:id="@+id/readerListFragment"
         android:icon="@drawable/ic_group"
         android:title="Độc Giả" />
-
+    <item
+        android:id="@+id/staffListFragment"
+        android:icon="@drawable/ic_staff"
+        android:title="Quản lý nhân viên" />
 </menu>

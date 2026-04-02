@@ -394,8 +394,7 @@ class BorrowPayFragment :Fragment(){
 
         adapter.submitList(filteredList)
 
-        //Ép Adapter ngoài màn hình chính phải vẽ lại để cập nhật Ngày và Trạng thái mới!
-        adapter.notifyDataSetChanged()
+
         if (filteredList.isEmpty()) {
             Toast.makeText(requireContext(), "Không tìm thấy phiếu mượn phù hợp!", Toast.LENGTH_SHORT).show()
         }
