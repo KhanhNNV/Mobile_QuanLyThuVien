@@ -68,8 +68,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/label_library"
-                android:background="@color/bg_chip_primary"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="2dp"
+                android:background="@drawable/bg_status_rounded"
                 android:textColor="@color/chip_primary"
+                android:backgroundTint="@color/bg_chip_primary"
                 android:textSize="14sp" />
 
             <TextView
@@ -93,8 +96,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/label_password"
-                android:background="@color/bg_chip_primary"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="2dp"
+                android:background="@drawable/bg_status_rounded"
                 android:textColor="@color/chip_primary"
+                android:backgroundTint="@color/bg_chip_primary"
                 android:textSize="14sp" />
 
             <TextView
