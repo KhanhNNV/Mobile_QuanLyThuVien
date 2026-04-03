@@ -10,6 +10,8 @@ import com.example.quanlythuvien.data.entity.Book // Nhớ import đúng đườ
 
 class BookAdapter(private val bookList: List<Book>) : RecyclerView.Adapter<BookAdapter.BookViewHolder>() {
 
+    var onItemClick: ((Book) -> Unit)? = null
+
     class BookViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tvTitle: TextView = view.findViewById(R.id.tvBookTitle)
         val tvAuthor: TextView = view.findViewById(R.id.tvBookAuthor)
@@ -27,16 +29,17 @@ class BookAdapter(private val bookList: List<Book>) : RecyclerView.Adapter<BookA
     override fun onBindViewHolder(holder: BookViewHolder, position: Int) {
         val book = bookList[position]
 
-        // Gán dữ liệu (Lưu ý: Thay đổi tên thuộc tính như title, author... cho khớp với Entity Book của bạn)
+        // Gán dữ liệu
         holder.tvTitle.text = book.title
         holder.tvAuthor.text = book.author
         holder.tvIsbn.text = "ISBN: ${book.isbnCode}"
-
-        // Cập nhật số lượng
         holder.tvQuantity.text = "Còn ${book.availableQuantity} bản"
+        holder.tvCategory.text = book.categoryId.toString()
 
-        // Cập nhật danh mục
-        holder.tvCategory.text = book.categoryId.toString() // Hoặc book.categoryName tuỳ cách bạn thiết kế
+        // Bắt sự kiện khi người dùng bấm vào 1 dòng (itemView)
+        holder.itemView.setOnClickListener {
+            onItemClick?.invoke(book) // Truyền cuốn sách đang được bấm ra ngoài
+        }
     }
 
     override fun getItemCount(): Int {
