@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="2dp"
+    app:cardBackgroundColor="@color/bg_card">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/tvItemCategory"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:paddingBottom="10dp"
+            android:text="Tiểu thuyết"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/text_primary"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btnEditPolicy"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tvTitleLoanObject"
+            android:layout_width="wrap_content"
+            android:layout_height="24dp"
+            android:paddingHorizontal="10dp"
+            android:gravity="center"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:text="Đối tượng:"
+            android:textColor="@color/chip_primary"
+            android:background="@drawable/bg_chip_primary"
+            android:layout_marginEnd="6dp"
+            app:layout_constraintTop_toBottomOf="@+id/tvItemCategory"
+            app:layout_constraintStart_toStartOf="parent" />
+        <TextView
+            android:id="@+id/tvLoanObject"
+            android:layout_width="wrap_content"
+            android:layout_height="24dp"
+            android:paddingStart="5sp"
+            android:paddingEnd="10sp"
+            android:gravity="center"
+            android:text="Học sinh"
+            android:textColor="@color/text_secondary"
+            android:textSize="11sp"
+            app:layout_constraintTop_toBottomOf="@+id/tvItemCategory"
+            app:layout_constraintStart_toEndOf="@+id/tvTitleLoanObject"/>
+
+        <TextView
+            android:id="@+id/tvTitleLoanExp"
+            android:layout_width="wrap_content"
+            android:layout_height="24dp"
+            android:paddingHorizontal="10dp"
+            android:gravity="center"
+            android:text="Thời hạn:"
+            android:textColor="@color/chip_primary"
+            android:background="@drawable/bg_chip_secondary"
+            android:textSize="11sp"
+            app:layout_constraintTop_toBottomOf="@+id/tvItemCategory"
+            app:layout_constraintStart_toEndOf="@+id/tvLoanObject"/>
+
+        <TextView
+            android:id="@+id/tvLoanExp"
+            android:layout_width="wrap_content"
+            android:layout_height="24dp"
+            android:paddingStart="5sp"
+            android:paddingEnd="10sp"
+            android:gravity="center"
+            android:text="7 ngày"
+            android:textColor="@color/text_secondary"
+            android:textSize="11sp"
+            app:layout_constraintTop_toBottomOf="@+id/tvItemCategory"
+            app:layout_constraintStart_toEndOf="@+id/tvTitleLoanExp"/>
+
+        <ImageButton
+            android:id="@+id/btnEditPolicy"
+            android:layout_width="21dp"
+            android:layout_height="20dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/ic_menu_edit"
+            app:tint="@color/btn_primary"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>
