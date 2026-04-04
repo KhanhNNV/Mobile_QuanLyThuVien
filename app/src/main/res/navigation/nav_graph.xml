@@ -68,4 +68,9 @@
         android:name="com.example.quanlythuvien.ui.admin.CrudStaffFragment"
         android:label="Quản lý Nhân viên"
         tools:layout="@layout/layout_manager_staff_of_admin" />
+    <fragment
+        android:id="@+id/readerDetailFragment"
+        android:name="com.example.quanlythuvien.ui.reader.ReaderDetailFragment"
+        android:label="Chi tiết Độc Giả"
+        />
 </navigation>
