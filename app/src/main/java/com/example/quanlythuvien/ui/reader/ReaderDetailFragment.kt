@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quanlythuvien.R
@@ -21,17 +22,13 @@ class ReaderDetailFragment : Fragment(R.layout.fragment_reader_detail) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setupCustomHeader(
-            view = view,
-            title = "Thông tin độc giả",
-            subtitle = "Chi tiết",
-            showBack = true,
-            showEdit = true,
-            onEditClick = {
-                Toast.makeText(requireContext(), "Chức năng đang phát triển", Toast.LENGTH_SHORT).show()
-            }
-        )
+        view.findViewById<View>(R.id.ivBack)?.setOnClickListener {
+            findNavController().navigateUp() // Quay lại trang trước
+        }
 
+        view.findViewById<View>(R.id.ivEditProfile)?.setOnClickListener {
+            Toast.makeText(requireContext(), "Chức năng đang phát triển", Toast.LENGTH_SHORT).show()
+        }
         //Lấy thông tin người dùng từ bundle
         var readerName = arguments?.getString("readerName")
         var readerPhone = arguments?.getString("readerPhone")
