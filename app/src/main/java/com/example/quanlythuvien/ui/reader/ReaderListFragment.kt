@@ -35,7 +35,17 @@ class ReaderListFragment : Fragment(R.layout.fragment_reader_list) {
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.rvReaders)
 
-        readerAdapter = ReaderAdapter()
+        readerAdapter = ReaderAdapter{
+            reader ->
+            var bundle = Bundle().apply{
+                putInt("readerId", reader.readerId)
+                putString("readerName", reader.name)
+                putString("readerPhone", reader.phoneNumber)
+                putString("readerType", reader.readerType.name)
+            }
+
+            findNavController().navigate(R.id.readerDetailFragment, bundle)
+        }
         recyclerView.adapter = readerAdapter
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
