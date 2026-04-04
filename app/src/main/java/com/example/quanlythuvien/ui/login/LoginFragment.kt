@@ -16,7 +16,7 @@ import com.example.quanlythuvien.R
 class LoginFragment : Fragment(R.layout.fragment_login) {
 
     private lateinit var btnLogin: Button
-    private lateinit var edtEmail: EditText
+    private lateinit var edtUsername: EditText
     private lateinit var edtPassword: EditText
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -28,7 +28,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
 
     private fun initViews(view: View){
         btnLogin=view.findViewById(R.id.btnLogin)
-        edtEmail=view.findViewById(R.id.edtEmail)
+        edtUsername=view.findViewById(R.id.edtUsername)
         edtPassword=view.findViewById(R.id.edtPassword)
     }
 
@@ -36,16 +36,16 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
 
 
         btnLogin.setOnClickListener {
-            val email= edtEmail.text.toString().trim()
+            val username= edtUsername.text.toString().trim()
             val password=edtPassword.text.toString().trim()
 
-            if (email.isEmpty() || password.isEmpty()) {
+            if (username.isEmpty() || password.isEmpty()) {
                 Toast.makeText(requireContext(), "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            if (email == "admin" && password == "123") {
-                saveLoginState(email, "ADMIN")
+            if (username == "admin" && password == "123") {
+                saveLoginState(username, "ADMIN")
 
                 Toast.makeText(requireContext(), "Đăng nhập thành công!", Toast.LENGTH_SHORT).show()
 
@@ -56,11 +56,11 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         }
     }
 
-    private fun saveLoginState(email: String, role: String) {
+    private fun saveLoginState(username: String, role: String) {
         val sharedPreferences = requireActivity().getSharedPreferences("LibraryAppPrefs", Context.MODE_PRIVATE)
         sharedPreferences.edit().apply {
             putBoolean("isLoggedIn", true)
-            putString("userEmail", email)
+            putString("username", username)
             putString("userRole", role)
             apply()
         }

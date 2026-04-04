@@ -22,11 +22,11 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
-        android:id="@+id/edtEmail"
+        android:id="@+id/edtUsername"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="48dp"
-        android:hint="@string/edtHintGmail"
+        android:hint="@string/edtHintUsername"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvLoginTitle"/>
@@ -39,7 +39,7 @@
         android:hint="@string/edtHintPassword"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edtEmail"/>
+        app:layout_constraintTop_toBottomOf="@+id/edtUsername"/>
 
     <Button
         android:id="@+id/btnLogin"

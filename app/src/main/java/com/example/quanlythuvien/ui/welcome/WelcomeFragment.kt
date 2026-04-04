@@ -27,7 +27,7 @@ class WelcomeFragment : Fragment(R.layout.fragment_welcome) {
 
     private fun handleButtonCreateLibraryEvent(){
         btnCreateLibrary.setOnClickListener {
-            findNavController().navigate(R.id.createCategoryFragment)
+            findNavController().navigate(R.id.registerFragment)
         }
     }
 
