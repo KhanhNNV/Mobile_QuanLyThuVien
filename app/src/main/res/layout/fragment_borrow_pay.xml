@@ -1,179 +1,185 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:fitsSystemWindows="true">
+
     <include
         android:id="@+id/headerDashboard"
         layout="@layout/layout_custom_header"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-
-
-    <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:layout_marginTop="8dp">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <AutoCompleteTextView
-            android:id="@+id/autoSearch"
-            android:layout_width="335dp"
-            android:layout_height="48dp"
-            android:layout_marginEnd="8dp"
-            android:layout_weight="1"
-            android:background="@drawable/bg_search"
-            android:drawableStart="@drawable/ic_search"
-            android:drawablePadding="6dp"
-            android:hint="@string/search_hint"
-            android:padding="10dp"
-            android:textColor="@color/text_primary"
-            android:textColorHint="@color/text_tertiary" />
+    <AutoCompleteTextView
+        android:id="@+id/autoSearch"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/bg_search"
+        android:drawableStart="@drawable/ic_search"
+        android:drawablePadding="6dp"
+        android:hint="@string/search_hint"
+        android:padding="10dp"
+        android:textColor="@color/text_primary"
+        android:textColorHint="@color/text_tertiary"
+        app:layout_constraintEnd_toStartOf="@+id/btnToggleFilter"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/headerDashboard" />
 
-
-        <ImageView
-            android:id="@+id/btnToggleFilter"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:padding="12dp"
-            android:background="@drawable/bg_search"
-            app:srcCompat="@drawable/ic_filter_list"
-            android:backgroundTint="@color/bg_chip_primary"
-            app:tint="@color/chip_primary"
-            android:contentDescription="Mở bộ lọc" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/layoutFilterContainer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginTop="10dp"
+    <ImageView
+        android:id="@+id/btnToggleFilter"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginEnd="12dp"
+        android:background="@drawable/bg_filter"
+        android:contentDescription="Mở bộ lọc"
         android:padding="12dp"
+        app:layout_constraintBottom_toBottomOf="@+id/autoSearch"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/autoSearch"
+        app:srcCompat="@drawable/ic_filter_list"
+        app:tint="@color/btn_primary" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layoutFilterContainer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginTop="10dp"
         android:background="@drawable/bg_list_container"
-        android:visibility="gone">
+        android:padding="12dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/autoSearch">
 
         <RadioGroup
             android:id="@+id/rgStatus"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:orientation="horizontal"
-            android:layout_marginBottom="12dp">
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
             <RadioButton
                 android:id="@+id/rbOption1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Tất cả"
-                android:checked="true"
                 android:layout_marginEnd="8dp"
+                android:checked="true"
+                android:text="Tất cả"
                 android:textColor="@color/text_primary"
-                app:buttonTint="@color/btn_primary"/>
+                app:buttonTint="@color/btn_primary" />
+
             <RadioButton
                 android:id="@+id/rbOption2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Đang mượn"
                 android:layout_marginEnd="8dp"
+                android:text="Đang mượn"
                 android:textColor="@color/text_primary"
-                app:buttonTint="@color/btn_primary"/>
+                app:buttonTint="@color/btn_primary" />
+
             <RadioButton
                 android:id="@+id/rbOption3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Trễ hạn"
                 android:textColor="@color/text_primary"
-                app:buttonTint="@color/btn_primary"/>
+                app:buttonTint="@color/btn_primary" />
         </RadioGroup>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+        <EditText
+            android:id="@+id/edtFromDate"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="4dp"
+            android:background="@drawable/bg_search"
+            android:clickable="true"
+            android:cursorVisible="false"
+            android:focusable="false"
+            android:hint="Từ ngày"
+            android:inputType="none"
+            android:padding="10dp"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_tertiary"
+            app:layout_constraintEnd_toStartOf="@+id/edtToDate"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/rgStatus" />
 
-            <EditText
-                android:id="@+id/edtFromDate"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_weight="1"
-                android:hint="Từ ngày"
-                android:focusable="false"
-                android:clickable="true"
-                android:cursorVisible="false"
-                android:inputType="none"
-                android:background="@drawable/bg_search"
-                android:textColor="@color/text_primary"
-                android:textColorHint="@color/text_tertiary"
-                android:padding="10dp"/>
+        <EditText
+            android:id="@+id/edtToDate"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="4dp"
+            android:background="@drawable/bg_search"
+            android:clickable="true"
+            android:cursorVisible="false"
+            android:focusable="false"
+            android:hint="Đến ngày"
+            android:inputType="none"
+            android:padding="10dp"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_tertiary"
+            app:layout_constraintBottom_toBottomOf="@+id/edtFromDate"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/edtFromDate"
+            app:layout_constraintTop_toTopOf="@+id/edtFromDate" />
 
-            <View
-                android:layout_width="8dp"
-                android:layout_height="1dp"/>
-
-            <EditText
-                android:id="@+id/edtToDate"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_weight="1"
-                android:hint="Đến ngày"
-                android:focusable="false"
-                android:clickable="true"
-                android:cursorVisible="false"
-                android:inputType="none"
-                android:background="@drawable/bg_search"
-                android:textColor="@color/text_primary"
-                android:textColorHint="@color/text_tertiary"
-                android:padding="10dp"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
+        <Button
+            android:id="@+id/btnResetFilter"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:layout_marginBottom="20dp"
-            android:orientation="horizontal">
+            android:layout_marginEnd="4dp"
+            android:layout_marginBottom="8dp"
+            android:text="Đặt lại"
+            android:textColor="@color/text_secondary"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btnConfirmFilter"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/edtFromDate"
+            app:strokeColor="@color/text_tertiary" />
 
-            <Button
-                android:id="@+id/btnResetFilter"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:layout_weight="1"
-                android:text="Đặt lại"
-                android:textColor="@color/text_secondary"
-                app:strokeColor="@color/text_tertiary" />
+        <Button
+            android:id="@+id/btnConfirmFilter"
+            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:backgroundTint="@color/btn_primary"
+            android:text="Xác nhận"
+            android:textColor="@color/white"
+            app:layout_constraintBottom_toBottomOf="@+id/btnResetFilter"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/btnResetFilter"
+            app:layout_constraintTop_toTopOf="@+id/btnResetFilter" />
 
-            <Button
-                android:id="@+id/btnConfirmFilter"
-                style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_weight="1"
-                android:backgroundTint="@color/btn_primary"
-                android:text="Xác nhận"
-                android:textColor="@color/white" />
-        </LinearLayout>
-
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginBottom="10dp"
-        android:layout_weight="1"
-        android:background="@color/bg_card"
-        android:paddingTop="8dp" />
+        android:layout_marginTop="12dp"
+        android:clipToPadding="false"
+        android:paddingTop="8dp"
+        android:paddingBottom="80dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/layoutFilterContainer" />
 
     <include layout="@layout/icon_create_loan" />
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

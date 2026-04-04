@@ -22,5 +22,5 @@
     <item
         android:id="@+id/staffListFragment"
         android:icon="@drawable/ic_staff"
-        android:title="Quản lý nhân viên" />
+        android:title="Nhân viên" />
 </menu>
