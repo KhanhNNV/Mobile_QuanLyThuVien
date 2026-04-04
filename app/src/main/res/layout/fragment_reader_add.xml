@@ -35,7 +35,7 @@
                 android:id="@+id/edtReaderCode"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Nhập mã thẻ (VD: SV001)..."
+                android:hint="@string/nh_p_m_th_vd_sv001"
                 android:inputType="textCapCharacters" />
         </com.google.android.material.textfield.TextInputLayout>
 

@@ -101,5 +101,6 @@
 
     <string name="tvTitleQuickAccess"> TRUY CẬP NHANH</string>
     <string name="nhập">＋ Nhập</string>
+    <string name="nh_p_m_th_vd_sv001">Nhập mã thẻ (VD: SV001)...</string>
 
 </resources>
