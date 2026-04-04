@@ -125,4 +125,21 @@
     <string name="textviewct">Vui lòng nhập tên thể loại sách mới</string>
     <string name="nameCt">Tên thể loại *</string>
 
+
+    //CRUD STAFF
+    <string name="label_library">Thư viện: </string>
+    <string name="label_password">Mật khẩu: </string>
+    <string name="hint_staff">Tìm kiếm nhân viên...</string>
+
+    <string name="staff_id">Staff ID:</string>
+    <string name="username">Username: </string>
+
+
+
+    <string-array name="staff_status_options">
+        <item>Tất cả</item>
+        <item>Đang hoạt động</item>
+        <item>Đã khóa</item>
+    </string-array>
+
 </resources>

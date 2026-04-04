@@ -18,6 +18,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.text.SimpleDateFormat
 import java.util.*
 import android.content.res.ColorStateList
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
@@ -28,7 +29,7 @@ class BorrowPayFragment :Fragment(){
             LoanItemData(
                 1, "10/03/2026", "20/03/2026", "BORROWING", "Nguyễn Văn A",
                 mutableListOf(
-                    LoanDetailItemData("Lập trình Java", "James Gosling", "Kỹ thuật", null, "BORROWING")
+                    LoanDetailItemData("Lập trình Java Lập trình Java Lập trình Java Lập trình Java Lập trình Java", "James Gosling", "Kỹ thuật", null, "BORROWING")
                 )
             ),
             LoanItemData(
@@ -55,7 +56,7 @@ class BorrowPayFragment :Fragment(){
     private lateinit var btnToggleFilter: ImageView
 // Nút mở/đóng phần bộ lọc
 
-    private lateinit var layoutFilterContainer: LinearLayout
+    private lateinit var layoutFilterContainer: ConstraintLayout
 // Layout chứa toàn bộ bộ lọc (ẩn/hiện)
 
     private lateinit var rgStatus: RadioGroup
@@ -152,23 +153,29 @@ class BorrowPayFragment :Fragment(){
         //Xử lý sự kiện nhấn nút lọc
         btnToggleFilter.setOnClickListener {
             if (layoutFilterContainer.visibility == View.GONE) {
-                //hiển thị bộ lọc
+                // 1. Hiển thị bộ lọc
                 layoutFilterContainer.visibility = View.VISIBLE
-                //Đổi màu nút lọc
-                val activeIconColor = ContextCompat.getColor(requireContext(), R.color.bg_chip_primary)
-                btnToggleFilter.setColorFilter(activeIconColor)
 
-                val activeBgColor = ContextCompat.getColorStateList(requireContext(), R.color.chip_primary)
+                // 2. Đổi màu NỀN của nút
+                val activeBgColor = ContextCompat.getColorStateList(requireContext(), R.color.btn_primary)
                 btnToggleFilter.backgroundTintList = activeBgColor
-            } else {
-                //Ẩn bộ lọc
-                layoutFilterContainer.visibility = View.GONE
-                //Trả lại màu ban đầu cho bộ lọc
-                val defaultIconColor = ContextCompat.getColor(requireContext(), R.color.chip_primary)
-                btnToggleFilter.setColorFilter(defaultIconColor)
 
-                val defaultBgColor = ContextCompat.getColorStateList(requireContext(), R.color.bg_chip_primary)
-                btnToggleFilter.backgroundTintList = defaultBgColor
+                // 3. Đổi màu ICON bên trong (Dùng imageTintList thay vì setColorFilter để khớp với app:tint)
+                val activeIconColor = ContextCompat.getColorStateList(requireContext(), R.color.white)
+                btnToggleFilter.imageTintList = activeIconColor
+
+            } else {
+                // 1. Ẩn bộ lọc
+                layoutFilterContainer.visibility = View.GONE
+
+                // 2. Trả NỀN về mặc định
+                // Gán null để xóa lớp màu phủ, giúp nút lấy lại màu gốc của @drawable/bg_filter
+                btnToggleFilter.backgroundTintList = null
+
+                // 3. Trả ICON về màu mặc định
+                // Theo như XML của bạn, màu gốc của Icon là btn_primary
+                val defaultIconColor = ContextCompat.getColorStateList(requireContext(), R.color.btn_primary)
+                btnToggleFilter.imageTintList = defaultIconColor
             }
         }
 
@@ -206,7 +213,7 @@ class BorrowPayFragment :Fragment(){
     private fun showDetailDialog(item: LoanItemData){
 
         //Nặn khuôn cho giao diện Dialog
-        val dialogView = layoutInflater.inflate(R.layout.dialog_layout_detail, null)
+        val dialogView = layoutInflater.inflate(R.layout.layout_dialog_loan, null)
 
         //Xây dựng hộp thoại và bỏ  khuông giao diện vào hộp thoại
         val alertDialog = MaterialAlertDialogBuilder(requireContext())
@@ -394,8 +401,7 @@ class BorrowPayFragment :Fragment(){
 
         adapter.submitList(filteredList)
 
-        //Ép Adapter ngoài màn hình chính phải vẽ lại để cập nhật Ngày và Trạng thái mới!
-        adapter.notifyDataSetChanged()
+
         if (filteredList.isEmpty()) {
             Toast.makeText(requireContext(), "Không tìm thấy phiếu mượn phù hợp!", Toast.LENGTH_SHORT).show()
         }

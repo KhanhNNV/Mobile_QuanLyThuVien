@@ -6,15 +6,15 @@
     >
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fasAddLoan"
+        android:id="@+id/fasAddStaff"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end|bottom"
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="15dp"
         android:backgroundTint="@color/btn_primary"
-        android:contentDescription="Thêm phiếu mượn"
-        android:src="@drawable/ic_credit_card"
+        android:contentDescription="Thêm staff"
+        android:src="@drawable/ic_person_add"
         android:tint="@color/white"
         app:elevation="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
