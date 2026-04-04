@@ -148,7 +148,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/s_l_ng"
+                    android:text="GIÁ GỐC"
                     android:textSize="20sp"
                     android:textStyle="bold" />
 
@@ -158,11 +158,11 @@
                     android:layout_height="wrap_content">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/edtQuantity"
+                        android:id="@+id/edtCost"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="number"
-                        android:text="@string/_1" />
+                        android:text="VND" />
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
         </LinearLayout>

@@ -23,4 +23,11 @@
         android:id="@+id/staffListFragment"
         android:icon="@drawable/ic_staff"
         android:title="Nhân viên" />
+  
+  <item
+        android:id="@+id/categoryAddFragment"
+        android:icon="@drawable/ic_library_books"
+        android:title="Thể loại" />
+  
+          
 </menu>
