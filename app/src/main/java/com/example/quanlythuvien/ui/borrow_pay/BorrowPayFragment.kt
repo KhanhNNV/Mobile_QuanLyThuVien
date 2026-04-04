@@ -206,7 +206,7 @@ class BorrowPayFragment :Fragment(){
     private fun showDetailDialog(item: LoanItemData){
 
         //Nặn khuôn cho giao diện Dialog
-        val dialogView = layoutInflater.inflate(R.layout.dialog_layout_detail, null)
+        val dialogView = layoutInflater.inflate(R.layout.layout_dialog_loan, null)
 
         //Xây dựng hộp thoại và bỏ  khuông giao diện vào hộp thoại
         val alertDialog = MaterialAlertDialogBuilder(requireContext())

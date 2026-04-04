@@ -20,44 +20,43 @@ class CrudStaffFragment: Fragment() {
     fun getMockStaffData(): List<StaffData> {
         return listOf(
             StaffData(
+                name = "Nguyễn Trung",
+                staffId = 1001L,
                 userName = "admin_trungtam",
-                passWord = "hash_e10adc3949ba59abbe56e057f20f883e", // Thực tế sẽ là chuỗi mã hóa
-                libraryName = "Thư viện Trung tâm",
-                is_active = true
+                isActive = true
             ),
             StaffData(
+                name = "Nguyễn Văn A",
+                staffId = 1002L,
                 userName = "nv_nguyenvana",
-                passWord = "hash_8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92",
-                libraryName = "Thư viện Cơ sở 1",
-                is_active = true
+                isActive = true
             ),
             StaffData(
+                name = "Lê Thị B",
+                staffId = 1003L,
                 userName = "nv_lethib",
-                passWord = "hash_c33367701511b4f6020ec61ded352059",
-                libraryName = "Thư viện Cơ sở 2",
-                is_active = false // Test trạng thái "Đã khóa"
+                isActive = false // Đã khóa
             ),
             StaffData(
+                name = "Trần Văn C",
+                staffId = 1004L,
                 userName = "nv_tranc",
-                passWord = "hash_0cc175b9c0f1b6a831c399e269772661",
-                libraryName = "Thư viện Trung tâm",
-                is_active = true
+                isActive = true
             ),
             StaffData(
+                name = "Phạm Chí D",
+                staffId = 1005L,
                 userName = "nv_phamchid",
-                passWord = "hash_92eb5ffee6ae2fec3ad71c777531578f",
-                libraryName = "Thư viện Cơ sở 1",
-                is_active = false // Test trạng thái "Đã khóa"
+                isActive = false // Đã khóa
             ),
             StaffData(
+                name = "Admin Cơ Sở 2",
+                staffId = 1006L,
                 userName = "admin_coso2",
-                passWord = "hash_4a8a08f09d37b73795649038408b5f33",
-                libraryName = "Thư viện Cơ sở 2",
-                is_active = true
+                isActive = true
             )
         )
     }
-
     // Khai báo các View
     private lateinit var autoSearchStaff: AutoCompleteTextView
     private lateinit var spnStatusFilter: Spinner
@@ -153,8 +152,8 @@ class CrudStaffFragment: Fragment() {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 val listFilter = listStaff.filter { item ->
                     when (position) {
-                        1 -> item.is_active == true  // Chọn "Đang hoạt động" -> Giữ lại người có is_active là true
-                        2 -> item.is_active == false // Chọn "Đã khóa" -> Giữ lại người có is_active là false
+                        1 -> item.isActive == true  // Chọn "Đang hoạt động" -> Giữ lại người có is_active là true
+                        2 -> item.isActive == false // Chọn "Đã khóa" -> Giữ lại người có is_active là false
                         else -> true                 // Chọn "Tất cả" (position = 0) -> return true để giữ lại hết
                     }
                 }

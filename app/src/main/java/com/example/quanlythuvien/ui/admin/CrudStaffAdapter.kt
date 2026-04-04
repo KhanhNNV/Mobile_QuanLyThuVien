@@ -15,9 +15,9 @@ class CrudStaffAdapter (
 ) : ListAdapter<StaffData, CrudStaffAdapter.StaffViewHolder>(StaffDiffCallback()) {
 
     inner class StaffViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val UserName: TextView = itemView.findViewById(R.id.tvUsername)
-        private val PassWord: TextView = itemView.findViewById(R.id.tvPassword)
-        private val LibraryName: TextView = itemView.findViewById(R.id.tvLibraryName)
+        private val UserName: TextView = itemView.findViewById(R.id.tvUserName)
+        private val StaffId: TextView=itemView.findViewById(R.id.tvStaffId)
+        private val Name: TextView = itemView.findViewById(R.id.tvName)
         private val Active: TextView = itemView.findViewById(R.id.tvStatusActive)
 
         // Nút menu
@@ -25,10 +25,10 @@ class CrudStaffAdapter (
 
         // Hàm bơm dữ liệu
         fun bind(item: StaffData){
+            StaffId.text=item.staffId.toString()
             UserName.text = item.userName
-            PassWord.text = "********" // Khuyên dùng: Ẩn mật khẩu
-            LibraryName.text = item.libraryName
-            val status = item.is_active
+            Name.text = item.name
+            val status = item.isActive
             val context = itemView.context
 
             // Xử lý status cho tài khoản Staff
