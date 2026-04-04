@@ -21,14 +21,21 @@
 
     <color name="chip_primary">#6c88f0</color>
     <color name="chip_secondary">#899ef0</color>
+    <color name="chip_active">#304671</color>
+    <color  name="chip_error">#EE3535</color>
 
+
+    <color name="bg_chip_active">#B1C6F9</color>
     <color name="bg_chip_primary">#0f298a</color>
     <color name="bg_chip_secondary">#1d45e2</color>
+    <color name="bg_chip_error">#FFDAD6</color>
+
 
     <color name="status_success">#92edb3</color>
     <color name="status_error">#f58a8a</color>
     <color name="status_warning">#F59E0B</color>
     <color name="status_info">#9ec1fa</color>
+
     <color name="text_status_info">#3B82F6</color>
     <color name="text_status_success">#22C55E</color>
     <color name="text_status_error">#EF4444</color>

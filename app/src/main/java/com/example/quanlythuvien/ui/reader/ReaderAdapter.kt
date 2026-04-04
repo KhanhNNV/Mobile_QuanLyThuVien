@@ -14,7 +14,10 @@ open class ReaderDiffCallback {
 
 }
 
-class ReaderAdapter : ListAdapter<Reader, ReaderAdapter.ReaderViewHolder>(ReaderDiffCallback()) {
+class ReaderAdapter (
+    private val onItemClick: (Reader) -> Unit
+): ListAdapter<Reader, ReaderAdapter.ReaderViewHolder>(ReaderDiffCallback()) {
+
     override fun onCreateViewHolder(
         p0: ViewGroup, p1: Int
     ): ReaderViewHolder {
@@ -27,6 +30,10 @@ class ReaderAdapter : ListAdapter<Reader, ReaderAdapter.ReaderViewHolder>(Reader
     ) {
         val currentReader = getItem(p1)
         p0.bind(currentReader)
+
+        p0.itemView.setOnClickListener {
+            onItemClick(currentReader)
+        }
     }
 
     class ReaderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

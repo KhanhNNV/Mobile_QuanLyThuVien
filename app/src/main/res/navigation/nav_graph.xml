@@ -66,4 +66,10 @@
         android:name="com.example.quanlythuvien.ui.category.CategoryAddFragment"
         android:label="Thể loại"
         tools:layout="@layout/fragment_category_add" />
+
+    <fragment
+        android:id="@+id/readerDetailFragment"
+        android:name="com.example.quanlythuvien.ui.reader.ReaderDetailFragment"
+        android:label="Chi tiết Độc Giả"
+        />
 </navigation>
