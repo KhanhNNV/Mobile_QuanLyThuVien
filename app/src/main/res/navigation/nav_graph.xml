@@ -61,4 +61,10 @@
         android:name="com.example.quanlythuvien.ui.reader.ReaderListFragment"
         android:label="Độc Giả"
         tools:layout="@layout/fragment_reader_list" />
+
+    <fragment
+        android:id="@+id/readerDetailFragment"
+        android:name="com.example.quanlythuvien.ui.reader.ReaderDetailFragment"
+        android:label="Chi tiết Độc Giả"
+        />
 </navigation>

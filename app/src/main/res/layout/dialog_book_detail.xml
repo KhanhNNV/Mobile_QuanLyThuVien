@@ -15,21 +15,50 @@
         android:padding="24dp"
         android:background="@color/white">
 
-        <TextView android:id="@+id/tvDetailTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/btn_primary" android:textSize="20sp" android:textStyle="bold" android:gravity="center" android:layout_marginBottom="16dp" />
+        <TextView
+            android:id="@+id/tvDetailTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/btn_primary"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginBottom="16dp" />
+
         <TextView android:id="@+id/tvDetailAuthor" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/text_primary" android:textSize="15sp" android:layout_marginBottom="8dp"/>
         <TextView android:id="@+id/tvDetailCategory" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/text_primary" android:textSize="15sp" android:layout_marginBottom="8dp"/>
         <TextView android:id="@+id/tvDetailStatus" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/text_primary" android:textSize="15sp" android:layout_marginBottom="16dp" />
 
         <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#EEEEEE" android:layout_marginBottom="12dp"/>
 
-        <TextView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Danh sách mã cuốn sách:"
-            android:textColor="@color/text_primary"
-            android:textStyle="bold"
-            android:textSize="14sp"
-            android:layout_marginBottom="8dp"/>
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Danh sách bản sao:"
+                android:textColor="@color/text_primary"
+                android:textStyle="bold"
+                android:textSize="14sp" />
+
+            <Button
+                android:id="@+id/btnAddCopy"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:text="Thêm mới"
+                android:textSize="12sp"
+                android:textColor="@color/white"
+                android:backgroundTint="@color/btn_primary"
+                app:cornerRadius="8dp"
+                app:icon="@drawable/baseline_add_24"
+                app:iconSize="16dp"/>
+        </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvBookCopies"

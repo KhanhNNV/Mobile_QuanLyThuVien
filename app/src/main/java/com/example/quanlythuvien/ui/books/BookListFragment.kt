@@ -10,12 +10,14 @@ import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.Spinner
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quanlythuvien.R
 import com.example.quanlythuvien.data.entity.Book
+import com.google.android.material.textfield.TextInputEditText
 
 class BookListFragment : Fragment() {
 
@@ -23,55 +25,42 @@ class BookListFragment : Fragment() {
     private lateinit var bookAdapter: BookAdapter
     private lateinit var spinnerCategory: Spinner
 
-    // Khai báo các biến cho phần Filter
     private lateinit var btnToggleFilter: ImageButton
     private lateinit var llFilterContainer: LinearLayout
     private var isFilterExpanded = false
-
     private lateinit var btnAddBook : Button
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_book_list, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Đổi tên Header
         val tvHeaderTitle = view.findViewById<TextView>(R.id.tvHeaderTitle)
         val tvHeaderSubtitle = view.findViewById<TextView>(R.id.tvHeaderSubtitle)
         tvHeaderTitle?.text = "Kho Sách"
         tvHeaderSubtitle?.text = "Quản lý và cập nhật sách"
 
-        // Ánh xạ View trước
         recyclerView = view.findViewById(R.id.recyclerViewBooks)
         btnToggleFilter = view.findViewById(R.id.btnToggleFilter)
         llFilterContainer = view.findViewById(R.id.llFilterContainer)
         spinnerCategory = view.findViewById(R.id.spinnerCategory)
         btnAddBook = view.findViewById(R.id.btnAddBook)
 
-        // Set nút thêm sách
         btnAddBook.setOnClickListener {
             findNavController().navigate(R.id.bookImportFragment)
         }
 
-        // Khởi tạo danh sách và Adapter
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         val dummyBooks = createDummyData()
         bookAdapter = BookAdapter(dummyBooks)
 
-        // Lắng nghe sự kiện click mở Dialog
         bookAdapter.onItemClick = { selectedBook ->
             showBookDetailDialog(selectedBook)
         }
 
-        // Gắn adapter vào RecyclerView
         recyclerView.adapter = bookAdapter
-
-        // Cài đặt các chức năng khác
         setupFilterToggle()
         setupCategorySpinner()
     }
@@ -86,7 +75,6 @@ class BookListFragment : Fragment() {
             android.view.ViewGroup.LayoutParams.WRAP_CONTENT
         )
 
-        // Ánh xạ View của Dialog
         val tvTitle = dialog.findViewById<TextView>(R.id.tvDetailTitle)
         val tvAuthor = dialog.findViewById<TextView>(R.id.tvDetailAuthor)
         val tvCategory = dialog.findViewById<TextView>(R.id.tvDetailCategory)
@@ -94,7 +82,9 @@ class BookListFragment : Fragment() {
         val rvBookCopies = dialog.findViewById<RecyclerView>(R.id.rvBookCopies)
         val btnClose = dialog.findViewById<Button>(R.id.btnCloseDialog)
 
-        // Đổ thông tin sách gốc
+        // 1. ÁNH XẠ NÚT THÊM BẢN SAO TỪ UI
+        val btnAddCopy = dialog.findViewById<Button>(R.id.btnAddCopy)
+
         val categoryName = when (book.categoryId) {
             1 -> "Công nghệ thông tin (CNTT)"
             2 -> "Tâm lý"
@@ -108,21 +98,18 @@ class BookListFragment : Fragment() {
         tvCategory?.text = "Thể loại: $categoryName"
 
         if (book.availableQuantity > 0) {
-            tvStatus?.text = "Tổng quan: Còn ${book.availableQuantity} cuốn" // Đã bỏ phần / Tổng
+            tvStatus?.text = "Tổng quan: Còn ${book.availableQuantity} cuốn"
             tvStatus?.setTextColor(resources.getColor(R.color.green, null))
         } else {
             tvStatus?.text = "Tổng quan: Đã hết sách trong kho"
             tvStatus?.setTextColor(resources.getColor(R.color.red, null))
         }
 
-        // Cài đặt RECYCLERVIEW mã sách trong dialog
         rvBookCopies?.layoutManager = LinearLayoutManager(requireContext())
-
         val copyList = mutableListOf<BookCopyItem>()
         for (i in 1..book.totalQuantity) {
             val statusText: String
             val statusColor: Int
-
             if (i <= book.availableQuantity) {
                 statusText = "Có sẵn"
                 statusColor = resources.getColor(R.color.green, null)
@@ -133,19 +120,70 @@ class BookListFragment : Fragment() {
                 statusText = "Đang mượn"
                 statusColor = resources.getColor(R.color.yellow, null)
             }
-
-            // Đưa dữ liệu vào danh sách
             copyList.add(BookCopyItem("Mã cuốn: B${book.bookId}-$i", statusText, statusColor))
         }
-
-        // Gắn Adapter vào RecyclerView
         rvBookCopies?.adapter = BookCopyAdapter(copyList)
 
         btnClose?.setOnClickListener {
             dialog.dismiss()
         }
 
+        // 2. SỰ KIỆN CLICK MỞ DIALOG THÊM BẢN SAO
+        btnAddCopy?.setOnClickListener {
+            showAddCopyDialog(book)
+        }
+
         dialog.show()
+    }
+
+    // 3. HÀM XỬ LÝ DIALOG THÊM BẢN SAO (FORM NHẬP LIỆU)
+    private fun showAddCopyDialog(parentBook: Book) {
+        val addDialog = android.app.Dialog(requireContext())
+        addDialog.setContentView(R.layout.dialog_add_book_copy)
+
+        addDialog.window?.setBackgroundDrawable(android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT))
+        addDialog.window?.setLayout(
+            android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+            android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+
+        val tvInfo = addDialog.findViewById<TextView>(R.id.tvAddCopyBookInfo)
+        val edtBarcode = addDialog.findViewById<TextInputEditText>(R.id.edtBarcode)
+        val spinnerCondition = addDialog.findViewById<Spinner>(R.id.spinnerCondition)
+        val btnCancel = addDialog.findViewById<Button>(R.id.btnCancelAddCopy)
+        val btnSave = addDialog.findViewById<Button>(R.id.btnSaveCopy)
+
+        // Set Book ID tự động từ cuốn sách cha
+        tvInfo.text = "Sách: ${parentBook.title} (ID: ${parentBook.bookId})"
+
+        // Khởi tạo danh sách tình trạng cho Spinner (Dropdown)
+        val conditions = listOf("NEW", "GOOD", "FAIR", "POOR")
+        val spinnerAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, conditions)
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinnerCondition.adapter = spinnerAdapter
+
+        // Hủy bỏ thêm
+        btnCancel.setOnClickListener {
+            addDialog.dismiss()
+        }
+
+        // Nhấn Lưu
+        btnSave.setOnClickListener {
+            val barcode = edtBarcode.text.toString().trim()
+            val condition = spinnerCondition.selectedItem.toString()
+            val status = "AVAILABLE" // Mặc định ở background
+
+            if (barcode.isEmpty()) {
+                Toast.makeText(requireContext(), "Vui lòng nhập Barcode!", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            // Ghi nhận thành công (Sau này bạn ghép lệnh gọi ViewModel/Room Database vào đây)
+            Toast.makeText(requireContext(), "Nhập kho thành công!\nBarcode: $barcode\nTình trạng: $condition", Toast.LENGTH_LONG).show()
+            addDialog.dismiss()
+        }
+
+        addDialog.show()
     }
 
     private fun setupCategorySpinner() {
@@ -158,7 +196,6 @@ class BookListFragment : Fragment() {
     private fun setupFilterToggle() {
         btnToggleFilter.setOnClickListener {
             isFilterExpanded = !isFilterExpanded
-
             if (isFilterExpanded) {
                 llFilterContainer.visibility = View.VISIBLE
                 btnToggleFilter.animate().rotation(90f).setDuration(200).start()
@@ -184,23 +221,19 @@ class BookListFragment : Fragment() {
 data class BookCopyItem(val copyId: String, val statusText: String, val statusColor: Int)
 
 class BookCopyAdapter(private val copyList: List<BookCopyItem>) : RecyclerView.Adapter<BookCopyAdapter.CopyViewHolder>() {
-
     class CopyViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tvCopyId: TextView = view.findViewById(R.id.tvCopyId)
         val tvCopyStatus: TextView = view.findViewById(R.id.tvCopyStatus)
     }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CopyViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_book_copy, parent, false)
         return CopyViewHolder(view)
     }
-
     override fun onBindViewHolder(holder: CopyViewHolder, position: Int) {
         val item = copyList[position]
         holder.tvCopyId.text = item.copyId
         holder.tvCopyStatus.text = item.statusText
         holder.tvCopyStatus.setTextColor(item.statusColor)
     }
-
     override fun getItemCount() = copyList.size
 }
