@@ -101,5 +101,10 @@
 
     <string name="tvTitleQuickAccess"> TRUY CẬP NHANH</string>
     <string name="nhập">＋ Nhập</string>
+    <string name="nh_p_m_th_vd_sv001">Nhập mã thẻ (VD: SV001)...</string>
+    <string name="hintcategory">VD: Công nghệ thông tin, Lịch sử...</string>
+    <string name="addcategory">Thêm Thể Loại</string>
+    <string name="textviewct">Vui lòng nhập tên thể loại sách mới</string>
+    <string name="nameCt">Tên thể loại *</string>
 
 </resources>

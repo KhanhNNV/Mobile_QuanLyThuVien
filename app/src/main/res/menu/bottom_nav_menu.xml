@@ -19,5 +19,9 @@
         android:id="@+id/readerListFragment"
         android:icon="@drawable/ic_group"
         android:title="Độc Giả" />
+    <item
+        android:id="@+id/categoryAddFragment"
+        android:icon="@drawable/ic_library_books"
+        android:title="Thể loại" />
 
 </menu>
