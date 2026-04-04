@@ -1,116 +1,111 @@
-    <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="8dp"
+    android:layout_marginVertical="6dp"
+    app:cardBackgroundColor="@color/bg_card"
+    app:cardCornerRadius="10dp"
+    app:cardElevation="3dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="8dp"
-        android:layout_marginVertical="6dp"
-        app:cardCornerRadius="10dp"
-        app:cardElevation="3dp"
-        app:cardBackgroundColor="@color/bg_card">
+        android:padding="12dp">
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/tvName"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="12dp">
+            android:layout_marginEnd="12dp"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:text="Nguyễn Văn A"
+            android:textColor="@color/text_primary"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@+id/tvLoanStatus"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-            <!-- HÀNG 1 -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
+        <TextView
+            android:id="@+id/tvLoanStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_status"
+            android:backgroundTint="@color/status_info"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="2dp"
+            android:text="Đang mượn"
+            android:textColor="@color/text_status_info"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/tvName"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/tvName" />
 
-                <!-- BÊN TRÁI -->
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
+        <TextView
+            android:id="@+id/tvMa"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/bg_status"
+            android:backgroundTint="@color/bg_chip_primary"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="2dp"
+            android:text="@string/loanId"
+            android:textColor="@color/chip_primary"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvName" />
 
-                    <TextView
-                        android:id="@+id/tvName"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/text_primary"
-                        android:text="Nguyễn Văn A"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-                        <TextView
-                            android:id="@+id/tvMa"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/loanId"
-                            android:paddingVertical="2dp"
-                            android:paddingHorizontal="8dp"
-                            android:background="@drawable/bg_status"
-                            android:textColor="@color/chip_primary"
-                            android:backgroundTint="@color/bg_chip_primary"
-                            android:textSize="13sp"
-                            android:textStyle="bold" />
-                        <TextView
-                            android:id="@+id/tvLoanId"
-                            android:text="RV01"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textColor="@color/text_secondary"
-                            android:textSize="13sp" />
+        <TextView
+            android:id="@+id/tvLoanId"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="12dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="RV01"
+            android:textColor="@color/text_secondary"
+            android:textSize="13sp"
+            app:layout_constraintBottom_toBottomOf="@+id/tvMa"
+            app:layout_constraintEnd_toStartOf="@+id/tvLoanStatus"
+            app:layout_constraintStart_toEndOf="@+id/tvMa"
+            app:layout_constraintTop_toTopOf="@+id/tvMa" />
 
-                    </LinearLayout>
+        <TextView
+            android:id="@+id/tvTitleDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_status"
+            android:backgroundTint="@color/bg_chip_secondary"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="2dp"
+            android:text="@string/dueDate"
+            android:textColor="@color/chip_secondary"
+            android:textSize="14sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvMa" />
 
-                </LinearLayout>
+        <TextView
+            android:id="@+id/tvDueDate"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="20/06/2026"
+            android:textColor="@color/text_secondary"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="@+id/tvTitleDate"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/tvTitleDate"
+            app:layout_constraintTop_toTopOf="@+id/tvTitleDate" />
 
-                <!-- STATUS -->
-                <TextView
-                    android:id="@+id/tvLoanStatus"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/bg_status"
-                    android:backgroundTint="@color/status_info"
-                    android:paddingHorizontal="8dp"
-                    android:paddingVertical="2dp"
-                    android:text="Đang mượn"
-                    android:textColor="@color/text_status_info"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-
-            <!-- HÀNG CUỐI -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
-
-                <TextView
-                    android:id="@+id/tvTitleDate"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/dueDate"
-                    android:paddingHorizontal="8dp"
-                    android:paddingVertical="2dp"
-                    android:background="@drawable/bg_status"
-                    android:textColor="@color/chip_primary"
-                    android:backgroundTint="@color/bg_chip_primary"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/tvDueDate"
-                    android:text="20/06/2026"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="14sp" />
-            </LinearLayout>
-
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>
