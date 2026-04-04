@@ -3,31 +3,65 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#F5F5F5">
 
-    <include
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/headerDashboard"
-        layout="@layout/layout_custom_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        />
+        android:background="@color/white"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageButton
+            android:id="@+id/ivBack"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Quay lại"
+            android:src="@drawable/baseline_arrow_back_24"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/text_primary" />
+
+        <TextView
+            android:id="@+id/tvHeaderTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:text="Chi tiết độc giả"
+            android:textColor="@color/text_primary"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/ivBack"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <View
+            android:id="@+id/vDivider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="16dp"
+            android:background="#E0E0E0"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvHeaderTitle" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/nestedScrollView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:clipToPadding="false"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/headerDashboard"
-        app:layout_constraintVertical_bias="1.0"
-        tools:layout_editor_absoluteX="0dp">
+        app:layout_constraintTop_toBottomOf="@+id/headerDashboard">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!--Thẻ thông tin của reader-->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -36,8 +70,7 @@
                 android:background="@color/bg_card"
                 android:padding="16dp"
                 app:cardCornerRadius="16dp"
-                app:cardElevation="2dp"
-                app:layout_constraintTop_toBottomOf="@+id/headerDashboard">
+                app:cardElevation="2dp">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
@@ -45,7 +78,6 @@
                     android:paddingHorizontal="5dp"
                     android:paddingVertical="16dp">
 
-                    <!--Avatar-->
                     <TextView
                         android:id="@+id/tvAvatar"
                         android:layout_width="64dp"
@@ -60,8 +92,9 @@
                         android:textStyle="bold"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-                    <!--Tên reader-->
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintVertical_bias="0.0" />
+
                     <TextView
                         android:id="@+id/tvReaderName"
                         android:layout_width="wrap_content"
@@ -73,25 +106,76 @@
                         android:textStyle="bold"
                         app:layout_constraintStart_toEndOf="@+id/tvAvatar"
                         app:layout_constraintTop_toTopOf="parent" />
-                    <!--Số điện thoại-->
+
                     <TextView
                         android:id="@+id/tvReaderPhone"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="09172220000"
                         android:textColor="@color/text_secondary"
-                        android:textSize="16sp"
+                        android:textSize="14sp"
                         app:layout_constraintStart_toStartOf="@+id/tvReaderName"
                         app:layout_constraintTop_toBottomOf="@+id/tvReaderName" />
 
                     <LinearLayout
+                        android:id="@+id/layoutDatesVertical"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-
-                        android:layout_marginTop="7dp"
-                        android:orientation="horizontal"
+                        android:layout_marginTop="6dp"
+                        android:orientation="vertical"
                         app:layout_constraintStart_toStartOf="@+id/tvReaderName"
                         app:layout_constraintTop_toBottomOf="@+id/tvReaderPhone">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Ngày tham gia: "
+                                android:textColor="@color/text_secondary"
+                                android:textStyle="bold"
+                                android:textSize="12sp" />
+                            <TextView
+                                android:id="@+id/tvJoinDate"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="15/05/2022"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:orientation="horizontal">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Ngày hết hạn: "
+                                android:textColor="@color/text_secondary"
+                                android:textStyle="bold"
+                                android:textSize="12sp" />
+                            <TextView
+                                android:id="@+id/tvExpireDate"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="15/05/2025"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/layoutChipsRow1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:orientation="horizontal"
+                        app:layout_constraintStart_toStartOf="@+id/tvReaderName"
+                        app:layout_constraintTop_toBottomOf="@+id/layoutDatesVertical">
 
                         <TextView
                             android:id="@+id/tvReaderType"
@@ -102,40 +186,52 @@
                             android:paddingVertical="4dp"
                             android:text="Sinh viên"
                             android:textColor="@color/chip_primary"
-                            android:textSize="12sp"
+                            android:textSize="11sp"
                             android:textStyle="bold" />
 
                         <TextView
                             android:id="@+id/tvReaderStatus"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="5dp"
+                            android:layout_marginStart="6dp"
                             android:background="@drawable/bg_tag_active"
                             android:paddingHorizontal="10dp"
                             android:paddingVertical="4dp"
                             android:text="Còn hạn"
                             android:textColor="@color/chip_active"
-                            android:textSize="12sp"
+                            android:textSize="11sp"
                             android:textStyle="bold" />
 
                         <TextView
                             android:id="@+id/tvDebtAmount"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="5dp"
+                            android:layout_marginStart="6dp"
                             android:background="@drawable/bg_chip_error"
                             android:paddingHorizontal="10dp"
                             android:paddingVertical="4dp"
                             android:text="Nợ: 50k"
                             android:textColor="@color/chip_error"
-                            android:textSize="12sp"
+                            android:textSize="11sp"
                             android:textStyle="bold" />
                     </LinearLayout>
-                </androidx.constraintlayout.widget.ConstraintLayout>
 
+                    <ImageView
+                        android:id="@+id/ivEditProfile"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_marginEnd="15dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:padding="6dp"
+                        android:src="@android:drawable/ic_menu_edit"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="@+id/tvReaderName"
+                        app:tint="@color/blue" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!--3 CARDS-->
             <LinearLayout
                 android:id="@+id/layoutStats"
                 android:layout_width="match_parent"
@@ -146,7 +242,6 @@
                 android:orientation="horizontal"
                 android:weightSum="3">
 
-                <!--Card 1-->
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -170,7 +265,7 @@
                             android:layout_height="wrap_content"
                             android:text="Đã mượn"
                             android:textColor="@color/text_tertiary"
-                            android:textSize="14sp"
+                            android:textSize="13sp"
                             android:textStyle="bold" />
 
                         <TextView
@@ -180,13 +275,11 @@
                             android:layout_marginTop="4dp"
                             android:text="24"
                             android:textColor="@color/text_primary"
-                            android:textSize="24sp"
+                            android:textSize="22sp"
                             android:textStyle="bold" />
                     </LinearLayout>
-
                 </com.google.android.material.card.MaterialCardView>
 
-                <!--Card 2-->
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -203,7 +296,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
-
                         android:orientation="vertical"
                         android:padding="12dp">
 
@@ -212,7 +304,7 @@
                             android:layout_height="wrap_content"
                             android:text="Đang mượn"
                             android:textColor="@color/text_tertiary"
-                            android:textSize="14sp"
+                            android:textSize="13sp"
                             android:textStyle="bold" />
 
                         <TextView
@@ -222,13 +314,11 @@
                             android:layout_marginTop="4dp"
                             android:text="3"
                             android:textColor="@color/blue"
-                            android:textSize="24sp"
+                            android:textSize="22sp"
                             android:textStyle="bold" />
                     </LinearLayout>
-
                 </com.google.android.material.card.MaterialCardView>
 
-                <!--Card 3-->
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -252,7 +342,7 @@
                             android:layout_height="wrap_content"
                             android:text="Sách trễ hạn"
                             android:textColor="@color/text_tertiary"
-                            android:textSize="14sp"
+                            android:textSize="13sp"
                             android:textStyle="bold" />
 
                         <TextView
@@ -262,16 +352,13 @@
                             android:layout_marginTop="4dp"
                             android:text="1"
                             android:textColor="@color/red"
-                            android:textSize="24sp"
+                            android:textSize="22sp"
                             android:textStyle="bold" />
                     </LinearLayout>
-
                 </com.google.android.material.card.MaterialCardView>
-
 
             </LinearLayout>
 
-            <!--TAB LAYOUT-->
             <com.google.android.material.tabs.TabLayout
                 android:id="@+id/tabLayout"
                 android:layout_width="match_parent"
@@ -301,15 +388,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:nestedScrollingEnabled="false"
                 android:clipToPadding="false"
+                android:nestedScrollingEnabled="false"
                 tools:itemCount="3"
                 tools:listitem="@layout/item_reader_book_detail" />
 
         </LinearLayout>
-
-
     </androidx.core.widget.NestedScrollView>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

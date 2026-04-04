@@ -20,8 +20,8 @@ fun Fragment.setupCustomHeader(
     val tvHeaderTitle = view.findViewById<TextView>(R.id.tvHeaderTitle)
     val tvHeaderSubtitle = view.findViewById<TextView>(R.id.tvHeaderSubtitle)
     val btnBell = view.findViewById<MaterialCardView>(R.id.btnBell)
-    val ivBack = view.findViewById<ImageView>(R.id.ivBack)
-    val ivEdit = view.findViewById<ImageView>(R.id.ivEdit)
+    val ivBack = view.findViewById<ImageView>(R.id.btnBack)
+    val ivEdit = view.findViewById<ImageView>(R.id.ivEditProfile)
     tvHeaderTitle?.text = title
 
     if (subtitle.isNotEmpty()) {
