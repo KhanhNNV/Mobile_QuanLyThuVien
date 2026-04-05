@@ -41,11 +41,17 @@ class ReaderAddFragment : Fragment() {
         val edtReaderPhone = view.findViewById<TextInputEditText>(R.id.edtReaderPhone)
         val spinnerReaderType = view.findViewById<AutoCompleteTextView>(R.id.spinnerReaderType)
         val btnSaveReader = view.findViewById<MaterialButton>(R.id.btnSaveReader)
+        val btnCancelReader = view.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnCancelReader)
 
         val displayTypes = ReaderType.entries.map { it.value }.toTypedArray()
 
         val adapter = android.widget.ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, displayTypes)
         spinnerReaderType.setAdapter(adapter)
+
+
+        btnCancelReader.setOnClickListener {
+            findNavController().popBackStack()
+        }
 
         // 2. Lắng nghe sự kiện người dùng bấm vào nút Lưu
         btnSaveReader.setOnClickListener {
