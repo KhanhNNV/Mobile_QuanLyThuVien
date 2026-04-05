@@ -76,9 +76,14 @@
         android:label="Độc Giả"
         tools:layout="@layout/fragment_reader_list" />
     <fragment
+        android:id="@+id/categoryListFragment"
+        android:name="com.example.quanlythuvien.ui.category.CategoryListFragment"
+        android:label="Thể loại"
+        tools:layout="@layout/fragment_category_list" />
+    <fragment
         android:id="@+id/categoryAddFragment"
         android:name="com.example.quanlythuvien.ui.category.CategoryAddFragment"
-        android:label="Thể loại"
+        android:label="Thêm thể loại"
         tools:layout="@layout/fragment_category_add" />
 
 
