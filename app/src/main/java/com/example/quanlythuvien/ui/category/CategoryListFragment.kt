@@ -28,9 +28,27 @@ class CategoryListFragment : Fragment() {
         tvHeaderTitle?.text = "Thể loại"
         tvHeaderSubtitle?.text = "Quản lý thể loại sách"
 
-        val btnAddCategory = view.findViewById<Button>(R.id.btnAddCategory)
-        btnAddCategory.setOnClickListener {
+        val fabAddCategory = view.findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.fabAddCategory)
+        fabAddCategory.setOnClickListener {
             findNavController().navigate(R.id.categoryAddFragment)
+        }
+
+        val mockData = listOf(
+            "Công nghệ thông tin",
+            "Kinh tế - Tài chính",
+            "Văn học - Tiểu thuyết",
+            "Lịch sử - Địa lý"
+        )
+
+        // 2. Tìm cái RecyclerView trong file fragment_category_list.xml
+        val recyclerView = view.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.recyclerViewCategories)
+
+        // 3. Nói cho Android biết là hãy xếp danh sách này theo chiều dọc (từ trên xuống)
+        recyclerView.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(requireContext())
+
+        // 4. Lắp Adapter vào cái RecyclerView
+        recyclerView.adapter = CategoryAdapter(mockData) { selectedName ->
+            findNavController().navigate(R.id.categoryEditFragment)
         }
 
     }

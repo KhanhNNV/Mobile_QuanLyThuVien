@@ -86,6 +86,11 @@
         android:label="Thêm thể loại"
         tools:layout="@layout/fragment_category_add" />
 
+    <fragment
+        android:id="@+id/categoryEditFragment"
+        android:name="com.example.quanlythuvien.ui.category.CategoryEditFragment"
+        android:label="Sửa thể loại"
+        tools:layout="@layout/fragment_category_edit" />
 
     <fragment
         android:id="@+id/staffListFragment"
