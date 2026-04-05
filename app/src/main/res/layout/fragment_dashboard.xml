@@ -27,6 +27,7 @@
 
 <!--            tổng sách-->
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cvTotalBooks"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
@@ -70,6 +71,7 @@
 
 <!--            tổng đang cho mượn-->
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cvTotalBorrowing"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
@@ -123,6 +125,7 @@
 
 <!--            tổng trễ hạn-->
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cvTotalDelayed"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
@@ -165,6 +168,7 @@
 
 <!--            tổng độc giả-->
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cvTotalReader"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"

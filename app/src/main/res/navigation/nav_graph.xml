@@ -40,18 +40,49 @@
         android:id="@+id/dashboardFragment"
         android:name="com.example.quanlythuvien.ui.dashboard.DashboardFragment"
         android:label="Dashboard"
-        tools:layout="@layout/fragment_dashboard" />
+        tools:layout="@layout/fragment_dashboard">
+
+        <action
+            android:id="@+id/action_dashboard_to_bookList"
+            app:destination="@id/bookListFragment"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/dashboardFragment"
+            app:popUpToInclusive="false"
+            app:popUpToSaveState="true"
+            app:restoreState="true" />
+
+        <action
+            android:id="@+id/action_dashboard_to_borrowPay"
+            app:destination="@id/borrowPayListFragment"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/dashboardFragment"
+            app:popUpToInclusive="false"
+            app:popUpToSaveState="true"
+            app:restoreState="true" />
+
+        <action
+            android:id="@+id/action_dashboard_to_readerList"
+            app:destination="@id/readerListFragment"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/dashboardFragment"
+            app:popUpToInclusive="false"
+            app:popUpToSaveState="true"
+            app:restoreState="true" />
+
+    </fragment>
 
     <fragment
         android:id="@+id/bookListFragment"
         android:name="com.example.quanlythuvien.ui.books.BookListFragment"
         android:label="Kho Sách"
         tools:layout="@layout/fragment_book_list" />
+
     <fragment
         android:id="@+id/bookImportFragment"
         android:name="com.example.quanlythuvien.ui.books.BookImportFragment"
         android:label="Kho Sách"
         tools:layout="@layout/fragment_book_import" />
+
     <fragment
         android:id="@+id/readerAddFragment"
         android:name="com.example.quanlythuvien.ui.reader.ReaderAddFragment"
@@ -75,11 +106,13 @@
         android:name="com.example.quanlythuvien.ui.reader.ReaderListFragment"
         android:label="Độc Giả"
         tools:layout="@layout/fragment_reader_list" />
+
     <fragment
         android:id="@+id/categoryListFragment"
         android:name="com.example.quanlythuvien.ui.category.CategoryListFragment"
         android:label="Thể loại"
         tools:layout="@layout/fragment_category_list" />
+
     <fragment
         android:id="@+id/categoryAddFragment"
         android:name="com.example.quanlythuvien.ui.category.CategoryAddFragment"
@@ -97,9 +130,10 @@
         android:name="com.example.quanlythuvien.ui.admin.CrudStaffFragment"
         android:label="Quản lý Nhân viên"
         tools:layout="@layout/layout_manager_staff_of_admin" />
+
     <fragment
         android:id="@+id/readerDetailFragment"
         android:name="com.example.quanlythuvien.ui.reader.ReaderDetailFragment"
-        android:label="Chi tiết Độc Giả"
-        />
+        android:label="Chi tiết Độc Giả" />
+
 </navigation>
