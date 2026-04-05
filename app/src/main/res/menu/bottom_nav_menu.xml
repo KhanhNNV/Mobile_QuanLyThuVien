@@ -25,7 +25,7 @@
         android:title="Nhân viên" />
   
   <item
-        android:id="@+id/categoryAddFragment"
+        android:id="@+id/categoryListFragment"
         android:icon="@drawable/ic_library_books"
         android:title="Thể loại" />
   
