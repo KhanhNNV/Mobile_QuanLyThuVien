@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.example.quanlythuvien.R
+import androidx.navigation.fragment.findNavController
 
 class CategoryEditFragment : Fragment() {
     override fun onCreateView(
@@ -14,6 +15,16 @@ class CategoryEditFragment : Fragment() {
     ): View? {
         // Nạp giao diện XML của màn hình Thêm Thể Loại
         return inflater.inflate(R.layout.fragment_category_edit, container, false)
+    }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val btnCancelEdit = view.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnCancelEdit)
+
+        btnCancelEdit.setOnClickListener {
+            findNavController().popBackStack()
+        }
+
     }
 
 
