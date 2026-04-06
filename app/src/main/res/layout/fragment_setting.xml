@@ -5,26 +5,22 @@
     android:layout_height="match_parent"
     android:fillViewport="true">
 
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <TextView
+        <include
+            android:id="@+id/headerDashboard"
+            layout="@layout/layout_custom_header"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="16dp"
-            android:text="Cài đặt hệ thống"
-            android:textColor="@color/text_primary"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-
+            android:layout_height="wrap_content" />
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cvManageStaff"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
             android:clickable="true"
             android:focusable="true"
             app:cardCornerRadius="12dp"
@@ -69,7 +65,6 @@
             android:id="@+id/cvLoanPolicy"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
             android:layout_marginTop="12dp"
             android:clickable="true"
             android:focusable="true"
@@ -115,7 +110,6 @@
             android:id="@+id/cvCategory"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
             android:layout_marginTop="12dp"
             android:clickable="true"
             android:focusable="true"
@@ -161,7 +155,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:paddingHorizontal="16dp"
             android:text="QUẢN LÝ CÁC LOẠI PHÍ"
             android:textColor="@color/text_primary"
             android:textSize="14sp"
@@ -170,7 +163,6 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
             android:layout_marginTop="8dp"
             app:cardCornerRadius="12dp"
             app:cardElevation="0dp"
@@ -321,6 +313,17 @@
 
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
+        <Button
+            android:id="@+id/btnLogout"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="32dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:text="Đăng xuất"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            app:backgroundTint="@color/btn_secondary" />
 
     </LinearLayout>
 </ScrollView>

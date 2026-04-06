@@ -139,6 +139,14 @@
     <fragment
         android:id="@+id/settingFragment"
         android:name="com.example.quanlythuvien.ui.setting.SettingFragment"
-        android:label="Cài đặt" />
+        android:label="Cài đặt" >
+    </fragment>
+
+    <fragment
+        android:id="@+id/loanPolicyFragment"
+        android:name="com.example.quanlythuvien.ui.borrow_pay.LoanPolicyFragment"
+        android:label="Chính sách mượn trả">
+    </fragment>
+
 
 </navigation>

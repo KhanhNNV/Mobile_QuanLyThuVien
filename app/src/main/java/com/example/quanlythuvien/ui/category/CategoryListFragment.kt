@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.navigation.fragment.findNavController
 import com.example.quanlythuvien.R
@@ -24,6 +25,7 @@ class CategoryListFragment : Fragment() {
 
         val tvHeaderTitle = view.findViewById<TextView>(R.id.tvHeaderTitle)
         val tvHeaderSubtitle = view.findViewById<TextView>(R.id.tvHeaderSubtitle)
+        val btnBack=view.findViewById<ImageButton>(R.id.btnBack)
 
         tvHeaderTitle?.text = "Thể loại"
         tvHeaderSubtitle?.text = "Quản lý thể loại sách"
@@ -49,6 +51,10 @@ class CategoryListFragment : Fragment() {
         // 4. Lắp Adapter vào cái RecyclerView
         recyclerView.adapter = CategoryAdapter(mockData) { selectedName ->
             findNavController().navigate(R.id.categoryEditFragment)
+        }
+
+        btnBack.setOnClickListener {
+            findNavController().popBackStack()
         }
 
     }

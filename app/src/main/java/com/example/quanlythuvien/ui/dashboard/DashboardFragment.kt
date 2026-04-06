@@ -25,7 +25,6 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
     private lateinit var cvTotalReader: MaterialCardView
     private lateinit var cvTotalDelayed: MaterialCardView
 
-    private lateinit var btnLogout: Button
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -47,8 +46,6 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
         cvTotalBorrowing = view.findViewById(R.id.cvTotalBorrowing)
         cvTotalReader=view.findViewById(R.id.cvTotalReader)
         cvTotalDelayed=view.findViewById(R.id.cvTotalDelayed)
-
-        btnLogout = view.findViewById(R.id.btnLogout)
     }
 
     private fun handleEvents() {
@@ -76,22 +73,5 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
         }
 
 
-
-        // ---- NÚT ĐĂNG XUẤT ----
-        btnLogout.setOnClickListener {
-            val sharedPreferences = requireActivity().getSharedPreferences("LibraryAppPrefs", Context.MODE_PRIVATE)
-            sharedPreferences.edit().apply {
-                putBoolean("isLoggedIn", false)
-                remove("username")
-                remove("userRole")
-                apply()
-            }
-
-            val navOptions = NavOptions.Builder()
-                .setPopUpTo(R.id.nav_graph, true)
-                .build()
-
-            findNavController().navigate(R.id.welcomeFragment, null, navOptions)
-        }
     }
 }
