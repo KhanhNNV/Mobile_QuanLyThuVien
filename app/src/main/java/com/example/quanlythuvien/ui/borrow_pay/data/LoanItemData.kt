@@ -6,5 +6,5 @@ data class LoanItemData(
     var dueDate: String,           // Đổi thành var để gia hạn được
     var overallStatus: String,     // Đổi thành var để cập nhật trạng thái tổng
     val readerName: String,
-    val borrowedBooks: List<LoanDetailItemData>
+    val borrowedBooks: MutableList<LoanDetailItemData>
 )

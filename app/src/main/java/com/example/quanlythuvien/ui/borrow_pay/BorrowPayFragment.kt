@@ -29,7 +29,8 @@ class BorrowPayFragment :Fragment(){
             LoanItemData(
                 1, "10/03/2026", "20/03/2026", "BORROWING", "Nguyễn Văn A",
                 mutableListOf(
-                    LoanDetailItemData("Lập trình Java Lập trình Java Lập trình Java Lập trình Java Lập trình Java", "James Gosling", "Kỹ thuật", null, "BORROWING")
+                    LoanDetailItemData("Lập trình Java", "James Gosling", "Kỹ thuật", null, "BORROWING"),
+                            LoanDetailItemData("Lập trình Python", "James Gosling", "Kỹ thuật", null, "BORROWING")
                 )
             ),
             LoanItemData(
@@ -48,7 +49,7 @@ class BorrowPayFragment :Fragment(){
     }
 
     private lateinit var fasAddLoan: FloatingActionButton
-// Nút thêm phiếu mượn mới
+// Nút thêm phiếu mượn
 
     private lateinit var autoSearch: AutoCompleteTextView
 // Ô tìm kiếm có gợi ý (search phiếu / người mượn / sách)
@@ -128,6 +129,7 @@ class BorrowPayFragment :Fragment(){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        //Custom lại header
         setupCustomHeader(
             view = view,
             title = "Mượn/Trả",
@@ -139,10 +141,13 @@ class BorrowPayFragment :Fragment(){
         sampleDataList=  getSampleData().toMutableList()
 
         //Khi có click vào item sẽ mở Dialog thông tin chi tiết
-        adapter = BorrowPayAdapter { item ->
-            showDetailDialog(item)
-        }
+        adapter = BorrowPayAdapter { clickedItem ->
+            // Dùng loanId để tìm ra phiên bản dữ liệu mới nhất, nóng hổi nhất từ danh sách gốc
+            val freshItem = sampleDataList.find { it.loanId == clickedItem.loanId } ?: clickedItem
 
+            // Truyền dữ liệu mới vào Dialog
+            showDetailDialog(freshItem)
+        }
         //Đổ dữ liệu vào RecyclerView
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -210,26 +215,21 @@ class BorrowPayFragment :Fragment(){
     }
 
     //Hàm hiển thị Dialog thông tin chi tiết của phiếu mượn
-    private fun showDetailDialog(item: LoanItemData){
+    private fun showDetailDialog(initialItem: LoanItemData) {
+        // 1. Tạo một biến var để lưu trữ trạng thái mới nhất của phiếu mượn
+        var currentItem = initialItem
 
-        //Nặn khuôn cho giao diện Dialog
         val dialogView = layoutInflater.inflate(R.layout.layout_dialog_loan, null)
-
-        //Xây dựng hộp thoại và bỏ  khuông giao diện vào hộp thoại
         val alertDialog = MaterialAlertDialogBuilder(requireContext())
             .setView(dialogView)
             .create()
-
-        //Mở Dialog lên
         alertDialog.show()
 
-        //Canh chỉnh lại kích thước của hộp thoại
         alertDialog.window?.setLayout(
             (resources.displayMetrics.widthPixels * 0.95).toInt(),
             ViewGroup.LayoutParams.WRAP_CONTENT
         )
 
-        //Ánh xạ các View trong Dialog Layout
         val tvReaderName = dialogView.findViewById<TextView>(R.id.tvDialogReaderName)
         val tvLoanId = dialogView.findViewById<TextView>(R.id.tvDialogLoanId)
         val tvStatus = dialogView.findViewById<TextView>(R.id.tvDialogStatus)
@@ -238,55 +238,93 @@ class BorrowPayFragment :Fragment(){
         val btnExtend = dialogView.findViewById<Button>(R.id.btChange)
         val rvBooks = dialogView.findViewById<RecyclerView>(R.id.rvBorrowedBooks)
 
+        tvReaderName.text = currentItem.readerName
+        tvLoanId.text = currentItem.loanId.toString()
+        tvBorrowDate.text = currentItem.borrowDate
+        tvDueDate.text = currentItem.dueDate
+        editStatusUI(currentItem.overallStatus, tvStatus)
 
-        tvReaderName.text = item.readerName
-        tvLoanId.text = item.loanId.toString()
-        tvBorrowDate.text = item.borrowDate
-        tvDueDate.text = item.dueDate
-        editStatusUI(item.overallStatus, tvStatus)
+        // 2. Logic xử lý sự kiện khi đổi trạng thái sách
+        val bookAdapter = DialogBorrowPayAdapter { targetBook, newStatus ->
 
-        val bookAdapter = DialogBorrowPayAdapter { book, newStatus ->
-            book.status = newStatus.value
+            // A. TẠO DANH SÁCH SÁCH MỚI
+            val updatedBooks = currentItem.borrowedBooks.map { book ->
+                // Tìm đúng cuốn sách đang thao tác (Lý tưởng nhất là so sánh bằng ID sách nếu bạn có)
+                if (book.title == targetBook.title) {
+                    val newReturnDate = if (newStatus == LoanDetailStatus.RETURNED) {
+                        SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
+                    } else null
 
-            //Nếu trạng thái mới là đã trả thì setup ngày trả
-            if (newStatus == LoanDetailStatus.RETURNED) {
-                book.returnDate = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
-            } else {
-                book.returnDate = null
+                    // Dùng .copy() để tạo bản sao cuốn sách với thông tin mới
+                    book.copy(status = newStatus.value, returnDate = newReturnDate)
+                } else {
+                    book // Sách khác giữ nguyên
+                }
+            }.toMutableList()
+
+            // B. TÍNH TOÁN TRẠNG THÁI PHIẾU MỚI
+            val hasAnyBookBorrowing = updatedBooks.any {
+                it.status == LoanDetailStatus.BORROWING.value || it.status == LoanDetailStatus.LOST.value
+            }
+            val newOverallStatus = if (hasAnyBookBorrowing) "BORROWING" else "RETURNED"
+
+            // C. TẠO BẢN SAO PHIẾU MƯỢN MỚI
+            currentItem = currentItem.copy(
+                borrowedBooks = updatedBooks,
+                overallStatus = newOverallStatus
+            )
+
+            // D. CẬP NHẬT VÀO DANH SÁCH GỐC (sampleDataList)
+            val index = sampleDataList.indexOfFirst { it.loanId == currentItem.loanId }
+            if (index != -1) {
+                sampleDataList[index] = currentItem
             }
 
+            // E. CẬP NHẬT GIAO DIỆN DIALOG (Không dùng notifyDataSetChanged)
+            editStatusUI(currentItem.overallStatus, tvStatus)
+            // Gửi danh sách sách mới vào adapter của Dialog để DiffUtil tự làm việc
+            (rvBooks.adapter as DialogBorrowPayAdapter).submitList(currentItem.borrowedBooks)
 
-            checkAndUpdateOverallStatus(item)
-
-
-            editStatusUI(item.overallStatus, tvStatus)
-
-            //ĐỂ SÁCH TRONG DIALOG ĐỔI MÀU NGAY LẬP TỨC
-            rvBooks.adapter?.notifyDataSetChanged()
-
-            //Bộ lọc trạng thái
+            // F. CẬP NHẬT MÀN HÌNH CHÍNH (Fragment)
             applyFilter()
         }
+
         rvBooks.layoutManager = LinearLayoutManager(requireContext())
         rvBooks.adapter = bookAdapter
-        bookAdapter.submitList(item.borrowedBooks)
+        bookAdapter.submitList(currentItem.borrowedBooks)
 
+        // 3. Xử lý logic gia hạn
         btnExtend.setOnClickListener {
-            handleExtension(item, tvDueDate)
+            handleExtension(currentItem, tvDueDate) { updatedItem ->
+                // Callback nhận dữ liệu mới từ handleExtension
+                currentItem = updatedItem
+                val index = sampleDataList.indexOfFirst { it.loanId == currentItem.loanId }
+                if (index != -1) {
+                    sampleDataList[index] = currentItem
+                }
+                applyFilter()
+            }
         }
-
     }
 
     //Hàm xử lý nút thay đổi trạng thái của sách
-    private fun handleExtension(item: LoanItemData, tvUpdate: TextView) {
+    private fun handleExtension(
+        currentItem: LoanItemData,
+        tvUpdate: TextView,
+        onExtended: (LoanItemData) -> Unit
+    ) {
         val calendar = Calendar.getInstance()
-        android.app.DatePickerDialog(requireContext(), { _, year, month, dayOfMonth ->
+        DatePickerDialog(requireContext(), { _, year, month, dayOfMonth ->
             val newDueDate = String.format("%02d/%02d/%d", dayOfMonth, month + 1, year)
-            item.dueDate = newDueDate
+
+            // Thay vì mutate: item.dueDate = newDueDate
+            // Hãy dùng copy:
+            val updatedItem = currentItem.copy(dueDate = newDueDate)
+
             tvUpdate.text = newDueDate
 
-            // Dùng applyFilter() để list tự làm mới lại theo bộ lọc
-            applyFilter()
+            // Truyền item mới về lại cho showDetailDialog xử lý cập nhật list
+            onExtended(updatedItem)
 
             Toast.makeText(requireContext(), "Gia hạn thành công!", Toast.LENGTH_SHORT).show()
         }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show()
@@ -314,22 +352,7 @@ class BorrowPayFragment :Fragment(){
         }
     }
 
-    //Hàm này check lại LoanDetailStatus để update LoanStatus
-    private fun checkAndUpdateOverallStatus(item: LoanItemData) {
-        //Kiểm tra trạng thái của tất cả những quyển sách có quyển sách nào còn mượn hay không
-        val hasAnyBookBorrowing = item.borrowedBooks.any {
-            it.status == LoanDetailStatus.BORROWING.value || it.status==LoanDetailStatus.LOST.value
-
-        }
-        //Nếu có thì LoanStatus là Đang mượn
-        if (hasAnyBookBorrowing) {
-            item.overallStatus = "BORROWING"
-        } else {//Nếu không thì đã trả
-            item.overallStatus = "RETURNED"
-        }
-    }
-
-
+    //Hàm xử lý bộ lọc
     private fun applyFilter() {
         val fromDateStr = edtFromDate.text.toString()
         val toDateStr = edtToDate.text.toString()
@@ -400,7 +423,6 @@ class BorrowPayFragment :Fragment(){
         }
 
         adapter.submitList(filteredList)
-
 
         if (filteredList.isEmpty()) {
             Toast.makeText(requireContext(), "Không tìm thấy phiếu mượn phù hợp!", Toast.LENGTH_SHORT).show()
