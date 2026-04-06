@@ -11,6 +11,20 @@
         tools:layout="@layout/fragment_welcome" />
 
     <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.example.quanlythuvien.ui.login.LoginFragment"
+        android:label="Login"
+        tools:layout="@layout/fragment_login">
+    </fragment>
+
+    <fragment
+        android:id="@+id/registerFragment"
+        android:name="com.example.quanlythuvien.ui.register.RegisterFragment"
+        android:label="Register"
+        tools:layout="@layout/fragment_register">
+    </fragment>
+
+    <fragment
         android:id="@+id/createCategoryFragment"
         android:name="com.example.quanlythuvien.ui.welcome.CreateCategoryFragment"
         android:label="Create Category"
@@ -61,11 +75,31 @@
         android:name="com.example.quanlythuvien.ui.reader.ReaderListFragment"
         android:label="Độc Giả"
         tools:layout="@layout/fragment_reader_list" />
+    <fragment
+        android:id="@+id/categoryListFragment"
+        android:name="com.example.quanlythuvien.ui.category.CategoryListFragment"
+        android:label="Thể loại"
+        tools:layout="@layout/fragment_category_list" />
+    <fragment
+        android:id="@+id/categoryAddFragment"
+        android:name="com.example.quanlythuvien.ui.category.CategoryAddFragment"
+        android:label="Thêm thể loại"
+        tools:layout="@layout/fragment_category_add" />
 
+    <fragment
+        android:id="@+id/categoryEditFragment"
+        android:name="com.example.quanlythuvien.ui.category.CategoryEditFragment"
+        android:label="Sửa thể loại"
+        tools:layout="@layout/fragment_category_edit" />
 
     <fragment
         android:id="@+id/staffListFragment"
         android:name="com.example.quanlythuvien.ui.admin.CrudStaffFragment"
         android:label="Quản lý Nhân viên"
         tools:layout="@layout/layout_manager_staff_of_admin" />
+    <fragment
+        android:id="@+id/readerDetailFragment"
+        android:name="com.example.quanlythuvien.ui.reader.ReaderDetailFragment"
+        android:label="Chi tiết Độc Giả"
+        />
 </navigation>

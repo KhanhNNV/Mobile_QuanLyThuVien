@@ -2,9 +2,27 @@
     <string name="app_name">QuanLyThuVien</string>
 
     <!--    Welcome    -->
-    <string name="txt_titleWelcome">Chào mừng đến với Thư Viện</string>
-    <string name="txt_des">Quản lý sách và độc giả của bạn một cách dễ dàng và chuyên nghiệp. Hãy bắt đầu bằng việc thiết lập không gian của bạn.</string>
-    <string name="txt_buttonStart">Bắt đầu tạo thư viện</string>
+    <string name="tvTitleWelcome">Chào mừng bạn</string>
+    <string name="tvDes">Nếu đã có tài khoản thủ thư hoặc tài khoản nhân viên hãy đăng nhập để tiếp tục. \n Nếu bạn muốn tạo một thư viện mới hãy nhấn nút bắt đầu để khởi tạo thư viện của bạn.</string>
+    <string name="btnStart">Bắt đầu tạo thư viện</string>
+    <string name="btnLogin">Đăng nhập</string>
+
+    <!--    Login    -->
+    <string name="tvLoginTitle">Nhập thông tin đăng nhập</string>
+    <string name="edtHintUsername">Nhập username</string>
+    <string name="edtHintPassword">Nhập password</string>
+
+    <!--    Register    -->
+    <string name="tvRegisterTitle">Nhập thông tin tài khoản và thư viện </string>
+    <string name="tvRegisterAccount">Đăng ký tài khoản thủ thư:</string>
+    <string name="edtHintRegisterUsername">Nhập username</string>
+    <string name="edtHintRegisterPassword">Nhập password</string>
+    <string name="tvCreateLibrary">Tạo thư viện:</string>
+    <string name="edtHintRegisterLibrary">Nhập tên thư viện</string>
+    <string name="edtHintRegisterAddress">Nhập địa chỉ</string>
+    <string name="cbStudentDiscount">Chế độ có khuyến mãi cho học sinh/sinh viên</string>
+    <string name="btnRegister">Tạo tài khoản và thư viện</string>
+
 
     <!--    Category welcome   -->
     <string name="txt_titleCreateCate">Tạo Thể Loại Đầu Tiên</string>
@@ -18,7 +36,7 @@
     <string name="txt_titleCreateBook">Thêm Cuốn Sách Đầu Tiên</string>
     <string name="hint_nameBook">Tên sách (*)</string>
     <string name="hint_nameAuthor">Tác giả</string>
-    <string name="hint_quantity">Số lượng</string>
+    <string name="hint_basePrice">Giá gốc (để đền bù khi mất sách)</string>
     <string name="txt_hardQuantity">1</string>
     <string name="hint_bookCode">Mã sách</string>
     <string name="txt_buttonCompletedAddBook">Hoàn tất và vào Thư Viện</string>
@@ -101,6 +119,11 @@
 
     <string name="tvTitleQuickAccess"> TRUY CẬP NHANH</string>
     <string name="nhập">＋ Nhập</string>
+    <string name="nh_p_m_th_vd_sv001">Nhập mã thẻ (VD: SV001)...</string>
+    <string name="hintcategory">VD: Công nghệ thông tin, Lịch sử...</string>
+    <string name="addcategory">Thêm Thể Loại</string>
+    <string name="textviewct">Vui lòng nhập tên thể loại sách mới</string>
+    <string name="nameCt">Tên thể loại *</string>
 
 
     //CRUD STAFF
@@ -110,7 +133,6 @@
 
     <string name="staff_id">Staff ID:</string>
     <string name="username">Username: </string>
-
 
 
     <string-array name="staff_status_options">

@@ -1,4 +1,4 @@
-package com.example.quanlythuvien.ui.books
+package com.example.quanlythuvien.ui.category
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -8,26 +8,24 @@ import android.view.ViewGroup
 import com.example.quanlythuvien.R
 import androidx.navigation.fragment.findNavController
 
-class BookImportFragment : Fragment() {
-
-
+class CategoryEditFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Nạp giao diện từ file fragment_book_import.xml
-        return inflater.inflate(R.layout.fragment_book_import, container, false)
+        // Nạp giao diện XML của màn hình Thêm Thể Loại
+        return inflater.inflate(R.layout.fragment_category_edit, container, false)
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val btnCancelEdit = view.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnCancelEdit)
 
-        val btnCancel = view.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnCancel)
-
-        btnCancel.setOnClickListener {
+        btnCancelEdit.setOnClickListener {
             findNavController().popBackStack()
         }
 
     }
+
 
 }
