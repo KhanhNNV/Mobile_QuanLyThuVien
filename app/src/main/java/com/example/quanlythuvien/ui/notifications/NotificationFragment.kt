@@ -8,6 +8,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quanlythuvien.R
+import com.example.quanlythuvien.utils.setupHeaderWithBack
 import com.google.android.material.card.MaterialCardView
 
 class NotificationFragment : Fragment(R.layout.fragment_notification) {
@@ -18,6 +19,8 @@ class NotificationFragment : Fragment(R.layout.fragment_notification) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        setupHeaderWithBack(view,"Thông báo")
 
         initViews(view)
         setupRecyclerView()

@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quanlythuvien.R
 import com.example.quanlythuvien.utils.setupCustomHeader
+import com.example.quanlythuvien.utils.setupHeaderWithBack
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class CrudStaffFragment: Fragment() {
@@ -103,10 +104,8 @@ class CrudStaffFragment: Fragment() {
     //Hàm sử dụng view
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupCustomHeader(
-            view = view,
-            title = "Quản lý nhân viên",
-            subtitle = "Tổng số nhân viên"
+        setupHeaderWithBack(
+           view, "Quản lý nhân viên"
         )
 
         initViews(view)
