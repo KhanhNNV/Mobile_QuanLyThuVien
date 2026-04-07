@@ -41,7 +41,7 @@ class ReaderAddFragment : Fragment() {
         val edtReaderPhone = view.findViewById<TextInputEditText>(R.id.edtReaderPhone)
         val spinnerReaderType = view.findViewById<AutoCompleteTextView>(R.id.spinnerReaderType)
         val btnSaveReader = view.findViewById<MaterialButton>(R.id.btnSaveReader)
-        val btnCancelReader = view.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnCancelReader)
+        val btnCancelReader = view.findViewById<MaterialButton>(R.id.btnCancelReader)
 
         val displayTypes = ReaderType.entries.map { it.value }.toTypedArray()
 
@@ -61,30 +61,38 @@ class ReaderAddFragment : Fragment() {
             val phone = edtReaderPhone.text.toString().trim()
             val type = spinnerReaderType.text.toString().trim()
 
-            if (code.isEmpty() || name.isEmpty() || phone.isEmpty() || type.isEmpty())
-            {
-                Toast.makeText(requireContext(),"Vui lòng nhập đầy đủ thông tin!", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
+            if (code.isEmpty()) {
+                edtReaderCode.error = "Vui lòng nhập mã độc giả!"
+                edtReaderCode.requestFocus() // Đẩy con trỏ nhấp nháy về ô này
+
+            } else if (name.isEmpty()) {
+                edtReaderName.error = "Vui lòng nhập họ tên!"
+                edtReaderName.requestFocus()
+
+            } else if (phone.isEmpty()) {
+                edtReaderPhone.error = "Vui lòng nhập số điện thoại!"
+                edtReaderPhone.requestFocus()
+
+            } else {
+                //Gọi MaterialAlertDialogBuilder để tạo Popup thông báo
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle("Lưu thành công!")
+                    .setMessage("Độc giả đã được thêm vào hệ thống. Bạn có muốn xuất thông tin này ra file PDF để in thẻ độc giả không?")
+
+                    .setPositiveButton("In PDF") { dialog, _ ->
+                        createPdf(code,name,phone,type)
+                        dialog.dismiss() // Đóng popup lại
+                        findNavController().popBackStack()
+                    }
+
+                    .setNegativeButton("Để sau") { dialog, _ ->
+                        dialog.dismiss() // Chỉ đóng popup lại thôi
+                        findNavController().popBackStack()
+                    }
+
+                    .show()
             }
-            //
 
-            // 3. Gọi MaterialAlertDialogBuilder để tạo Popup thông báo
-            MaterialAlertDialogBuilder(requireContext())
-                .setTitle("Lưu thành công!")
-                .setMessage("Độc giả đã được thêm vào hệ thống. Bạn có muốn xuất thông tin này ra file PDF để in thẻ độc giả không?")
-
-                .setPositiveButton("In PDF") { dialog, _ ->
-                    createPdf(code,name,phone,type)
-                    dialog.dismiss() // Đóng popup lại
-                    findNavController().popBackStack()
-                }
-
-                .setNegativeButton("Để sau") { dialog, _ ->
-                    dialog.dismiss() // Chỉ đóng popup lại thôi
-                    findNavController().popBackStack()
-                }
-
-                .show()
         }
 
     }
