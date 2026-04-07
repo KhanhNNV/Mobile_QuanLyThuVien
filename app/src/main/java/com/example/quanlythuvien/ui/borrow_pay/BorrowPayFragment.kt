@@ -96,7 +96,7 @@ class BorrowPayFragment :Fragment(){
 
 
 
-    //Hàm tạo giao diện
+    //Hàm chuyển file layout xml thành UI
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -142,7 +142,7 @@ class BorrowPayFragment :Fragment(){
 
         //Khi có click vào item sẽ mở Dialog thông tin chi tiết
         adapter = BorrowPayAdapter { clickedItem ->
-            // Dùng loanId để tìm ra phiên bản dữ liệu mới nhất, nóng hổi nhất từ danh sách gốc
+            // Dùng loanId để tìm ra phiên bản dữ liệu mới nhất
             val freshItem = sampleDataList.find { it.loanId == clickedItem.loanId } ?: clickedItem
 
             // Truyền dữ liệu mới vào Dialog
@@ -165,7 +165,7 @@ class BorrowPayFragment :Fragment(){
                 val activeBgColor = ContextCompat.getColorStateList(requireContext(), R.color.btn_primary)
                 btnToggleFilter.backgroundTintList = activeBgColor
 
-                // 3. Đổi màu ICON bên trong (Dùng imageTintList thay vì setColorFilter để khớp với app:tint)
+                // 3. Đổi màu ICON bên trong
                 val activeIconColor = ContextCompat.getColorStateList(requireContext(), R.color.white)
                 btnToggleFilter.imageTintList = activeIconColor
 
@@ -262,7 +262,7 @@ class BorrowPayFragment :Fragment(){
                 }
             }.toMutableList()
 
-            // B. TÍNH TOÁN TRẠNG THÁI PHIẾU MỚI
+            // B. TÍNH TOÁN SỐ LƯỢNG lOANDELTALSTATUS ĐỂ THAY ĐỔI LOANSTATUS
             val hasAnyBookBorrowing = updatedBooks.any {
                 it.status == LoanDetailStatus.BORROWING.value || it.status == LoanDetailStatus.LOST.value
             }
@@ -280,7 +280,7 @@ class BorrowPayFragment :Fragment(){
                 sampleDataList[index] = currentItem
             }
 
-            // E. CẬP NHẬT GIAO DIỆN DIALOG (Không dùng notifyDataSetChanged)
+            // E. CẬP NHẬT GIAO DIỆN DIALOG
             editStatusUI(currentItem.overallStatus, tvStatus)
             // Gửi danh sách sách mới vào adapter của Dialog để DiffUtil tự làm việc
             (rvBooks.adapter as DialogBorrowPayAdapter).submitList(currentItem.borrowedBooks)
@@ -318,7 +318,6 @@ class BorrowPayFragment :Fragment(){
             val newDueDate = String.format("%02d/%02d/%d", dayOfMonth, month + 1, year)
 
             // Thay vì mutate: item.dueDate = newDueDate
-            // Hãy dùng copy:
             val updatedItem = currentItem.copy(dueDate = newDueDate)
 
             tvUpdate.text = newDueDate

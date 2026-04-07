@@ -56,7 +56,7 @@ class BorrowPayAdapter(
                 tvLoanStatus.setTextColor(textColor)
                 tvLoanStatus.backgroundTintList = ColorStateList.valueOf(bgColor)
             }
-            // Sự kiện click để mở Dialog (Nơi này sẽ hiện đầy đủ Tên sách, Tác giả...)
+            // Sự kiện click để mở Dialog
             itemView.setOnClickListener {
                 onItemClick(item)
             }
