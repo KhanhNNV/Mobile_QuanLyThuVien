@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Button
-import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Spinner
 import android.widget.TextView
@@ -18,6 +18,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.quanlythuvien.R
 import com.example.quanlythuvien.data.entity.Book
 import com.google.android.material.textfield.TextInputEditText
+import android.content.res.ColorStateList
+import androidx.core.content.ContextCompat
 
 class BookListFragment : Fragment() {
 
@@ -25,10 +27,10 @@ class BookListFragment : Fragment() {
     private lateinit var bookAdapter: BookAdapter
     private lateinit var spinnerCategory: Spinner
 
-    private lateinit var btnToggleFilter: ImageButton
+    private lateinit var btnToggleFilter: ImageView
     private lateinit var llFilterContainer: LinearLayout
     private var isFilterExpanded = false
-    private lateinit var btnAddBook : Button
+    private lateinit var fabAddBook : com.google.android.material.floatingactionbutton.FloatingActionButton
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_book_list, container, false)
@@ -46,9 +48,9 @@ class BookListFragment : Fragment() {
         btnToggleFilter = view.findViewById(R.id.btnToggleFilter)
         llFilterContainer = view.findViewById(R.id.llFilterContainer)
         spinnerCategory = view.findViewById(R.id.spinnerCategory)
-        btnAddBook = view.findViewById(R.id.btnAddBook)
+        fabAddBook = view.findViewById(R.id.fabAddBook)
 
-        btnAddBook.setOnClickListener {
+        fabAddBook.setOnClickListener {
             findNavController().navigate(R.id.bookImportFragment)
         }
 
@@ -78,6 +80,7 @@ class BookListFragment : Fragment() {
         val tvTitle = dialog.findViewById<TextView>(R.id.tvDetailTitle)
         val tvAuthor = dialog.findViewById<TextView>(R.id.tvDetailAuthor)
         val tvCategory = dialog.findViewById<TextView>(R.id.tvDetailCategory)
+        val tvBasePrice = dialog.findViewById<TextView>(R.id.tvDetailBasePrice)
         val tvStatus = dialog.findViewById<TextView>(R.id.tvDetailStatus)
         val rvBookCopies = dialog.findViewById<RecyclerView>(R.id.rvBookCopies)
         val btnClose = dialog.findViewById<Button>(R.id.btnCloseDialog)
@@ -96,6 +99,7 @@ class BookListFragment : Fragment() {
         tvTitle?.text = book.title
         tvAuthor?.text = "Tác giả: ${book.author}"
         tvCategory?.text = "Thể loại: $categoryName"
+        tvBasePrice?.text = "Giá gốc: ${book.basePrice.toInt()} VND"
 
         if (book.availableQuantity > 0) {
             tvStatus?.text = "Tổng quan: Còn ${book.availableQuantity} cuốn"
@@ -198,22 +202,29 @@ class BookListFragment : Fragment() {
             isFilterExpanded = !isFilterExpanded
             if (isFilterExpanded) {
                 llFilterContainer.visibility = View.VISIBLE
-                btnToggleFilter.animate().rotation(90f).setDuration(200).start()
+                val activeBgColor = ContextCompat.getColorStateList(requireContext(), R.color.btn_primary)
+                btnToggleFilter.backgroundTintList = activeBgColor
+
+                val activeIconColor = ContextCompat.getColorStateList(requireContext(), R.color.white)
+                btnToggleFilter.imageTintList = activeIconColor
             } else {
                 llFilterContainer.visibility = View.GONE
-                btnToggleFilter.animate().rotation(0f).setDuration(200).start()
+                btnToggleFilter.backgroundTintList = null
+
+                val defaultIconColor = ContextCompat.getColorStateList(requireContext(), R.color.btn_primary)
+                btnToggleFilter.imageTintList = defaultIconColor
             }
         }
     }
 
     private fun createDummyData(): List<Book> {
         return listOf(
-            Book(bookId = 1, categoryId = 1, isbnCode = "978-0132350884", title = "Clean Code", author = "Robert C. Martin", totalQuantity = 10, availableQuantity = 5),
-            Book(bookId = 2, categoryId = 2, isbnCode = "978-6045635094", title = "Đắc Nhân Tâm", author = "Dale Carnegie", totalQuantity = 15, availableQuantity = 12),
-            Book(bookId = 3, categoryId = 1, isbnCode = "978-0201633610", title = "Design Patterns", author = "Erich Gamma", totalQuantity = 5, availableQuantity = 2),
-            Book(bookId = 4, categoryId = 3, isbnCode = "978-6048554164", title = "Nhà Giả Kim", author = "Paulo Coelho", totalQuantity = 5, availableQuantity = 0, lostQuantity = 1),
-            Book(bookId = 5, categoryId = 4, isbnCode = "978-6043026368", title = "Sapiens", author = "Yuval Noah Harari", totalQuantity = 10, availableQuantity = 8),
-            Book(bookId = 6, categoryId = 1, isbnCode = "978-0596009205", title = "Head First Java", author = "Kathy Sierra", totalQuantity = 5, availableQuantity = 3)
+            Book(bookId = 1, categoryId = 1, isbnCode = "978-0132350884", title = "Clean Code", author = "Robert C. Martin", totalQuantity = 10, availableQuantity = 5, basePrice = 250000.0),
+            Book(bookId = 2, categoryId = 2, isbnCode = "978-6045635094", title = "Đắc Nhân Tâm", author = "Dale Carnegie", totalQuantity = 15, availableQuantity = 12, basePrice = 120000.0),
+            Book(bookId = 3, categoryId = 1, isbnCode = "978-0201633610", title = "Design Patterns", author = "Erich Gamma", totalQuantity = 5, availableQuantity = 2, basePrice = 300000.0),
+            Book(bookId = 4, categoryId = 3, isbnCode = "978-6048554164", title = "Nhà Giả Kim", author = "Paulo Coelho", totalQuantity = 5, availableQuantity = 0, lostQuantity = 1, basePrice = 90000.0),
+            Book(bookId = 5, categoryId = 4, isbnCode = "978-6043026368", title = "Sapiens", author = "Yuval Noah Harari", totalQuantity = 10, availableQuantity = 8, basePrice = 280000.0),
+            Book(bookId = 6, categoryId = 1, isbnCode = "978-0596009205", title = "Head First Java", author = "Kathy Sierra", totalQuantity = 5, availableQuantity = 3, basePrice = 220000.0)
         )
     }
 }
