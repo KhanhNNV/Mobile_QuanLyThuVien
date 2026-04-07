@@ -15,9 +15,9 @@ import com.example.quanlythuvien.R
 import com.example.quanlythuvien.data.entity.enums.LoanDetailStatus
 import com.example.quanlythuvien.ui.borrow_pay.data.LoanDetailItemData
 
-class DialogBorrowPayAdapter(
+class LoanAdapter(
     private val onStatusChange: (LoanDetailItemData, LoanDetailStatus) -> Unit
-) : ListAdapter<LoanDetailItemData, DialogBorrowPayAdapter.BookViewHolder>(BookDiffCallback()) {
+) : ListAdapter<LoanDetailItemData, LoanAdapter.BookViewHolder>(BookDiffCallback()) {
 
     // 1. LỚP KHUÔN (VIEW HOLDER)
     inner class BookViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -109,7 +109,7 @@ class DialogBorrowPayAdapter(
     // 2. TẠO KHUÔN
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BookViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_loan_detail_of_dialog, parent, false)
+            .inflate(R.layout.item_loan_detail, parent, false)
         return BookViewHolder(view)
     }
 

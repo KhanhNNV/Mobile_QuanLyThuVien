@@ -1,8 +1,10 @@
 package com.example.quanlythuvien.ui.borrow_pay.adapter
 
+import android.content.res.ColorStateList
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
@@ -10,7 +12,9 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quanlythuvien.R
 import com.example.quanlythuvien.ui.borrow_pay.data.LoanItemData
-import android.content.res.ColorStateList
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 class BorrowPayAdapter(
     private val onItemClick: (LoanItemData) -> Unit
@@ -27,43 +31,86 @@ class BorrowPayAdapter(
     }
 
     inner class BorrowPayViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        // Ánh xạ các View từ XML bạn đã cung cấp
+        // Ánh xạ các View từ XML
         private val tvName: TextView = itemView.findViewById(R.id.tvName)
         private val tvLoanId: TextView = itemView.findViewById(R.id.tvLoanId)
         private val tvLoanStatus: TextView = itemView.findViewById(R.id.tvLoanStatus)
         private val tvDueDate: TextView = itemView.findViewById(R.id.tvDueDate)
+
+        // 1. Ánh xạ thêm Icon cảnh báo
+        private val ivWarningOverdue: ImageView = itemView.findViewById(R.id.ivWarningOverdue)
 
         fun bind(item: LoanItemData) {
             tvName.text = item.readerName
             tvLoanId.text = "${item.loanId}"
             tvDueDate.text = item.dueDate
             val context = itemView.context
-            // Xử lý màu sắc cho trạng thái để dễ phân biệt
+
+            // Xử lý màu sắc cho trạng thái
             if (item.overallStatus == "BORROWING") {
                 tvLoanStatus.text = "Đang mượn"
-
                 val textColor = ContextCompat.getColor(context, R.color.text_status_info)
                 val bgColor = ContextCompat.getColor(context, R.color.status_info)
-
                 tvLoanStatus.setTextColor(textColor)
                 tvLoanStatus.backgroundTintList = ColorStateList.valueOf(bgColor)
             } else {
                 tvLoanStatus.text = "Đã trả"
-
                 val textColor = ContextCompat.getColor(context, R.color.text_status_success)
                 val bgColor = ContextCompat.getColor(context, R.color.status_success)
-
                 tvLoanStatus.setTextColor(textColor)
                 tvLoanStatus.backgroundTintList = ColorStateList.valueOf(bgColor)
             }
-            // Sự kiện click để mở Dialog
+
+            // 2. Gọi hàm kiểm tra trễ hạn để bật/tắt Icon
+            checkOverdue(item.dueDate, item.overallStatus)
+
+            // Sự kiện click để giao diện chi tiết của phiếu mượn
             itemView.setOnClickListener {
                 onItemClick(item)
             }
         }
+
+        // 3. Hàm xử lý logic ẩn/hiện cảnh báo trễ hạn
+        private fun checkOverdue(dueDateStr: String, status: String) {
+            val context = itemView.context
+
+            // Nếu phiếu đã trả xong, chắc chắn ẩn cảnh báo và trả lại màu chữ bình thường
+            if (status != "BORROWING") {
+                ivWarningOverdue.visibility = View.GONE
+                tvDueDate.setTextColor(ContextCompat.getColor(context, R.color.text_secondary))
+                return
+            }
+
+            try {
+                // Dịch chuỗi ngày tháng
+                val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                val dueDate = sdf.parse(dueDateStr)
+
+                // Lấy ngày hôm nay và xóa giờ/phút/giây để so sánh chính xác ngày
+                val today = Calendar.getInstance().apply {
+                    set(Calendar.HOUR_OF_DAY, 0)
+                    set(Calendar.MINUTE, 0)
+                    set(Calendar.SECOND, 0)
+                    set(Calendar.MILLISECOND, 0)
+                }.time
+
+                // Nếu có ngày trả và hạn trả nằm trước ngày hôm nay
+                if (dueDate != null && dueDate.before(today)) {
+                    ivWarningOverdue.visibility = View.VISIBLE
+                    // Tô đỏ luôn dòng chữ ngày tháng cho đồng bộ với icon
+                    tvDueDate.setTextColor(ContextCompat.getColor(context, R.color.text_status_error))
+                } else {
+                    ivWarningOverdue.visibility = View.GONE
+                    tvDueDate.setTextColor(ContextCompat.getColor(context, R.color.text_secondary))
+                }
+            } catch (e: Exception) {
+                // Đề phòng lỗi định dạng chuỗi, mặc định ẩn đi
+                ivWarningOverdue.visibility = View.GONE
+                tvDueDate.setTextColor(ContextCompat.getColor(context, R.color.text_secondary))
+            }
+        }
     }
 
-    // DiffUtil giúp RecyclerView cập nhật danh sách cực nhanh và mượt
     class BorrowPayDiffCallback : DiffUtil.ItemCallback<LoanItemData>() {
         override fun areItemsTheSame(oldItem: LoanItemData, newItem: LoanItemData): Boolean {
             return oldItem.loanId == newItem.loanId

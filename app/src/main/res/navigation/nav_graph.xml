@@ -99,7 +99,18 @@
         android:id="@+id/borrowPayListFragment"
         android:name="com.example.quanlythuvien.ui.borrow_pay.BorrowPayFragment"
         android:label="Mượn Trả"
-        tools:layout="@layout/fragment_borrow_pay" />
+        tools:layout="@layout/fragment_borrow_pay">
+
+    <action
+        android:id="@+id/action_borrowPay_to_loanDetail"
+        app:destination="@id/loanFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/loanFragment"
+        android:name="com.example.quanlythuvien.ui.borrow_pay.LoanFragment"
+        android:label="Chi tiết phiếu mượn"
+        tools:layout="@layout/fragment_loan" />
 
     <fragment
         android:id="@+id/readerListFragment"

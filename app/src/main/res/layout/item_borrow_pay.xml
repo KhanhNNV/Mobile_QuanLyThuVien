@@ -94,7 +94,7 @@
 
         <TextView
             android:id="@+id/tvDueDate"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:ellipsize="end"
@@ -103,9 +103,19 @@
             android:textColor="@color/text_secondary"
             android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="@+id/tvTitleDate"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/tvTitleDate"
             app:layout_constraintTop_toTopOf="@+id/tvTitleDate" />
 
+        <ImageView
+            android:id="@+id/ivWarningOverdue"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_marginStart="6dp"
+            android:src="@drawable/ic_diamond_exclamation"
+            app:tint="@color/text_status_error"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/tvDueDate"
+            app:layout_constraintStart_toEndOf="@+id/tvDueDate"
+            app:layout_constraintTop_toTopOf="@+id/tvDueDate" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>
