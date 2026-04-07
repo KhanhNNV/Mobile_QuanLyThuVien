@@ -6,8 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Button
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.RadioGroup
 import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
@@ -20,12 +22,18 @@ import com.example.quanlythuvien.data.entity.Book
 import com.google.android.material.textfield.TextInputEditText
 import android.content.res.ColorStateList
 import androidx.core.content.ContextCompat
+import com.example.quanlythuvien.utils.setupCustomHeader
 
 class BookListFragment : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var bookAdapter: BookAdapter
     private lateinit var spinnerCategory: Spinner
+    private lateinit var etSearch: EditText
+    private lateinit var rgStatusFilter: RadioGroup
+    private lateinit var btnResetFilter: Button
+    private lateinit var btnApplyFilter: Button
+    private lateinit var allBooks: MutableList<Book>
 
     private lateinit var btnToggleFilter: ImageView
     private lateinit var llFilterContainer: LinearLayout
@@ -39,15 +47,20 @@ class BookListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val tvHeaderTitle = view.findViewById<TextView>(R.id.tvHeaderTitle)
-        val tvHeaderSubtitle = view.findViewById<TextView>(R.id.tvHeaderSubtitle)
-        tvHeaderTitle?.text = "Kho Sách"
-        tvHeaderSubtitle?.text = "Quản lý và cập nhật sách"
+        setupCustomHeader(
+            view = view,
+            title = "Kho Sách",
+            subtitle = "Quản lý và cập nhật sách"
+        )
 
         recyclerView = view.findViewById(R.id.recyclerViewBooks)
         btnToggleFilter = view.findViewById(R.id.btnToggleFilter)
         llFilterContainer = view.findViewById(R.id.llFilterContainer)
         spinnerCategory = view.findViewById(R.id.spinnerCategory)
+        etSearch = view.findViewById(R.id.etSearch)
+        rgStatusFilter = view.findViewById(R.id.rgStatusFilter)
+        btnResetFilter = view.findViewById(R.id.btnResetFilter)
+        btnApplyFilter = view.findViewById(R.id.btnApplyFilter)
         fabAddBook = view.findViewById(R.id.fabAddBook)
 
         fabAddBook.setOnClickListener {
@@ -55,8 +68,8 @@ class BookListFragment : Fragment() {
         }
 
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        val dummyBooks = createDummyData()
-        bookAdapter = BookAdapter(dummyBooks)
+        allBooks = createDummyData().toMutableList()
+        bookAdapter = BookAdapter(allBooks.toMutableList())
 
         bookAdapter.onItemClick = { selectedBook ->
             showBookDetailDialog(selectedBook)
@@ -65,6 +78,64 @@ class BookListFragment : Fragment() {
         recyclerView.adapter = bookAdapter
         setupFilterToggle()
         setupCategorySpinner()
+        setupFilterActions()
+    }
+
+    private fun setupFilterActions() {
+        btnApplyFilter.setOnClickListener {
+            applyFilters()
+        }
+
+        btnResetFilter.setOnClickListener {
+            etSearch.text?.clear()
+            rgStatusFilter.check(R.id.rbAll)
+            spinnerCategory.setSelection(0)
+            bookAdapter.setItems(allBooks)
+        }
+
+        // Enter/ActionSearch cũng áp dụng lọc
+        etSearch.setOnEditorActionListener { _, _, _ ->
+            applyFilters()
+            true
+        }
+    }
+
+    private fun applyFilters() {
+        val query = etSearch.text?.toString()?.trim().orEmpty().lowercase()
+
+        val selectedCategoryId = when (spinnerCategory.selectedItemPosition) {
+            1 -> 1 // CNTT
+            2 -> 2 // Tâm lý
+            3 -> 3 // Tiểu thuyết
+            4 -> 4 // Lịch sử
+            else -> null // Tất cả
+        }
+
+        val filtered = allBooks.filter { book ->
+            val matchesQuery =
+                query.isEmpty() ||
+                    book.title.lowercase().contains(query) ||
+                    book.author.lowercase().contains(query) ||
+                    book.isbnCode.lowercase().contains(query)
+
+            val matchesCategory =
+                selectedCategoryId == null || book.categoryId == selectedCategoryId
+
+            val matchesStatus = when (rgStatusFilter.checkedRadioButtonId) {
+                R.id.rbAvailable -> book.availableQuantity > 0
+                R.id.rbBorrowed -> (book.totalQuantity - book.availableQuantity - book.lostQuantity) > 0
+                R.id.rbLost -> book.lostQuantity > 0
+                else -> true // rbAll
+            }
+
+            matchesQuery && matchesCategory && matchesStatus
+        }
+
+        bookAdapter.setItems(filtered)
+
+        if (filtered.isEmpty()) {
+            Toast.makeText(requireContext(), "Không tìm thấy sách phù hợp!", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun showBookDetailDialog(book: Book) {
@@ -84,6 +155,7 @@ class BookListFragment : Fragment() {
         val tvStatus = dialog.findViewById<TextView>(R.id.tvDetailStatus)
         val rvBookCopies = dialog.findViewById<RecyclerView>(R.id.rvBookCopies)
         val btnClose = dialog.findViewById<Button>(R.id.btnCloseDialog)
+        val btnDelete = dialog.findViewById<Button>(R.id.btnDeleteBook)
 
         // 1. ÁNH XẠ NÚT THÊM BẢN SAO TỪ UI
         val btnAddCopy = dialog.findViewById<Button>(R.id.btnAddCopy)
@@ -126,11 +198,31 @@ class BookListFragment : Fragment() {
             }
             copyList.add(BookCopyItem("Mã cuốn: B${book.bookId}-$i", statusText, statusColor))
         }
-        rvBookCopies?.adapter = BookCopyAdapter(copyList)
+        lateinit var copyAdapter: BookCopyAdapter
+        copyAdapter = BookCopyAdapter(copyList) { item, position ->
+            // Validation: đang mượn thì không cho xóa
+            if (item.statusText == "Đang mượn") {
+                Toast.makeText(requireContext(), "Bản sao đang mượn — không thể xóa!", Toast.LENGTH_SHORT).show()
+                return@BookCopyAdapter
+            }
+
+            androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                .setTitle("Xóa bản sao")
+                .setMessage("Bạn chắc chắn muốn xóa ${item.copyId}?")
+                .setNegativeButton("Hủy", null)
+                .setPositiveButton("Xóa") { _, _ ->
+                    copyAdapter.removeAt(position)
+                }
+                .show()
+        }
+        rvBookCopies?.adapter = copyAdapter
 
         btnClose?.setOnClickListener {
             dialog.dismiss()
         }
+
+        // (Tạm thời) Không xóa đầu sách ở đây nữa — chỉ xóa từng bản sao trong danh sách.
+        btnDelete?.visibility = View.GONE
 
         // 2. SỰ KIỆN CLICK MỞ DIALOG THÊM BẢN SAO
         btnAddCopy?.setOnClickListener {
@@ -227,24 +319,4 @@ class BookListFragment : Fragment() {
             Book(bookId = 6, categoryId = 1, isbnCode = "978-0596009205", title = "Head First Java", author = "Kathy Sierra", totalQuantity = 5, availableQuantity = 3, basePrice = 220000.0)
         )
     }
-}
-
-data class BookCopyItem(val copyId: String, val statusText: String, val statusColor: Int)
-
-class BookCopyAdapter(private val copyList: List<BookCopyItem>) : RecyclerView.Adapter<BookCopyAdapter.CopyViewHolder>() {
-    class CopyViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val tvCopyId: TextView = view.findViewById(R.id.tvCopyId)
-        val tvCopyStatus: TextView = view.findViewById(R.id.tvCopyStatus)
-    }
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CopyViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_book_copy, parent, false)
-        return CopyViewHolder(view)
-    }
-    override fun onBindViewHolder(holder: CopyViewHolder, position: Int) {
-        val item = copyList[position]
-        holder.tvCopyId.text = item.copyId
-        holder.tvCopyStatus.text = item.statusText
-        holder.tvCopyStatus.setTextColor(item.statusColor)
-    }
-    override fun getItemCount() = copyList.size
 }

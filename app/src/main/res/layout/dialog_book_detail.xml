@@ -95,13 +95,34 @@
             android:layout_marginBottom="16dp"
             android:clipToPadding="false" />
 
-        <Button
-            android:id="@+id/btnCloseDialog"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:text="ĐÓNG"
-            android:textColor="@color/white"
-            android:backgroundTint="@color/btn_primary"
-            app:cornerRadius="25dp" />
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="4dp">
+
+            <Button
+                android:id="@+id/btnDeleteBook"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_weight="1"
+                android:text="XÓA"
+                android:textColor="@color/red"
+                app:strokeColor="@color/red"
+                android:layout_marginEnd="8dp"
+                app:cornerRadius="25dp" />
+
+            <Button
+                android:id="@+id/btnCloseDialog"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_weight="1"
+                android:text="ĐÓNG"
+                android:textColor="@color/white"
+                android:backgroundTint="@color/btn_primary"
+                app:cornerRadius="25dp" />
+
+        </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>

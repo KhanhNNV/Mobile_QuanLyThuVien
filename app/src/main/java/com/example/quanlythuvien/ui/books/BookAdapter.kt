@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.quanlythuvien.R
 import com.example.quanlythuvien.data.entity.Book // Nhớ import đúng đường dẫn Entity của bạn
 
-class BookAdapter(private val bookList: List<Book>) : RecyclerView.Adapter<BookAdapter.BookViewHolder>() {
+class BookAdapter(private val bookList: MutableList<Book>) : RecyclerView.Adapter<BookAdapter.BookViewHolder>() {
 
     var onItemClick: ((Book) -> Unit)? = null
 
@@ -44,5 +44,20 @@ class BookAdapter(private val bookList: List<Book>) : RecyclerView.Adapter<BookA
 
     override fun getItemCount(): Int {
         return bookList.size
+    }
+
+    fun removeById(bookId: Long): Int {
+        val index = bookList.indexOfFirst { it.bookId == bookId }
+        if (index >= 0) {
+            bookList.removeAt(index)
+            notifyItemRemoved(index)
+        }
+        return index
+    }
+
+    fun setItems(items: List<Book>) {
+        bookList.clear()
+        bookList.addAll(items)
+        notifyDataSetChanged()
     }
 }
