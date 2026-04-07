@@ -32,7 +32,7 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
         setupCustomHeader(
             view = view,
             title = "Cài đặt",
-            subtitle = "*chưa biết ghi gì"
+            subtitle = "Dành cho thủ thư"
         )
 
         initViews(view)
