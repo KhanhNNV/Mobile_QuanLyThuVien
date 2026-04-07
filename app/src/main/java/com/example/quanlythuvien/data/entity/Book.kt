@@ -13,10 +13,10 @@ import androidx.room.PrimaryKey
             entity = Category::class,
             parentColumns = ["category_id"],
             childColumns = ["category_id"],
-            onDelete = ForeignKey.RESTRICT // Không cho xóa Category nếu đang có Book
+            onDelete = ForeignKey.RESTRICT
         )
     ],
-    indices = [Index(value = ["isbn_code"], unique = true)] //Cột isbnCode không được trùng
+    indices = [Index(value = ["isbn_code"], unique = true)]
 )
 data class Book(
     @PrimaryKey(autoGenerate = true)
@@ -40,5 +40,8 @@ data class Book(
     val availableQuantity: Int,
 
     @ColumnInfo(name = "lost_quantity")
-    val lostQuantity: Int = 0
+    val lostQuantity: Int = 0,
+
+    @ColumnInfo(name = "base_price")
+    val basePrice: Double = 0.0
 )
