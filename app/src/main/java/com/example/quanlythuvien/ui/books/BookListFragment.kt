@@ -23,6 +23,7 @@ import com.google.android.material.textfield.TextInputEditText
 import android.content.res.ColorStateList
 import androidx.core.content.ContextCompat
 import com.example.quanlythuvien.utils.setupCustomHeader
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class BookListFragment : Fragment() {
 
@@ -155,7 +156,7 @@ class BookListFragment : Fragment() {
         val tvStatus = dialog.findViewById<TextView>(R.id.tvDetailStatus)
         val rvBookCopies = dialog.findViewById<RecyclerView>(R.id.rvBookCopies)
         val btnClose = dialog.findViewById<Button>(R.id.btnCloseDialog)
-        val btnDelete = dialog.findViewById<Button>(R.id.btnDeleteBook)
+        val btnEdit = dialog.findViewById<Button>(R.id.btnEditBook)
 
         // 1. ÁNH XẠ NÚT THÊM BẢN SAO TỪ UI
         val btnAddCopy = dialog.findViewById<Button>(R.id.btnAddCopy)
@@ -217,12 +218,14 @@ class BookListFragment : Fragment() {
         }
         rvBookCopies?.adapter = copyAdapter
 
-        btnClose?.setOnClickListener {
-            dialog.dismiss()
-        }
+        btnClose?.setOnClickListener { dialog.dismiss() }
 
-        // (Tạm thời) Không xóa đầu sách ở đây nữa — chỉ xóa từng bản sao trong danh sách.
-        btnDelete?.visibility = View.GONE
+        btnEdit?.setOnClickListener {
+            showEditBookDialog(book) {
+                // refresh theo bộ lọc hiện tại
+                applyFilters()
+            }
+        }
 
         // 2. SỰ KIỆN CLICK MỞ DIALOG THÊM BẢN SAO
         btnAddCopy?.setOnClickListener {
@@ -230,6 +233,66 @@ class BookListFragment : Fragment() {
         }
 
         dialog.show()
+    }
+
+    private fun showEditBookDialog(book: Book, onUpdated: () -> Unit) {
+        val context = requireContext()
+
+        val container = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            val pad = (16 * resources.displayMetrics.density).toInt()
+            setPadding(pad, pad, pad, 0)
+        }
+
+        fun input(hint: String, value: String, inputType: Int): EditText {
+            return EditText(context).apply {
+                this.hint = hint
+                setText(value)
+                this.inputType = inputType
+            }
+        }
+
+        val edtTitle = input("Tên sách", book.title, android.text.InputType.TYPE_CLASS_TEXT)
+        val edtAuthor = input("Tác giả", book.author, android.text.InputType.TYPE_CLASS_TEXT)
+        val edtIsbn = input("ISBN", book.isbnCode, android.text.InputType.TYPE_CLASS_TEXT)
+        val edtBasePrice = input(
+            "Giá gốc (VND)",
+            book.basePrice.toInt().toString(),
+            android.text.InputType.TYPE_CLASS_NUMBER
+        )
+
+        container.addView(edtTitle)
+        container.addView(edtAuthor)
+        container.addView(edtIsbn)
+        container.addView(edtBasePrice)
+
+        MaterialAlertDialogBuilder(context)
+            .setTitle("Sửa sách")
+            .setView(container)
+            .setNegativeButton("Hủy", null)
+            .setPositiveButton("Lưu") { _, _ ->
+                val newTitle = edtTitle.text.toString().trim()
+                val newAuthor = edtAuthor.text.toString().trim()
+                val newIsbn = edtIsbn.text.toString().trim()
+                val newBasePrice = edtBasePrice.text.toString().trim().toDoubleOrNull()
+
+                if (newTitle.isEmpty() || newAuthor.isEmpty() || newIsbn.isEmpty() || newBasePrice == null) {
+                    Toast.makeText(context, "Vui lòng nhập đầy đủ thông tin!", Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+
+                val idx = allBooks.indexOfFirst { it.bookId == book.bookId }
+                if (idx >= 0) {
+                    allBooks[idx] = allBooks[idx].copy(
+                        title = newTitle,
+                        author = newAuthor,
+                        isbnCode = newIsbn,
+                        basePrice = newBasePrice
+                    )
+                    onUpdated()
+                }
+            }
+            .show()
     }
 
     // 3. HÀM XỬ LÝ DIALOG THÊM BẢN SAO (FORM NHẬP LIỆU)
