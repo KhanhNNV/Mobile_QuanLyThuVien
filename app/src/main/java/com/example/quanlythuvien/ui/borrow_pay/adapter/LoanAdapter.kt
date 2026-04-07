@@ -121,7 +121,7 @@ class LoanAdapter(
     // 4. CÔNG CỤ SO SÁNH (DIFF UTIL)
     class BookDiffCallback : DiffUtil.ItemCallback<LoanDetailItemData>() {
         override fun areItemsTheSame(oldItem: LoanDetailItemData, newItem: LoanDetailItemData): Boolean {
-            return oldItem.title == newItem.title // Lý tưởng nhất là so sánh bằng ID nếu có
+            return oldItem.bookId == newItem.bookId
         }
 
         override fun areContentsTheSame(oldItem: LoanDetailItemData, newItem: LoanDetailItemData): Boolean {

@@ -115,7 +115,7 @@ class LoanFragment : Fragment() {
             val updatedBooks = currentItem.borrowedBooks.map { book ->
 
                 //Kiểm tra xem có book nào được thay đổi trạng thái hau không nếu có thì cập nhật dô ds
-                if (book.title == targetBook.title) {
+                if (book.bookId == targetBook.bookId) {
                     val newReturnDate = if (newStatus == LoanDetailStatus.RETURNED) {
                         SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
                     } else null

@@ -33,20 +33,21 @@ class BorrowPayFragment :Fragment(){
             LoanItemData(
                 1, "10/03/2026", "20/03/2026", "BORROWING", "Nguyễn Văn A",
                 mutableListOf(
-                    LoanDetailItemData("Lập trình Java", "James Gosling", "Kỹ thuật", null, "BORROWING"),
-                            LoanDetailItemData("Lập trình Python", "James Gosling", "Kỹ thuật", null, "BORROWING")
+                    // Thêm 101L, 102L... làm bookId
+                    LoanDetailItemData(101L, "Lập trình Java", "James Gosling", "Kỹ thuật", null, "BORROWING"),
+                    LoanDetailItemData(102L, "Lập trình Python", "James Gosling", "Kỹ thuật", null, "BORROWING")
                 )
             ),
             LoanItemData(
                 2, "05/03/2026", "15/03/2026", "RETURNED", "Trần Thị B",
                 mutableListOf(
-                    LoanDetailItemData("Android nâng cao", "Google", "Lập trình", "14/03/2026", "RETURNED")
+                    LoanDetailItemData(103L, "Android nâng cao", "Google", "Lập trình", "14/03/2026", "RETURNED")
                 )
             ),
             LoanItemData(
                 3, "01/03/2026", "10/03/2026", "BORROWING", "Người Trễ Hạn",
                 mutableListOf(
-                    LoanDetailItemData("Clean Code", "Robert C. Martin", "Kỹ thuật", null, "BORROWING")
+                    LoanDetailItemData(104L, "Clean Code", "Robert C. Martin", "Kỹ thuật", null, "BORROWING")
                 )
             )
         )

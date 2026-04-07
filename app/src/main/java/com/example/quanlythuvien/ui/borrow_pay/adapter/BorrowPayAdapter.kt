@@ -94,7 +94,7 @@ class BorrowPayAdapter(
                     set(Calendar.MILLISECOND, 0)
                 }.time
 
-                // Nếu có ngày trả và hạn trả nằm trước ngày hôm nay
+                // Nếu trễ hạn thì hiện cảnh báo
                 if (dueDate != null && dueDate.before(today)) {
                     ivWarningOverdue.visibility = View.VISIBLE
                     // Tô đỏ luôn dòng chữ ngày tháng cho đồng bộ với icon
