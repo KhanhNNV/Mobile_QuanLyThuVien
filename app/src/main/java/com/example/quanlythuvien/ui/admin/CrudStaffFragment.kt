@@ -7,13 +7,16 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
+import android.widget.ImageButton
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quanlythuvien.R
 import com.example.quanlythuvien.utils.setupCustomHeader
+import com.example.quanlythuvien.utils.setupHeaderWithBack
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class CrudStaffFragment: Fragment() {
@@ -72,6 +75,7 @@ class CrudStaffFragment: Fragment() {
     //Apdapter cho RecyclerView
     private lateinit var adapter: CrudStaffAdapter
 
+    private lateinit var btnBack: ImageButton
     //Hàm tạo giao diện
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -94,15 +98,14 @@ class CrudStaffFragment: Fragment() {
 
         // 3. Cài đặt LayoutManager cho RecyclerView (Bắt buộc để danh sách hiển thị dạng dọc)
         recyclerViewStaff=view.findViewById(R.id.recyclerViewStaff)
+        btnBack=view.findViewById(R.id.btnBack)
     }
 
     //Hàm sử dụng view
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupCustomHeader(
-            view = view,
-            title = "Quản lý nhân viên",
-            subtitle = "Tổng số nhân viên"
+        setupHeaderWithBack(
+           view, "Quản lý nhân viên"
         )
 
         initViews(view)
@@ -129,6 +132,7 @@ class CrudStaffFragment: Fragment() {
 
         setupSpinner()
         handleSpinnerEvent()
+        handleButtonBackEvent()
 
     }
 
@@ -167,6 +171,12 @@ class CrudStaffFragment: Fragment() {
             override fun onNothingSelected(parent: AdapterView<*>?) {
                 // Không cần xử lý
             }
+        }
+    }
+
+    private fun handleButtonBackEvent(){
+        btnBack.setOnClickListener {
+            findNavController().popBackStack()
         }
     }
 

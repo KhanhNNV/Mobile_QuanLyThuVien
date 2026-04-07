@@ -34,13 +34,17 @@ class MainActivity : AppCompatActivity() {
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation)
         bottomNavigationView.setupWithNavController(navController)
 
+
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
                 R.id.welcomeFragment,
                 R.id.registerFragment,
                 R.id.loginFragment,
                 R.id.createCategoryFragment,
-                R.id.createBookFragment -> {
+                R.id.createBookFragment,
+                R.id.staffListFragment,
+                R.id.loanPolicyFragment,
+                R.id.categoryListFragment-> {
                     bottomNavigationView.visibility = View.GONE
                 }
                 else -> {

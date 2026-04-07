@@ -20,6 +20,8 @@ import java.util.*
 import android.content.res.ColorStateList
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.activityViewModels
+import com.example.quanlythuvien.viewmodel.SharedFilterLoanViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class BorrowPayFragment :Fragment(){
@@ -47,6 +49,8 @@ class BorrowPayFragment :Fragment(){
             )
         )
     }
+
+    private val sharedViewModel: SharedFilterLoanViewModel by activityViewModels()
 
     private lateinit var fasAddLoan: FloatingActionButton
 // Nút thêm phiếu mượn
@@ -93,6 +97,8 @@ class BorrowPayFragment :Fragment(){
 
     //Adapter cho RecyclerView
     private lateinit var adapter: BorrowPayAdapter
+
+    private var lastFilter: String? = null
 
 
 
@@ -202,8 +208,10 @@ class BorrowPayFragment :Fragment(){
             adapter.submitList(sampleDataList)
         }
 
+        setupViewModelObserver()
 
     }
+
 
     //Hàm dùng để hiển thị DatePicker để chọn ngày
     private fun showDatePickerForFilter(editText: EditText) {
@@ -427,4 +435,27 @@ class BorrowPayFragment :Fragment(){
             Toast.makeText(requireContext(), "Không tìm thấy phiếu mượn phù hợp!", Toast.LENGTH_SHORT).show()
         }
     }
+
+    private fun setupViewModelObserver() {
+        sharedViewModel.filterType.observe(viewLifecycleOwner) { type ->
+            if (type != null) {
+                // Mở layout bộ lọc
+                layoutFilterContainer.visibility = View.VISIBLE
+                btnToggleFilter.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.btn_primary)
+                btnToggleFilter.imageTintList = ContextCompat.getColorStateList(requireContext(), R.color.white)
+
+                // Check vào RadioButton
+                when (type) {
+                    "BORROWING" -> rgStatus.check(R.id.rbOption2)
+                    "DELAYED" -> rgStatus.check(R.id.rbOption3)
+                }
+
+                applyFilter()
+
+                // Đọc xong thì phải xóa để không bị lặp lại
+                sharedViewModel.clearFilter()
+            }
+        }
+    }
+
 }

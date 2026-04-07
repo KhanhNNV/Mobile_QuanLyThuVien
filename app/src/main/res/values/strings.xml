@@ -113,7 +113,7 @@
     <string name="tvTitleTotalBookQuantity">Tổng đầu sách</string>
     <string name="tvTitleTotalBookBorrowing">Tổng đang mượn</string>
     <string name="tvTitleTotalBookDelayed">Trả trễ hạn</string>
-    <string name="tvTitleTotalReader">Trả trễ hạn</string>
+    <string name="tvTitleTotalReader">Tổng độc giả</string>
 
     <string name="tvTitleWarning">CẢNH BÁO</string>
 

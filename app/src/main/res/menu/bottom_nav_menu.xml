@@ -15,19 +15,18 @@
         android:id="@+id/borrowPayListFragment"
         android:icon="@drawable/ic_borrow_pay"
         android:title="Mượn/Trả" />
+
     <item
         android:id="@+id/readerListFragment"
         android:icon="@drawable/ic_group"
         android:title="Độc Giả" />
+
     <item
-        android:id="@+id/staffListFragment"
-        android:icon="@drawable/ic_staff"
-        android:title="Nhân viên" />
-  
-  <item
-        android:id="@+id/categoryListFragment"
-        android:icon="@drawable/ic_library_books"
-        android:title="Thể loại" />
+        android:id="@+id/settingFragment"
+        android:icon="@drawable/outline_settings_24"
+        android:title="cài đặt" />
+
+
   
           
 </menu>

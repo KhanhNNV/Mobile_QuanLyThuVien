@@ -4,9 +4,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#F5F5F5"
-    android:padding="16dp">
+    android:layout_height="match_parent">
+
+    <include
+        android:id="@+id/includeHeader"
+        layout="@layout/layout_header_back"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <LinearLayout
         android:id="@+id/llSearchFilter"
@@ -14,7 +19,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/includeHeader">
 
         <AutoCompleteTextView
             android:id="@+id/autoSearch"
@@ -30,15 +35,6 @@
             android:textColor="@color/text_primary"
             android:textColorHint="@color/text_tertiary" />
 
-        <ImageView
-            android:id="@+id/btnToggleFilter"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:padding="12dp"
-            android:background="@drawable/bg_search"
-            app:srcCompat="@drawable/ic_filter_list"
-            app:tint="@color/btn_primary"
-            android:contentDescription="Mở bộ lọc" />
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
