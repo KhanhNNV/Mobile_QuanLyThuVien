@@ -148,5 +148,11 @@
         android:label="Chính sách mượn trả">
     </fragment>
 
+    <fragment
+        android:id="@+id/loanAddFragment"
+        android:name="com.example.quanlythuvien.ui.borrow_pay.LoanAddFragment"
+        android:label="Thêm phiếu mượn"
+        tools:layout="@layout/fragment_loan_add" />
+
 
 </navigation>

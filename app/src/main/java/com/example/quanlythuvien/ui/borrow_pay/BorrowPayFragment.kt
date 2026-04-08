@@ -21,6 +21,7 @@ import android.content.res.ColorStateList
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import com.example.quanlythuvien.viewmodel.SharedFilterLoanViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
@@ -141,6 +142,10 @@ class BorrowPayFragment :Fragment(){
         )
 
         initViews(view)
+
+        fasAddLoan.setOnClickListener {
+            findNavController().navigate(R.id.loanAddFragment)
+        }
         //Gán List data mẫu
         sampleDataList=  getSampleData().toMutableList()
 
@@ -204,7 +209,6 @@ class BorrowPayFragment :Fragment(){
         }
 
         setupViewModelObserver()
-
     }
 
 
