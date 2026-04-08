@@ -20,6 +20,7 @@ import java.util.*
 import android.content.res.ColorStateList
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.example.quanlythuvien.viewmodel.LoanSharedViewModel
@@ -173,6 +174,11 @@ class BorrowPayFragment :Fragment(){
         // 3. Đón lõng dữ liệu trả về (khi người dùng tắt LoanFragment)
         setupLoanResultObserver()
 
+        //Gọi sự kiện khi có người nhập vào ô tìm kiếm
+        autoSearch.addTextChangedListener {
+            // Mỗi khi người dùng gõ thêm 1 chữ hoặc xóa 1 chữ, hàm lọc sẽ chạy lại ngay lập tức
+            applyFilter()
+        }
 
         //Xử lý sự kiện nhấn nút lọc
         btnToggleFilter.setOnClickListener {
@@ -235,10 +241,18 @@ class BorrowPayFragment :Fragment(){
         }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show()
     }
 
-    //Hàm xử lý bộ lọc
+
+
+    //Hàm xử lý lọc danh sách vừa đảm nhiệm lọc theo ngày, trạng thái, ô tìm kiếm
     private fun applyFilter() {
+        //Lấy giá trị của mốc thời gian người dùng chọn
         val fromDateStr = edtFromDate.text.toString()
         val toDateStr = edtToDate.text.toString()
+
+        //Lấy dữ liệucuaro ô tìm kiếm và chuyển thành chữ thường để dễ so sánh
+        val searchQuery = autoSearch.text.toString().trim().lowercase()
+
+
         //Dịch ngày tháng năm thành chuỗi và ngược lại
         val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
 
@@ -301,8 +315,23 @@ class BorrowPayFragment :Fragment(){
                 e.printStackTrace()
             }
 
-            // Kết hợp cả hai điều kiện
-            statusMatch && dateMatch
+            // C. Lọc theo TỪ KHÓA TÌM KIẾM
+            val searchMatch = if (searchQuery.isEmpty()) {
+                true // Nếu ô tìm kiếm trống, coi như thỏa mãn điều kiện này
+            } else {
+                // Kiểm tra xem từ khóa có nằm trong ID phiếu không
+                val matchId = item.loanId.toString().contains(searchQuery)
+
+                // Kiểm tra xem từ khóa có nằm trong Tên người mượn không
+                val matchName = item.readerName.lowercase().contains(searchQuery)
+
+
+                // Chỉ cần 1 trong 2 thông tin trên khớp với từ khóa là được giữ lại
+                matchId || matchName
+            }
+
+            // KẾT HỢP CẢ 3 ĐIỀU KIỆN
+            statusMatch && dateMatch && searchMatch
         }
 
         adapter.submitList(filteredList)
