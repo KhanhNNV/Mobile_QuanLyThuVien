@@ -20,7 +20,9 @@ data class MockReaderBook(
 )
 
 
-class ReaderDetailAdapter : RecyclerView.Adapter<ReaderDetailAdapter.BooKViewHolder>() {
+class ReaderDetailAdapter(
+    private val onBookClick: (MockReaderBook) -> Unit
+) : RecyclerView.Adapter<ReaderDetailAdapter.BooKViewHolder>() {
     private var bookList: List<MockReaderBook> = listOf()
 
     fun submitList(bookList: List<MockReaderBook>) {
@@ -42,7 +44,13 @@ class ReaderDetailAdapter : RecyclerView.Adapter<ReaderDetailAdapter.BooKViewHol
         p0: BooKViewHolder,
         p1: Int
     ) {
-        p0.bind(this.bookList[p1])
+        val book = this.bookList[p1]
+        p0.bind(book)
+
+        // Bắt sự kiện click vào Card/View của từng sách
+        p0.itemView.setOnClickListener {
+            onBookClick(book)
+        }
     }
 
     override fun getItemCount(): Int {

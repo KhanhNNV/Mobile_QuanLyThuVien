@@ -6,48 +6,12 @@
     android:layout_height="match_parent"
     android:background="#F5F5F5">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <include
         android:id="@+id/headerDashboard"
+        layout="@layout/layout_header_back"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <ImageButton
-            android:id="@+id/ivBack"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_marginStart="8dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Quay lại"
-            android:src="@drawable/baseline_arrow_back_24"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/text_primary" />
-
-        <TextView
-            android:id="@+id/tvHeaderTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:text="Chi tiết độc giả"
-            android:textColor="@color/text_primary"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/ivBack"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <View
-            android:id="@+id/vDivider"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="16dp"
-            android:background="#E0E0E0"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvHeaderTitle" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/nestedScrollView"
@@ -217,14 +181,14 @@
                     </LinearLayout>
 
                     <ImageView
-                        android:id="@+id/ivEditProfile"
+                        android:id="@+id/ivMoreOption"
                         android:layout_width="36dp"
                         android:layout_height="36dp"
                         android:layout_marginEnd="15dp"
                         android:clickable="true"
                         android:focusable="true"
                         android:padding="6dp"
-                        android:src="@android:drawable/ic_menu_edit"
+                        android:src="@drawable/ic_3_dots"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="@+id/tvReaderName"
                         app:tint="@color/blue" />
@@ -380,6 +344,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Đã trả" />
+
+                <com.google.android.material.tabs.TabItem
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Quá hạn" />
 
             </com.google.android.material.tabs.TabLayout>
 
