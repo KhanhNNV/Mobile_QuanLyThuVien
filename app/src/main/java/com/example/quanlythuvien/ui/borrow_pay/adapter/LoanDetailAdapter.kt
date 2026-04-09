@@ -56,15 +56,17 @@ class LoanDetailAdapter(
             val currentStatus = LoanDetailStatus.fromValue(item.status)
 
             // --- BƯỚC 2: Xử lý màu sắc và nội dung cho Tag Trạng Thái ---
-            // Mặc định mọi trạng thái ngoài Đã trả và Bị mất đều được quy về Đang mượn
-            val (text, textColorRes, bgColorRes) = when (currentStatus) {
-                LoanDetailStatus.RETURNED -> Triple("Đã trả", R.color.text_status_success, R.color.status_success)
-                LoanDetailStatus.LOST -> Triple("Bị mất", R.color.text_status_error, R.color.status_error)
-                else -> Triple("Đang mượn", R.color.text_status_info, R.color.status_info)
+            val (text, textColorRes, bgDrawableRes) = when (currentStatus) {
+                LoanDetailStatus.RETURNED -> Triple("Đã trả", R.color.text_status_success, R.drawable.bg_status_success)
+                LoanDetailStatus.LOST -> Triple("Bị mất", R.color.text_status_error, R.drawable.bg_status_error)
+                else -> Triple("Đang mượn", R.color.text_status_info, R.drawable.bg_status_info)
             }
+
             tvStatus.text = text
+           // 1. Cập nhật màu chữ (Dùng getColor là đúng)
             tvStatus.setTextColor(ContextCompat.getColor(context, textColorRes))
-            tvStatus.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(context, bgColorRes))
+            // 2. CẬP NHẬT NỀN
+            tvStatus.setBackgroundResource(bgDrawableRes)
 
             // --- BƯỚC 3: Xử lý ẩn/hiện Ngày Trả thực tế ---
             // Chỉ hiển thị ngày trả khi sách "Đã trả" và có dữ liệu ngày trả

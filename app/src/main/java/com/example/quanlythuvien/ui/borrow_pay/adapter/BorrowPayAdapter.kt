@@ -1,5 +1,6 @@
 package com.example.quanlythuvien.ui.borrow_pay.adapter
 
+import android.content.Context
 import android.content.res.ColorStateList
 import android.view.LayoutInflater
 import android.view.View
@@ -55,16 +56,16 @@ class BorrowPayAdapter(
             when (finalStatus) {
                 LoanStatus.BORROWING -> {
                     tvLoanStatus.text = "Đang mượn"
-                    updateStatusStyle(context, R.color.text_status_info, R.color.status_info)
+                    updateStatusStyle(context, R.color.text_status_info, R.drawable.bg_status_info)
                 }
                 LoanStatus.RETURNED -> {
                     tvLoanStatus.text = "Đã trả"
-                    updateStatusStyle(context, R.color.text_status_success, R.color.status_success)
+                    updateStatusStyle(context, R.color.text_status_success, R.drawable.bg_status_success)
                 }
                 LoanStatus.OVERDUE -> {
                     tvLoanStatus.text = "Quá hạn"
                     // Màu đỏ nổi bật cho trạng thái quá hạn
-                    updateStatusStyle(context, R.color.text_status_error, R.color.status_error)
+                    updateStatusStyle(context, R.color.text_status_error, R.drawable.bg_status_error)
                 }
             }
 
@@ -108,9 +109,13 @@ class BorrowPayAdapter(
 
 
         //Hàm này giúp edit màu chữ, màu nền của trạng thái thuận tiện hơn
-        private fun updateStatusStyle(context: android.content.Context, textColor: Int, bgColor: Int) {
-            tvLoanStatus.setTextColor(ContextCompat.getColor(context, textColor))
-            tvLoanStatus.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(context, bgColor))
+        private fun updateStatusStyle(context: Context, textColorRes: Int, bgDrawableRes: Int) {
+            // 1. Cập nhật màu chữ đúng cách
+            tvLoanStatus.setTextColor(ContextCompat.getColor(context, textColorRes))
+
+            // 2. Thay đổi toàn bộ Resource nền thay vì nhuộm màu (tint)
+            // Điều này giúp tránh lỗi Resources.NotFoundException và giữ đúng bo góc/viền của XML
+            tvLoanStatus.setBackgroundResource(bgDrawableRes)
         }
     }
 
