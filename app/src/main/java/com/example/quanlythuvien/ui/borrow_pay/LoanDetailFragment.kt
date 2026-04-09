@@ -29,11 +29,11 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.text.SimpleDateFormat
 import java.util.*
 
-class LoanFragment : Fragment() {
+class LoanDetailFragment : Fragment() {
 
     private val loanSharedViewModel: LoanSharedViewModel by activityViewModels()
     private lateinit var currentItem: LoanItemData
-    private lateinit var bookAdapter: LoanAdapter
+    private lateinit var bookAdapter: LoanDetailAdapter
 
 // ==========================================
 // KHAI BÁO CÁC VIEW TRÊN GIAO DIỆN (UI)
@@ -52,7 +52,7 @@ class LoanFragment : Fragment() {
     private lateinit var rvBooks: RecyclerView
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_loan, container, false)
+        return inflater.inflate(R.layout.fragment_loan_detail, container, false)
     }
 
     private fun initViews(view: View) {
@@ -109,7 +109,7 @@ class LoanFragment : Fragment() {
         }
 
         // 3. Setup Danh sách sách (Của từng cuốn sách bên dưới)
-        bookAdapter = LoanAdapter { targetBook, action ->
+        bookAdapter = LoanDetailAdapter { targetBook, action ->
             when (action) {
                 "EDIT" -> handleEditBook(targetBook)//Sửa thông tin sách đã mượn
                 "DELETE" -> handleDeleteBook(targetBook)//Xoá thông tin sách đã mượn

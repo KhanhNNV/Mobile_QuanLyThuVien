@@ -19,10 +19,10 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
-class LoanAdapter(
+class LoanDetailAdapter(
     // Kênh liên lạc để báo cáo với Fragment khi người dùng chọn SỬA hoặc XÓA
     private val onMenuActionClick: (LoanDetailItemData, String) -> Unit
-) : ListAdapter<LoanDetailItemData, LoanAdapter.BookViewHolder>(BookDiffCallback()) {
+) : ListAdapter<LoanDetailItemData, LoanDetailAdapter.BookViewHolder>(BookDiffCallback()) {
 
     // ==========================================
     // LỚP KHUÔN (VIEW HOLDER) - Quản lý 1 thẻ sách

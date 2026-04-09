@@ -119,9 +119,9 @@
 
     <fragment
         android:id="@+id/loanFragment"
-        android:name="com.example.quanlythuvien.ui.borrow_pay.LoanFragment"
+        android:name="com.example.quanlythuvien.ui.borrow_pay.LoanDetailFragment"
         android:label="Chi tiết phiếu mượn"
-        tools:layout="@layout/fragment_loan" />
+        tools:layout="@layout/fragment_loan_detail" />
 
     <fragment
         android:id="@+id/readerListFragment"
