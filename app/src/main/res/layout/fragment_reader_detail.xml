@@ -181,7 +181,7 @@
                             android:id="@+id/tvReaderType"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/bg_chip_primary_rounded"
+                            android:background="@drawable/bg_chip_primary"
                             android:paddingHorizontal="10dp"
                             android:paddingVertical="4dp"
                             android:text="Sinh viên"

@@ -20,25 +20,31 @@
 
     <color name="bg_card">#F5F5F5</color>
 
-    <color name="chip_primary">#6c88f0</color>
-    <color name="chip_secondary">#899ef0</color>
+    <color name="chip_primary">#2563EB</color>
+    <color name="chip_secondary">#3B82F6</color>
     <color name="chip_active">#304671</color>
     <color  name="chip_error">#EE3535</color>
 
 
     <color name="bg_chip_active">#B1C6F9</color>
-    <color name="bg_chip_primary">#0f298a</color>
-    <color name="bg_chip_secondary">#1d45e2</color>
+    <color name="bg_chip_primary">#B4D8FF</color>
+    <color name="bg_chip_secondary">#DBEAFE</color>
     <color name="bg_chip_error">#FFDAD6</color>
 
+    <color name="stroke_chip_primary">#93C5FD</color>
+    <color name="stroke_chip_secondary">#BFDBFE</color>
 
-    <color name="status_success">#92edb3</color>
-    <color name="status_error">#f58a8a</color>
+    <color name="status_success">#BBF7D0</color>
+    <color name="status_error">#FECACA</color>
     <color name="status_warning">#F59E0B</color>
-    <color name="status_info">#9ec1fa</color>
+    <color name="status_info">#BAE6FD</color>
 
-    <color name="text_status_info">#3B82F6</color>
-    <color name="text_status_success">#22C55E</color>
-    <color name="text_status_error">#EF4444</color>
+    <color name="text_status_info">#0284C7</color>
+    <color name="text_status_success">#16A34A</color>
+    <color name="text_status_error">#DC2626</color>
+
+    <color name="stroke_status_success">#86EFAC</color>
+    <color name="stroke_status_error">#FCA5A5</color>
+    <color name="stroke_status_info">#7DD3FC</color>
 
 </resources>
