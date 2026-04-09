@@ -44,7 +44,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_delete"
+            android:src="@drawable/ic_delete_loan"
             app:tint="@color/red" />
     </LinearLayout>
 </androidx.cardview.widget.CardView>
