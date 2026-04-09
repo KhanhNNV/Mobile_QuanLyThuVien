@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
@@ -21,6 +22,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quanlythuvien.R
+import com.example.quanlythuvien.ui.borrow_pay.data.BookData
 import com.example.quanlythuvien.ui.borrow_pay.data.LoanDetailItemData
 import com.example.quanlythuvien.ui.borrow_pay.data.LoanItemData
 import com.example.quanlythuvien.viewmodel.LoanSharedViewModel
@@ -95,13 +97,12 @@ class LoanDetailFragment : Fragment() {
         // ==========================================
         ibtLoanMenu.setOnClickListener { menuView ->
             val popup = PopupMenu(requireContext(), menuView)
-            popup.menu.add(0, 1, 0, "Sửa thông tin phiếu")
-            popup.menu.add(0, 2, 0, "Xóa phiếu mượn")
+            // Chỉ thêm chức năng Xóa
+            popup.menu.add(0, 1, 0, "Xóa phiếu mượn")
 
             popup.setOnMenuItemClickListener { item ->
-                when (item.itemId) {
-                    1 -> handleEditLoan()   // Gọi hàm sửa phiếu
-                    2 -> handleDeleteLoan() // Gọi hàm xóa phiếu
+                if (item.itemId == 1) {
+                    handleDeleteLoan()
                 }
                 true
             }
@@ -130,73 +131,19 @@ class LoanDetailFragment : Fragment() {
 // CÁC HÀM XỬ LÝ LOGIC CHO TỔNG PHIẾU MƯỢN
 // ==========================================
 
-    // Hàm hiển thị Dialog nhỏ gọn để sửa Tên và Ngày mượn
-    private fun handleEditLoan() {
-        // Nạp layout nhỏ mà bạn vừa tạo
-        val viewDialog = layoutInflater.inflate(R.layout.layout_dialog_edit_loan, null)
-        val edtName = viewDialog.findViewById<EditText>(R.id.edtEditReaderName)
-        val edtBorrowDate = viewDialog.findViewById<EditText>(R.id.edtEditBorrowDate)
-
-        // Gắn dữ liệu cũ vào ô
-        edtName.setText(currentItem.readerName)
-        edtBorrowDate.setText(currentItem.borrowDate)
-
-        // Xử lý mở lịch cho Ngày mượn
-        edtBorrowDate.setOnClickListener {
-            val calendar = Calendar.getInstance()
-            DatePickerDialog(requireContext(), { _, year, month, dayOfMonth ->
-                val newDate = String.format(Locale.getDefault(), "%02d/%02d/%d", dayOfMonth, month + 1, year)
-                edtBorrowDate.setText(newDate)
-            }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show()
-        }
-
-        // Tạo Alert Dialog có gắn layout ở trên vào
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Sửa phiếu mượn")
-            .setView(viewDialog)
-            .setNegativeButton("Hủy", null)
-            .setPositiveButton("Lưu") { _, _ ->
-                // Cập nhật dữ liệu vào currentItem
-                currentItem = currentItem.copy(
-                    readerName = edtName.text.toString(),
-                    borrowDate = edtBorrowDate.text.toString()
-                )
-                // Gọi hàm cập nhật lại giao diện
-                bindDataToUI()
-                Toast.makeText(requireContext(), "Đã cập nhật thông tin phiếu!", Toast.LENGTH_SHORT).show()
-            }
-            .show()
-    }
-
-    // Hàm xử lý Xóa toàn bộ phiếu
     private fun handleDeleteLoan() {
-        //Kiểm tra xem có sách nào mà người dùng chưa trả hay không
-        val hasUnreturnedBooks = currentItem.borrowedBooks.any { it.status != "RETURNED" }
-
-        //Nếu chưa không cho xóa phiếu
-        if (hasUnreturnedBooks) {
-            MaterialAlertDialogBuilder(requireContext())
-                .setTitle("Không thể xóa")
-                .setMessage("Người này vẫn còn sách chưa trả hoặc bị mất. Vui lòng xử lý toàn bộ sách trong phiếu trước khi xóa!")
-                .setIcon(R.drawable.ic_diamond_exclamation)
-                .setPositiveButton("Đã hiểu", null)
-                .show()
-            return
-        }
-
-        //Nếu đã trả hết thì có thể xóa phiếu
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Xóa phiếu mượn")
-            .setMessage("Bạn có chắc chắn muốn xóa toàn bộ phiếu mượn của '${currentItem.readerName}' không?")
+            .setTitle("Xác nhận xóa vĩnh viễn")
+            .setMessage("Cảnh báo: Việc xóa phiếu mượn của '${currentItem.readerName}' sẽ làm mất toàn bộ lịch sử mượn và trạng thái các cuốn sách trong phiếu này. Bạn có chắc chắn muốn tiếp tục?")
+            .setIcon(R.drawable.ic_diamond_exclamation) // Đảm bảo bạn có icon này hoặc đổi icon khác
             .setNegativeButton("Hủy", null)
-            .setPositiveButton("Xóa") { _, _ ->
-                // --- CẬP NHẬT TẠI ĐÂY ---
-                // 1. Phát tín hiệu xóa đi
+            .setPositiveButton("Xóa vĩnh viễn") { _, _ ->
+                // Phát tín hiệu xóa ID phiếu về cho BorrowPayFragment
                 loanSharedViewModel.deletedLoanId.value = currentItem.loanId
 
                 Toast.makeText(requireContext(), "Đã xóa phiếu mượn thành công!", Toast.LENGTH_SHORT).show()
 
-                // 2. Quay lại màn hình chính
+                // Quay lại màn hình danh sách
                 findNavController().popBackStack()
             }
             .show()
@@ -204,119 +151,142 @@ class LoanDetailFragment : Fragment() {
 // ==========================================
 // CÁC HÀM XỬ LÝ LOGIC CHO TỪNG CUỐN SÁCH
 // ==========================================
-    //Hàm edit lại thông tin của sách đã mượn bao gồm thay đổi trạng thái và gia hạn thêm
-    private fun handleEditBook(targetBook: LoanDetailItemData) {
-        val dialog = BottomSheetDialog(requireContext())
-        val viewDialog = layoutInflater.inflate(R.layout.layout_dialog_edit_loan_detail, null)
-        dialog.setContentView(viewDialog)
+private fun handleEditBook(targetBook: LoanDetailItemData) {
+    val dialog = BottomSheetDialog(requireContext())
+    val viewDialog = layoutInflater.inflate(R.layout.layout_dialog_edit_loan_detail, null)
+    dialog.setContentView(viewDialog)
 
-        //Ánh xạ view của dialog sửa thông tin
-        val edtTitle = viewDialog.findViewById<EditText>(R.id.edtEditBookTitle)
-        val edtAuthor = viewDialog.findViewById<EditText>(R.id.edtEditAuthor)
-        val edtCategory = viewDialog.findViewById<EditText>(R.id.edtEditCategory)
-        val spnStatus = viewDialog.findViewById<Spinner>(R.id.spnEditStatus)
-        val edtDueDate = viewDialog.findViewById<EditText>(R.id.edtEditDueDate)
-        val btnCancel = viewDialog.findViewById<Button>(R.id.btnCancelEdit)
-        val btnSave = viewDialog.findViewById<Button>(R.id.btnSaveEdit)
+    // 1. Ánh xạ View
+    val spnSelectBookInLoan = viewDialog.findViewById<Spinner>(R.id.spnSelectBookInLoan)
+    val spnStatus = viewDialog.findViewById<Spinner>(R.id.spnEditStatus)
+    val edtDueDate = viewDialog.findViewById<EditText>(R.id.edtEditDueDate)
+    val btnSave = viewDialog.findViewById<Button>(R.id.btnSaveEdit)
+    val btnCancel = viewDialog.findViewById<Button>(R.id.btnCancelEdit)
 
-        edtTitle.setText(targetBook.title)
-        edtAuthor.setText(targetBook.author)
-        edtCategory.setText(targetBook.categoryName)
-        edtDueDate.setText(targetBook.dueDate)
-
-
-        //Set up dữ liệu cho spinner trạng thái
-        val statusAdapter = ArrayAdapter(
-            requireContext(),
-            android.R.layout.simple_spinner_item,
-            listOf("Đang mượn", "Đã trả", "Bị mất")
+    // ==========================================
+    // 2. CHUẨN BỊ DỮ LIỆU CHO SPINNER CHỌN SÁCH
+    // ==========================================
+    // Chuyển đổi List<BookData> thành List<LoanDetailItemData> để truyền vào Adapter
+    val sampleBooks = getSampleLibraryBooks().mapIndexed { index, bookData ->
+        LoanDetailItemData(
+            bookId = 1000L + index, // Cấp phát ID giả định (1000, 1001, 1002...)
+            title = bookData.title,
+            author = bookData.author,
+            categoryName = bookData.categoryName,
+            dueDate = "",
+            returnDate = null,
+            status = "AVAILABLE"
         )
-        statusAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spnStatus.adapter = statusAdapter
-
-        val currentPos = when (targetBook.status) {
-            "BORROWING" -> 0
-            "RETURNED" -> 1
-            "LOST" -> 2
-            else -> 0
-        }
-        spnStatus.setSelection(currentPos)
-
-
-
-        //Lắng nghe nút gia hạn nếu có thì hiện DatePicker để chọn ngày
-        edtDueDate.setOnClickListener {
-            val calendar = Calendar.getInstance()
-            DatePickerDialog(requireContext(), { _, year, month, dayOfMonth ->
-                val newDate = String.format(Locale.getDefault(), "%02d/%02d/%d", dayOfMonth, month + 1, year)
-                edtDueDate.setText(newDate)
-            }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show()
-        }
-
-        //Nếu nhấn hủy thì tắt dialog
-        btnCancel.setOnClickListener { dialog.dismiss() }
-
-
-        //Nếu lưu thì ghi đè toàn bộ lại dữ liệu lại cho item được chọn
-        btnSave.setOnClickListener {
-            val newTitle = edtTitle.text.toString()
-            val newAuthor = edtAuthor.text.toString()
-            val newCategory = edtCategory.text.toString()
-            val newDueDate = edtDueDate.text.toString()
-
-            val newStatusStr = when (spnStatus.selectedItemPosition) {
-                1 -> "RETURNED"
-                2 -> "LOST"
-                else -> "BORROWING"
-            }
-
-            val newReturnDate = if (newStatusStr == "RETURNED" && targetBook.status != "RETURNED") {
-                SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
-            } else if (newStatusStr != "RETURNED") {
-                null
-            } else {
-                targetBook.returnDate
-            }
-
-            val updatedBooks = currentItem.borrowedBooks.map { book ->
-                if (book.bookId == targetBook.bookId) {
-                    book.copy(
-                        title = newTitle,
-                        author = newAuthor,
-                        categoryName = newCategory,
-                        dueDate = newDueDate,
-                        status = newStatusStr,
-                        returnDate = newReturnDate
-                    )
-                } else {
-                    book
-                }
-            }.toMutableList()
-
-            //Kiểm tra LoanDetailStatus để cập nhật cho LoanStatus
-            val hasAnyBookBorrowing = updatedBooks.any {
-                it.status == "BORROWING" || it.status == "LOST"
-            }
-            val newOverallStatus = if (hasAnyBookBorrowing) "BORROWING" else "RETURNED"
-
-            //Lưu lại danh sách book mới và trạng thái mới đã cập nhật cho Loan
-            currentItem = currentItem.copy(
-                borrowedBooks = updatedBooks,
-                overallStatus = newOverallStatus
-            )
-
-            //Chỉnh màu cho LoanStatus của layout chi tiết này
-            editStatusUI(currentItem.overallStatus, tvStatus)
-            //Cập nhật danh sách book
-            bookAdapter.submitList(currentItem.borrowedBooks)
-
-            //Hiển thị thông báo đã cập nhật và tự động tắt dialog khi đã lưu xong
-            Toast.makeText(requireContext(), "Cập nhật sách thành công!", Toast.LENGTH_SHORT).show()
-            dialog.dismiss()
-        }
-        dialog.show()
     }
 
+    // Tạo danh sách gộp cho Spinner
+    val combinedBookOptions = mutableListOf<LoanDetailItemData>()
+
+    // Vị trí số 0: Cuốn sách đang được chọn để sửa (thêm chữ "Giữ nguyên" để người dùng biết)
+    val currentBookOption = targetBook.copy(title = "${targetBook.title} (Giữ nguyên)")
+    combinedBookOptions.add(currentBookOption)
+
+    // Từ vị trí số 1 trở đi: Danh sách sách mẫu trong kho
+    combinedBookOptions.addAll(sampleBooks)
+
+    // Cài đặt Adapter
+    val customBookAdapter = CustomBookSpinnerAdapter(requireContext(), combinedBookOptions)
+    spnSelectBookInLoan.adapter = customBookAdapter
+    spnSelectBookInLoan.setSelection(0) // Luôn mặc định chọn cuốn hiện tại
+
+    // ==========================================
+    // 3. THIẾT LẬP TRẠNG THÁI VÀ HẠN TRẢ
+    // ==========================================
+    val statusAdapter = ArrayAdapter(
+        requireContext(),
+        android.R.layout.simple_spinner_item,
+        listOf("Đang mượn", "Đã trả", "Bị mất")
+    )
+    statusAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+    spnStatus.adapter = statusAdapter
+
+    // Trạng thái mặc định lấy từ cuốn sách gốc
+    spnStatus.setSelection(when (targetBook.status) {
+        "BORROWING" -> 0
+        "RETURNED" -> 1
+        "LOST" -> 2
+        else -> 0
+    })
+
+    edtDueDate.setText(targetBook.dueDate)
+    edtDueDate.setOnClickListener {
+        val calendar = Calendar.getInstance()
+        DatePickerDialog(requireContext(), { _, year, month, dayOfMonth ->
+            val newDate = String.format(Locale.getDefault(), "%02d/%02d/%d", dayOfMonth, month + 1, year)
+            edtDueDate.setText(newDate)
+        }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show()
+    }
+
+    // ==========================================
+    // 4. LOGIC LƯU THAY ĐỔI VÀO PHIẾU MƯỢN
+    // ==========================================
+    btnSave.setOnClickListener {
+        val selectedIndex = spnSelectBookInLoan.selectedItemPosition
+
+        // Lấy ra thông tin của cuốn sách người dùng CHỐT
+        // Nếu chọn 0 -> Lấy cuốn gốc (targetBook). Nếu > 0 -> Lấy cuốn sách mẫu
+        val finalBookInfo = if (selectedIndex == 0) targetBook else combinedBookOptions[selectedIndex]
+
+        val newDueDate = edtDueDate.text.toString()
+        val newStatusStr = when (spnStatus.selectedItemPosition) {
+            1 -> "RETURNED"
+            2 -> "LOST"
+            else -> "BORROWING"
+        }
+
+        // Tiến hành cập nhật danh sách sách mượn
+        val updatedBooks = currentItem.borrowedBooks.map { book ->
+            // Chỉ tìm và ghi đè ĐÚNG vào vị trí của cuốn sách mà ta đang bấm "Sửa"
+            if (book.bookId == targetBook.bookId) {
+                val newReturnDate = if (newStatusStr == "RETURNED" && book.status != "RETURNED") {
+                    SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
+                } else if (newStatusStr != "RETURNED") {
+                    null
+                } else {
+                    book.returnDate
+                }
+
+                // Ghi đè thông tin mới
+                book.copy(
+                    bookId = finalBookInfo.bookId, // Thay đổi ID nếu đổi sách khác
+                    title = finalBookInfo.title.replace(" (Giữ nguyên)", ""), // Làm sạch tên sách
+                    author = finalBookInfo.author, // Tác giả mới (hoặc cũ)
+                    categoryName = finalBookInfo.categoryName, // Thể loại mới (hoặc cũ)
+                    dueDate = newDueDate,
+                    status = newStatusStr,
+                    returnDate = newReturnDate
+                )
+            } else {
+                book // Các cuốn khác nằm trong phiếu mượn thì giữ nguyên
+            }
+        }.toMutableList()
+
+        // Kiểm tra trạng thái tổng quát (Nếu có bất kỳ cuốn nào chưa trả -> BORROWING)
+        val hasAnyActive = updatedBooks.any { it.status == "BORROWING" || it.status == "LOST" }
+        val newOverallStatus = if (hasAnyActive || updatedBooks.isEmpty()) "BORROWING" else "RETURNED"
+
+        // Gán dữ liệu đã cập nhật vào Object chính
+        currentItem = currentItem.copy(
+            borrowedBooks = updatedBooks,
+            overallStatus = newOverallStatus
+        )
+
+        // Làm mới giao diện bên ngoài
+        editStatusUI(currentItem.overallStatus, tvStatus)
+        bookAdapter.submitList(currentItem.borrowedBooks)
+
+        Toast.makeText(requireContext(), "Cập nhật sách thành công!", Toast.LENGTH_SHORT).show()
+        dialog.dismiss()
+    }
+
+    btnCancel.setOnClickListener { dialog.dismiss() }
+    dialog.show()
+}
 
     //Hàm xóa sách đã mượn
     private fun handleDeleteBook(targetBook: LoanDetailItemData) {
@@ -348,14 +318,103 @@ class LoanDetailFragment : Fragment() {
     //Hàm chỉnh màu cho LoanStatus
     private fun editStatusUI(status: String, tvStatus: TextView) {
         val context = requireContext()
-        if (status == "BORROWING") {
-            tvStatus.text = "Đang mượn"
-            tvStatus.setTextColor(ContextCompat.getColor(context, R.color.text_status_info))
-            tvStatus.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.status_info))
-        } else {
-            tvStatus.text = "Đã trả"
-            tvStatus.setTextColor(ContextCompat.getColor(context, R.color.text_status_success))
-            tvStatus.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.status_success))
+
+        // Sử dụng when để code sạch và dễ mở rộng hơn if-else
+        when (status) {
+            "BORROWING" -> {
+                tvStatus.text = "Đang mượn"
+                tvStatus.setTextColor(ContextCompat.getColor(context, R.color.text_status_info))
+                tvStatus.setBackgroundResource(R.drawable.bg_status_info)
+            }
+            "RETURNED" -> {
+                tvStatus.text = "Đã trả"
+                tvStatus.setTextColor(ContextCompat.getColor(context, R.color.text_status_success))
+                tvStatus.setBackgroundResource(R.drawable.bg_status_success)
+            }
+            "OVERDUE" -> {
+                tvStatus.text = "Quá hạn"
+                // Sử dụng màu đỏ và background đỏ cho trạng thái quá hạn
+                tvStatus.setTextColor(ContextCompat.getColor(context, R.color.text_status_error))
+                tvStatus.setBackgroundResource(R.drawable.bg_status_error)
+            }
+        }
+    }
+    // ==========================================
+    // TẠO DỮ LIỆU MẪU: DANH SÁCH SÁCH TRONG KHO
+    // ==========================================
+    // Hàm tạo dữ liệu mẫu mô phỏng Database của thư viện
+    fun getSampleLibraryBooks(): List<BookData> {
+        return listOf(
+            // --- Nhóm Công nghệ / Lập trình ---
+            BookData("Lập trình Android với Kotlin", "Nguyễn Văn A", "Công nghệ thông tin"),
+            BookData("Clean Code: Mã sạch", "Robert C. Martin", "Kỹ thuật phần mềm"),
+            BookData("Cấu trúc dữ liệu và giải thuật", "Phạm Văn Ất", "Giáo trình ĐH"),
+            BookData("Design Patterns in Java", "Gang of Four", "Kỹ thuật phần mềm"),
+            BookData("Head First Java", "Kathy Sierra", "Công nghệ thông tin"),
+            BookData("Làm chủ trí tuệ nhân tạo (AI)", "Nhiều tác giả", "Khoa học máy tính"),
+
+            // --- Nhóm Văn học / Tiểu thuyết ---
+            BookData("Nhà Giả Kim", "Paulo Coelho", "Tiểu thuyết"),
+            BookData("Dế Mèn Phiêu Lưu Ký", "Tô Hoài", "Văn học Việt Nam"),
+            BookData("Hai Số Phận", "Jeffrey Archer", "Tiểu thuyết nước ngoài"),
+            BookData("Mắt Biếc", "Nguyễn Nhật Ánh", "Truyện dài"),
+            BookData("Sherlock Holmes toàn tập", "Arthur Conan Doyle", "Trinh thám"),
+
+            // --- Nhóm Kỹ năng / Phát triển bản thân ---
+            BookData("Đắc Nhân Tâm", "Dale Carnegie", "Kỹ năng sống"),
+            BookData("Tuổi Trẻ Đáng Giá Bao Nhiêu", "Rosie Nguyễn", "Phát triển bản thân"),
+            BookData("Lối Sống Tối Giản Của Người Nhật", "Sasaki Fumio", "Kỹ năng sống"),
+            BookData("Atomic Habits (Thói quen nguyên tử)", "James Clear", "Tâm lý học"),
+
+            // --- Nhóm Lịch sử / Khoa học Xã hội ---
+            BookData("Sapiens: Lược Sử Loài Người", "Yuval Noah Harari", "Lịch sử"),
+            BookData("Tâm Lý Học Tội Phạm", "Stanton Samenow", "Tâm lý học"),
+            BookData("Súng, Vi Trùng và Thép", "Jared Diamond", "Khoa học xã hội")
+        )
+    }
+
+
+    // =========================================================================
+    // ADAPTER CUSTOM CHO SPINNER CHỌN SÁCH
+    // =========================================================================
+    inner class CustomBookSpinnerAdapter(
+        context: android.content.Context,
+        private val bookList: List<LoanDetailItemData>
+    ) : ArrayAdapter<LoanDetailItemData>(context, 0, bookList) {
+
+        // Giao diện khi Spinner đang đóng (chỉ hiện 1 mục đã chọn)
+        override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+            return createView(position, convertView, parent)
+        }
+
+        // Giao diện khi bấm vào Spinner (xổ ra danh sách để chọn)
+        override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
+            return createView(position, convertView, parent)
+        }
+
+        private fun createView(position: Int, convertView: View?, parent: ViewGroup): View {
+            // Nạp layout item_custom_spinner.xml của bạn
+            val view = convertView ?: LayoutInflater.from(context)
+                .inflate(R.layout.item_custom_spinner_book, parent, false)
+
+            val item = getItem(position)
+
+            // Ánh xạ các View trong item_custom_spinner.xml
+            val tvName = view.findViewById<TextView>(R.id.tvBookName)
+            val tvAuthorCategory = view.findViewById<TextView>(R.id.tvAuthorCategory)
+
+            item?.let {
+                // Hiển thị tên sách (in đậm)
+                tvName.text = "${it.bookId} - ${it.title}"
+
+                // Hiển thị Tác giả & Thể loại (nếu bạn dùng bản XML mới nhất mình gửi)
+                // Dùng if (tvAuthorCategory != null) để tránh lỗi nếu bạn dùng bản XML cũ
+                if (tvAuthorCategory != null) {
+                    tvAuthorCategory.text = "${it.author}  •  ${it.categoryName}"
+                }
+            }
+
+            return view
         }
     }
 }
