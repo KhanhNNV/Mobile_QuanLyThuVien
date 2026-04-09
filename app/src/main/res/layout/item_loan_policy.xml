@@ -61,6 +61,7 @@
             android:paddingHorizontal="10dp"
             android:gravity="center"
             android:text="Thời hạn:"
+            android:textStyle="bold"
             android:textColor="@color/chip_primary"
             android:background="@drawable/bg_chip_secondary"
             android:textSize="11sp"
