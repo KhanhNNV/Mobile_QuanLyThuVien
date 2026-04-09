@@ -15,6 +15,17 @@
         android:name="com.example.quanlythuvien.ui.login.LoginFragment"
         android:label="Login"
         tools:layout="@layout/fragment_login">
+        <action
+            android:id="@+id/action_loginFragment_to_dashboardFragment"
+            app:destination="@id/dashboardFragment"
+            app:popUpTo="@id/loginFragment"
+            app:popUpToInclusive="true"/>
+
+        <action
+            android:id="@+id/action_loginFragment_to_staffDashboardFragment"
+            app:destination="@id/staffDashboardFragment"
+            app:popUpTo="@id/loginFragment"
+            app:popUpToInclusive="true"/>
     </fragment>
 
     <fragment
@@ -154,5 +165,45 @@
         android:label="Thêm phiếu mượn"
         tools:layout="@layout/fragment_loan_add" />
 
+<!--    =========================================Staff=============================================-->
 
+    <fragment
+        android:id="@+id/staffDashboardFragment"
+        android:name="com.example.quanlythuvien.ui.dashboard.DashboardStaffFragment"
+        android:label="Staff Dashboard"
+        tools:layout="@layout/fragment_dashboard_staff">
+
+        <action
+            android:id="@+id/action_staffDashboard_to_bookList"
+            app:destination="@id/bookListFragment"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/staffDashboardFragment"
+            app:popUpToInclusive="false"
+            app:popUpToSaveState="true"
+            app:restoreState="true" />
+
+        <action
+            android:id="@+id/action_staffDashboard_to_borrowPay"
+            app:destination="@id/borrowPayListFragment"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/staffDashboardFragment"
+            app:popUpToInclusive="false"
+            app:popUpToSaveState="true"
+            app:restoreState="true" />
+
+        <action
+            android:id="@+id/action_staffDashboard_to_readerList"
+            app:destination="@id/readerListFragment"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/staffDashboardFragment"
+            app:popUpToInclusive="false"
+            app:popUpToSaveState="true"
+            app:restoreState="true" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/staffSettingFragment"
+        android:name="com.example.quanlythuvien.ui.setting.StaffSettingFragment"
+        android:label="Staff Setting"
+        tools:layout="@layout/fragment_staff_setting"/>
 </navigation>

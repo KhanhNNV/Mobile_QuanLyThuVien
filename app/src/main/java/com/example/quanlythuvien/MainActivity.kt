@@ -20,21 +20,32 @@ class MainActivity : AppCompatActivity() {
         val navInflater = navController.navInflater
         val navGraph = navInflater.inflate(R.navigation.nav_graph)
 
+        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation)
+
+        // Đọc trạng thái đăng nhập và quyền (Role)
         val sharedPreferences = getSharedPreferences("LibraryAppPrefs", MODE_PRIVATE)
         val isLoggedIn = sharedPreferences.getBoolean("isLoggedIn", false)
+        val userRole = sharedPreferences.getString("userRole", "ADMIN") ?: "ADMIN"
 
+        // Phân luồng Start Destination và Menu
         if (isLoggedIn) {
-            navGraph.setStartDestination(R.id.dashboardFragment)
+            if (userRole == "STAFF") {
+                navGraph.setStartDestination(R.id.staffDashboardFragment)
+            } else {
+                navGraph.setStartDestination(R.id.dashboardFragment)
+            }
+
+            updateBottomNavigationMenu(userRole)
+
         } else {
             navGraph.setStartDestination(R.id.welcomeFragment)
+            // Setup mặc định khi chưa đăng nhập
+            bottomNavigationView.setupWithNavController(navController)
         }
 
         navController.graph = navGraph
 
-        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation)
-        bottomNavigationView.setupWithNavController(navController)
-
-
+        // Quản lý ẩn/hiện Bottom Navigation
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
                 R.id.welcomeFragment,
@@ -44,7 +55,7 @@ class MainActivity : AppCompatActivity() {
                 R.id.createBookFragment,
                 R.id.staffListFragment,
                 R.id.loanPolicyFragment,
-                R.id.categoryListFragment-> {
+                R.id.categoryListFragment -> {
                     bottomNavigationView.visibility = View.GONE
                 }
                 else -> {
@@ -52,5 +63,23 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    fun updateBottomNavigationMenu(role: String) {
+        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation)
+
+        // Xóa menu cũ
+        bottomNavigationView.menu.clear()
+
+        // Bơm menu mới dựa vào Role
+        if (role == "STAFF") {
+            bottomNavigationView.inflateMenu(R.menu.menu_staff)
+        } else {
+            bottomNavigationView.inflateMenu(R.menu.bottom_nav_menu)
+        }
+
+        // Kết nối lại với NavController
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        bottomNavigationView.setupWithNavController(navHostFragment.navController)
     }
 }

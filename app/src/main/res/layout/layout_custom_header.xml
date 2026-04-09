@@ -31,7 +31,7 @@
         android:id="@+id/btnBell"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        app:cardBackgroundColor="@color/gray"
+        app:cardBackgroundColor="@color/theme_primary"
         app:cardCornerRadius="14dp"
         app:cardElevation="0dp"
         app:layout_constraintBottom_toBottomOf="@+id/tvHeaderSubtitle"
@@ -44,7 +44,7 @@
             android:layout_height="24dp"
             android:layout_gravity="center"
             android:src="@android:drawable/ic_popup_reminder"
-            app:tint="@color/gray" />
+            app:tint="@color/white" />
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cvNotificationBadge"
