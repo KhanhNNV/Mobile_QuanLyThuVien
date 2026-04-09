@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true">
@@ -47,6 +48,18 @@
             android:layout_marginBottom="16dp"
             android:layout_marginTop="4dp"
             android:layout_marginStart="4dp"/>
+        <TextView
+            android:id="@+id/tvReaderViolation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Cảnh báo: Đang có vi phạm chưa xử lý!"
+            android:textColor="@color/red"
+            android:textStyle="bold|italic"
+            android:layout_marginBottom="16dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginStart="4dp"
+            android:visibility="gone"
+            tools:visibility="visible" />
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
@@ -78,7 +91,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/item_selected_book"/>
         <View
             android:layout_width="match_parent"
             android:layout_height="0dp"
