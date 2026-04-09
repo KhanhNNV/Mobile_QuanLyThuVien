@@ -79,7 +79,6 @@ class CrudStaffFragment : Fragment() {
         val viewDialog = layoutInflater.inflate(R.layout.layout_dialog_edit_staff, null)
 
         val edtName = viewDialog.findViewById<EditText>(R.id.edtEditFullname)
-        val edtLibName = viewDialog.findViewById<EditText>(R.id.edtEditLibName)
         val edtUser = viewDialog.findViewById<EditText>(R.id.edtEditUsername)
         val edtPass = viewDialog.findViewById<EditText>(R.id.edtEditPassword)
         // Ánh xạ Switch mới bổ sung
@@ -87,7 +86,6 @@ class CrudStaffFragment : Fragment() {
 
         // Đổ dữ liệu hiện tại vào View
         edtName.setText(staffItem.name)
-        edtLibName.setText(staffItem.libraryName)
         edtUser.setText(staffItem.userName)
         swActive.isChecked = staffItem.isActive // Gán trạng thái hiện tại
 
@@ -97,12 +95,11 @@ class CrudStaffFragment : Fragment() {
             .setNegativeButton("Hủy", null)
             .setPositiveButton("Lưu thay đổi") { _, _ ->
                 val newName = edtName.text.toString().trim()
-                val newLib = edtLibName.text.toString().trim()
                 val newUser = edtUser.text.toString().trim()
                 val newPass = edtPass.text.toString().trim()
                 val newStatus = swActive.isChecked // Lấy trạng thái từ Switch
 
-                if (newName.isEmpty() || newLib.isEmpty() || newUser.isEmpty()) {
+                if (newName.isEmpty() || newUser.isEmpty()) {
                     Toast.makeText(requireContext(), "Thông tin không được để trống!", Toast.LENGTH_SHORT).show()
                     return@setPositiveButton
                 }
@@ -112,7 +109,6 @@ class CrudStaffFragment : Fragment() {
                     // Sử dụng .copy() để tạo object mới (Giải quyết lỗi UI không cập nhật)
                     val updatedStaff = listStaff[index].copy(
                         name = newName,
-                        libraryName = newLib,
                         userName = newUser,
                         isActive = newStatus, // Cập nhật trạng thái mới
                         passwordHash = if (newPass.isNotEmpty()) newPass else listStaff[index].passwordHash
