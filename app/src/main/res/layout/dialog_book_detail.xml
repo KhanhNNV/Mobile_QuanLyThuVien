@@ -25,9 +25,37 @@
             android:gravity="center"
             android:layout_marginBottom="16dp" />
 
-        <TextView android:id="@+id/tvDetailAuthor" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/text_primary" android:textSize="15sp" android:layout_marginBottom="8dp"/>
-        <TextView android:id="@+id/tvDetailCategory" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/text_primary" android:textSize="15sp" android:layout_marginBottom="8dp"/>
-        <TextView android:id="@+id/tvDetailStatus" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/text_primary" android:textSize="15sp" android:layout_marginBottom="16dp" />
+        <TextView
+            android:id="@+id/tvDetailAuthor"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_primary"
+            android:textSize="15sp"
+            android:layout_marginBottom="8dp"/>
+
+        <TextView
+            android:id="@+id/tvDetailCategory"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_primary"
+            android:textSize="15sp"
+            android:layout_marginBottom="8dp"/>
+
+        <TextView
+            android:id="@+id/tvDetailBasePrice"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_primary"
+            android:textSize="15sp"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/tvDetailStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_primary"
+            android:textSize="15sp"
+            android:layout_marginBottom="16dp" />
 
         <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#EEEEEE" android:layout_marginBottom="12dp"/>
 
@@ -67,13 +95,35 @@
             android:layout_marginBottom="16dp"
             android:clipToPadding="false" />
 
-        <Button
-            android:id="@+id/btnCloseDialog"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:text="ĐÓNG"
-            android:textColor="@color/white"
-            android:backgroundTint="@color/btn_primary"
-            app:cornerRadius="25dp" />
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="4dp">
+
+            <Button
+                android:id="@+id/btnEditBook"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_weight="1"
+                android:text="SỬA"
+                android:textColor="@color/btn_primary"
+                app:strokeColor="@color/btn_primary"
+                app:strokeWidth="2dp"
+                android:layout_marginEnd="8dp"
+                app:cornerRadius="25dp" />
+
+            <Button
+                android:id="@+id/btnCloseDialog"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_weight="1"
+                android:text="ĐÓNG"
+                android:textColor="@color/white"
+                android:backgroundTint="@color/btn_primary"
+                app:cornerRadius="25dp" />
+
+        </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>

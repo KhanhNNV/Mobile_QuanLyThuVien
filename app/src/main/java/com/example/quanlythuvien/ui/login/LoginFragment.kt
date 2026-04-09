@@ -10,6 +10,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.navigation.fragment.findNavController
+import com.example.quanlythuvien.MainActivity
 import com.example.quanlythuvien.R
 
 
@@ -43,14 +44,26 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                 Toast.makeText(requireContext(), "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
+            val mainActivity = requireActivity() as MainActivity
 
             if (username == "admin" && password == "123") {
                 saveLoginState(username, "ADMIN")
 
                 Toast.makeText(requireContext(), "Đăng nhập thành công!", Toast.LENGTH_SHORT).show()
 
-                findNavController().navigate(R.id.dashboardFragment)
-            } else {
+                mainActivity.updateBottomNavigationMenu("ADMIN")
+                findNavController().navigate(R.id.action_loginFragment_to_dashboardFragment)
+            }
+            else if(username == "staff" && password == "123"){
+                saveLoginState(username, "STAFF")
+
+                Toast.makeText(requireContext(), "Đăng nhập thành công!", Toast.LENGTH_SHORT).show()
+
+                mainActivity.updateBottomNavigationMenu("STAFF")
+
+                findNavController().navigate(R.id.action_loginFragment_to_staffDashboardFragment)
+
+            }else {
                 Toast.makeText(requireContext(), "Sai email hoặc mật khẩu!", Toast.LENGTH_SHORT).show()
             }
         }
