@@ -62,13 +62,6 @@
     <string name="extend_action">Gia hạn</string>
     <string name="ngayMuon">Ngày mượn: </string>
 
-    <!-- Bộ lọc cho layout mượn trả -->
-    <string-array name="load_status">
-        <item>Tất cả</item>
-        <item>Đang mượn</item>
-        <item>Đã trả</item>
-    </string-array>
-
 
     <!-- Import Book -->
     <string name="err_bookEmpty">Vui lòng nhập tên sách</string>

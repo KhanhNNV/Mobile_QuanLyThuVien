@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bg_card">
+
     <include
         android:id="@+id/headerBack"
         layout="@layout/layout_header_back"
@@ -24,6 +25,34 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/headerBack">
 
+        <ImageButton
+            android:id="@+id/ibtSet"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Tùy chọn phiếu"
+            app:layout_constraintBottom_toBottomOf="@+id/tvDialogReaderName"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/tvDialogReaderName"
+            app:srcCompat="@drawable/ic_3_dots" />
+
+        <TextView
+            android:id="@+id/tvDialogStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
+            android:background="@drawable/bg_status"
+            android:backgroundTint="@color/status_info"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="4dp"
+            android:text="Đang mượn"
+            android:textColor="@color/text_status_info"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/tvDialogReaderName"
+            app:layout_constraintEnd_toStartOf="@+id/ibtSet"
+            app:layout_constraintTop_toTopOf="@+id/tvDialogReaderName" />
+
         <TextView
             android:id="@+id/tvDialogReaderName"
             android:layout_width="0dp"
@@ -38,22 +67,6 @@
             app:layout_constraintEnd_toStartOf="@+id/tvDialogStatus"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/tvDialogStatus"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/bg_status"
-            android:backgroundTint="@color/status_info"
-            android:paddingHorizontal="12dp"
-            android:paddingVertical="4dp"
-            android:text="Đang mượn"
-            android:textColor="@color/text_status_info"
-            android:textSize="11sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@+id/tvDialogReaderName"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/tvDialogReaderName" />
 
         <TextView
             android:id="@+id/tvMa"
@@ -127,58 +140,6 @@
             app:layout_constraintStart_toEndOf="@+id/tvDialogNM"
             app:layout_constraintTop_toTopOf="@+id/tvDialogNM" />
 
-        <Button
-            android:id="@+id/btChange"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:layout_marginTop="4dp"
-            android:text="@string/extend_action"
-            android:textColor="@color/chip_primary"
-            android:textSize="12sp"
-            app:cornerRadius="24dp"
-            app:icon="@android:drawable/ic_menu_edit"
-            app:iconPadding="4dp"
-            app:iconSize="14dp"
-            app:iconTint="@color/chip_primary"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvDialogNM"
-            app:strokeColor="@color/chip_primary"
-            app:strokeWidth="1dp" />
-
-        <TextView
-            android:id="@+id/tvDialogNT"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/bg_status"
-            android:backgroundTint="@color/bg_chip_primary"
-            android:paddingHorizontal="8dp"
-            android:paddingVertical="2dp"
-            android:text="@string/dueDate"
-            android:textColor="@color/chip_primary"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@+id/btChange"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/btChange" />
-
-        <TextView
-            android:id="@+id/tvDialogDueDate"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:text="20/06/2026"
-            android:textColor="@color/text_secondary"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@+id/btChange"
-            app:layout_constraintEnd_toStartOf="@+id/btChange"
-            app:layout_constraintStart_toEndOf="@+id/tvDialogNT"
-            app:layout_constraintTop_toTopOf="@+id/btChange" />
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -193,6 +154,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/layoutTopInfo">
+
         <TextView
             android:id="@+id/tvBorrowedBooksLabel"
             android:layout_width="wrap_content"
@@ -205,6 +167,7 @@
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvBorrowedBooks"
             android:layout_width="match_parent"

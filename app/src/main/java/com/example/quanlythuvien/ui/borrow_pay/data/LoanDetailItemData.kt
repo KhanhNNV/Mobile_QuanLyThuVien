@@ -6,5 +6,7 @@ data class  LoanDetailItemData (
     val author: String,
     val categoryName: String,
     var returnDate: String?,
+    var dueDate: String,           // Đổi thành var để gia hạn được
     var status: String
+
 )

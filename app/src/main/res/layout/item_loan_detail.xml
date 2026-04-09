@@ -35,7 +35,6 @@
             android:layout_height="24dp"
             android:backgroundTint="@color/bg_card"
             android:contentDescription="Tùy chọn sách"
-
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_3_dots" />
@@ -124,6 +123,22 @@
             app:layout_constraintTop_toBottomOf="@+id/barrierCategory" />
 
         <TextView
+            android:id="@+id/tvDetailStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_status"
+            android:backgroundTint="@color/status_info"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="4dp"
+            android:text="Đang mượn"
+            android:textColor="@color/text_status_info"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/divider" />
+
+        <TextView
             android:id="@+id/tvNgayTraTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -143,28 +158,54 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
-            android:text="2024-05-20"
+            android:layout_marginEnd="8dp"
+            android:text="20/05/2026"
             android:textColor="@color/text_secondary"
             android:textSize="13sp"
             app:layout_constraintBottom_toBottomOf="@+id/tvNgayTraTitle"
+            app:layout_constraintEnd_toStartOf="@+id/tvDetailStatus"
             app:layout_constraintStart_toEndOf="@+id/tvNgayTraTitle"
             app:layout_constraintTop_toTopOf="@+id/tvNgayTraTitle" />
 
         <TextView
-            android:id="@+id/tvDetailStatus"
+            android:id="@+id/tvDetailDueDateTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:background="@drawable/bg_status"
-            android:backgroundTint="@color/status_info"
-            android:paddingHorizontal="10dp"
-            android:paddingVertical="4dp"
-            android:text="Đang mượn"
-            android:textColor="@color/text_status_info"
-            android:textSize="12sp"
+            android:backgroundTint="@color/bg_chip_secondary"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="2dp"
+            android:text="Hạn trả:"
+            android:textColor="@color/chip_secondary"
+            android:textSize="13sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvNgayTraTitle" />
+
+        <TextView
+            android:id="@+id/tvDetailDueDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:text="20/06/2026"
+            android:textColor="@color/text_secondary"
+            android:textSize="13sp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@+id/tvNgayTraTitle"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/tvNgayTraTitle" />
+            app:layout_constraintBottom_toBottomOf="@+id/tvDetailDueDateTitle"
+            app:layout_constraintStart_toEndOf="@+id/tvDetailDueDateTitle"
+            app:layout_constraintTop_toTopOf="@+id/tvDetailDueDateTitle" />
+
+        <ImageView
+            android:id="@+id/ivWarningOverdueDetail"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginStart="6dp"
+            android:src="@drawable/ic_diamond_exclamation"
+            app:tint="@color/text_status_error"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/tvDetailDueDate"
+            app:layout_constraintStart_toEndOf="@+id/tvDetailDueDate"
+            app:layout_constraintTop_toTopOf="@+id/tvDetailDueDate" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

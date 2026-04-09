@@ -63,22 +63,18 @@
 
         <TextView
             android:id="@+id/tvLoanId"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_marginEnd="12dp"
-            android:ellipsize="end"
-            android:maxLines="1"
             android:text="RV01"
             android:textColor="@color/text_secondary"
             android:textSize="13sp"
             app:layout_constraintBottom_toBottomOf="@+id/tvMa"
-            app:layout_constraintEnd_toStartOf="@+id/tvLoanStatus"
             app:layout_constraintStart_toEndOf="@+id/tvMa"
             app:layout_constraintTop_toTopOf="@+id/tvMa" />
 
         <TextView
-            android:id="@+id/tvTitleDate"
+            android:id="@+id/tvTitleBorrowDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
@@ -86,36 +82,23 @@
             android:backgroundTint="@color/bg_chip_secondary"
             android:paddingHorizontal="8dp"
             android:paddingVertical="2dp"
-            android:text="@string/dueDate"
+            android:text="Ngày mượn:"
             android:textColor="@color/chip_secondary"
-            android:textSize="14sp"
+            android:textSize="13sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tvMa" />
 
         <TextView
-            android:id="@+id/tvDueDate"
-            android:layout_width="wrap_content"
+            android:id="@+id/tvBorrowDate"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:text="20/06/2026"
+            android:text="20/05/2026"
             android:textColor="@color/text_secondary"
-            android:textSize="14sp"
-            app:layout_constraintBottom_toBottomOf="@+id/tvTitleDate"
-            app:layout_constraintStart_toEndOf="@+id/tvTitleDate"
-            app:layout_constraintTop_toTopOf="@+id/tvTitleDate" />
+            android:textSize="13sp"
+            app:layout_constraintBottom_toBottomOf="@+id/tvTitleBorrowDate"
+            app:layout_constraintStart_toEndOf="@+id/tvTitleBorrowDate"
+            app:layout_constraintTop_toTopOf="@+id/tvTitleBorrowDate" />
 
-        <ImageView
-            android:id="@+id/ivWarningOverdue"
-            android:layout_width="18dp"
-            android:layout_height="18dp"
-            android:layout_marginStart="6dp"
-            android:src="@drawable/ic_diamond_exclamation"
-            app:tint="@color/text_status_error"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="@+id/tvDueDate"
-            app:layout_constraintStart_toEndOf="@+id/tvDueDate"
-            app:layout_constraintTop_toTopOf="@+id/tvDueDate" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>
