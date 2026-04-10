@@ -110,7 +110,18 @@
         android:id="@+id/borrowPayListFragment"
         android:name="com.example.quanlythuvien.ui.borrow_pay.BorrowPayFragment"
         android:label="Mượn Trả"
-        tools:layout="@layout/fragment_borrow_pay" />
+        tools:layout="@layout/fragment_borrow_pay">
+
+    <action
+        android:id="@+id/action_borrowPay_to_loanDetail"
+        app:destination="@id/loanFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/loanFragment"
+        android:name="com.example.quanlythuvien.ui.borrow_pay.LoanDetailFragment"
+        android:label="Chi tiết phiếu mượn"
+        tools:layout="@layout/fragment_loan_detail" />
 
     <fragment
         android:id="@+id/readerListFragment"
@@ -140,7 +151,7 @@
         android:id="@+id/staffListFragment"
         android:name="com.example.quanlythuvien.ui.admin.CrudStaffFragment"
         android:label="Quản lý Nhân viên"
-        tools:layout="@layout/layout_manager_staff_of_admin" />
+        tools:layout="@layout/fragment_manager_staff_of_admin" />
 
     <fragment
         android:id="@+id/readerDetailFragment"
@@ -163,6 +174,12 @@
         android:name="com.example.quanlythuvien.ui.borrow_pay.LoanPolicyFragment"
         android:label="Chính sách mượn trả">
     </fragment>
+
+    <fragment
+        android:id="@+id/loanAddFragment"
+        android:name="com.example.quanlythuvien.ui.borrow_pay.LoanAddFragment"
+        android:label="Thêm phiếu mượn"
+        tools:layout="@layout/fragment_loan_add" />
 
 <!--    =========================================Staff=============================================-->
 

@@ -1,36 +1,26 @@
 package com.example.quanlythuvien.ui.reader
 
-import android.content.res.ColorStateList
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.widget.Button
 import android.widget.PopupMenu
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quanlythuvien.R
-import com.example.quanlythuvien.data.entity.enums.LoanDetailStatus
-import com.example.quanlythuvien.ui.borrow_pay.DialogBorrowPayAdapter
-import com.example.quanlythuvien.ui.borrow_pay.data.LoanDetailItemData
 import com.example.quanlythuvien.ui.borrow_pay.data.LoanItemData
-import com.example.quanlythuvien.utils.setupCustomHeader
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.example.quanlythuvien.viewmodel.LoanSharedViewModel
 import com.google.android.material.tabs.TabLayout
-import java.security.KeyStore
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import kotlin.getValue
 
 class ReaderDetailFragment : Fragment(R.layout.fragment_reader_detail) {
     private lateinit var bookAdapter: ReaderDetailAdapter
     private var allDataMockReaderBook: List<MockReaderBook> = listOf()
+    private val loanSharedViewModel: LoanSharedViewModel by activityViewModels()
 
     var onItemClick: ((MockReaderBook) -> Unit)? = null
 
@@ -52,6 +42,7 @@ class ReaderDetailFragment : Fragment(R.layout.fragment_reader_detail) {
             findNavController().navigateUp()
         }
 
+        //Nút 3 chấm
         view.findViewById<View>(R.id.ivMoreOption)?.setOnClickListener {
            showOptionMenu(it,readerName, readerPhone,readerType)
         }
@@ -61,30 +52,27 @@ class ReaderDetailFragment : Fragment(R.layout.fragment_reader_detail) {
         setupMockData()
 
         val rvBooks = view.findViewById<RecyclerView>(R.id.rvReaderBooks)
-        bookAdapter = ReaderDetailAdapter() { selectedBook ->
-            val currentStatus = if (selectedBook.isReturned) "RETURNED" else "BORROWING"
 
-            // Đóng gói selectedBook thành LoanItemData để khớp với hàm showDetailDialog
-            val fakeLoanDataForDialog = LoanItemData(
-                loanId = 999, // Fake ID
+        //Xữ lý khi nhấn vào từng book
+        bookAdapter = ReaderDetailAdapter {
+
+                selectedBook ->
+            // 1. Tạo hoặc lấy thông tin Phiếu mượn tương ứng với cuốn sách này
+            // Vì hiện tại bạn đang dùng Mock dữ liệu, ta sẽ tạo một LoanItemData giả
+            val mockLoan =LoanItemData(
+                loanId = 12345, // ID thực tế bạn sẽ lấy từ dữ liệu sách hoặc phiếu
+                readerName = arguments?.getString("readerName") ?: "Độc giả",
                 borrowDate = selectedBook.borrowDate,
-                dueDate = selectedBook.dueDate,
-                overallStatus = currentStatus,
-                readerName = readerName, // Tên độc giả bạn đã lấy ở Fragment này
-                borrowedBooks = mutableListOf( // Đổi thành mutableListOf nếu List bên kia yêu cầu
-                    // Tạo 1 item list chứa chính cuốn sách vừa click
-                    LoanDetailItemData(
-                        title = selectedBook.title,
-                        author = selectedBook.author, // Bổ sung tác giả
-                        categoryName = "Không có",
-                        returnDate = if (selectedBook.isReturned) selectedBook.dueDate else null, // Bổ sung ngày trả
-                        status = currentStatus // Bổ sung trạng thái
-                    )
-                )
+                overallStatus = if (selectedBook.isReturned) "RETURNED" else "BORROWING",
+                borrowedBooks = mutableListOf() // Bạn có thể đưa danh sách sách vào đây
             )
 
-            // Gọi hàm và truyền data đã đóng gói chuẩn vào
-            showDetailDialog(fakeLoanDataForDialog)
+            // 2. Lưu thông tin này vào ViewModel để trang LoanDetailFragment có thể đọc được
+            loanSharedViewModel.selectedLoanToView.value = mockLoan
+            //Mốt truyền dữ liệu thông qua API
+            findNavController().navigate(R.id.loanFragment)
+
+
         }
         rvBooks?.layoutManager = LinearLayoutManager(requireContext())
         rvBooks?.adapter = bookAdapter
@@ -229,69 +217,6 @@ class ReaderDetailFragment : Fragment(R.layout.fragment_reader_detail) {
             else -> allDataMockReaderBook
         }
         bookAdapter.submitList(filteredList)
-    }
-
-    private fun showDetailDialog(item: LoanItemData){
-
-        //Nặn khuôn cho giao diện Dialog
-        val dialogView = layoutInflater.inflate(R.layout.layout_dialog_loan, null)
-
-        //Xây dựng hộp thoại và bỏ  khuông giao diện vào hộp thoại
-        val alertDialog = MaterialAlertDialogBuilder(requireContext())
-            .setView(dialogView)
-            .create()
-
-        //Mở Dialog lên
-        alertDialog.show()
-
-        //Canh chỉnh lại kích thước của hộp thoại
-        alertDialog.window?.setLayout(
-            (resources.displayMetrics.widthPixels * 0.95).toInt(),
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        )
-
-        //Ánh xạ các View trong Dialog Layout
-        val tvReaderName = dialogView.findViewById<TextView>(R.id.tvDialogReaderName)
-        val tvLoanId = dialogView.findViewById<TextView>(R.id.tvDialogLoanId)
-        val tvStatus = dialogView.findViewById<TextView>(R.id.tvDialogStatus)
-        val tvBorrowDate = dialogView.findViewById<TextView>(R.id.tvDialogBorrowDate)
-        val tvDueDate = dialogView.findViewById<TextView>(R.id.tvDialogDueDate)
-        val btnExtend = dialogView.findViewById<Button>(R.id.btChange)
-        val rvBooks = dialogView.findViewById<RecyclerView>(R.id.rvBorrowedBooks)
-
-
-        tvReaderName.text = item.readerName
-        tvLoanId.text = "Mã phiếu: #${item.loanId}"
-        tvBorrowDate.text = item.borrowDate
-        tvDueDate.text = item.dueDate
-
-        if (item.overallStatus == "BORROWING") {
-            tvStatus.text = "Đang mượn"
-            tvStatus.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_status_info))
-            tvStatus.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.status_info))
-        } else {
-            tvStatus.text = "Đã trả"
-            tvStatus.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_status_success))
-            tvStatus.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.status_success))
-        }
-
-        // 4. Set Adapter cho danh sách sách
-        val bookAdapter = DialogBorrowPayAdapter { book, newStatus ->
-            // Không xử lý đổi trạng thái ở màn hình xem chi tiết độc giả
-        }
-        rvBooks.layoutManager = LinearLayoutManager(requireContext())
-        rvBooks.adapter = bookAdapter
-        bookAdapter.submitList(item.borrowedBooks)
-
-        // Ở màn hình Độc giả thì ẩn nút gia hạn
-        btnExtend.visibility = View.GONE
-
-        // 5. Hiển thị lên
-        alertDialog.show()
-        alertDialog.window?.setLayout(
-            (resources.displayMetrics.widthPixels * 0.95).toInt(),
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        )
     }
 
 }

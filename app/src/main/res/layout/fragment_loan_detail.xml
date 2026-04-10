@@ -2,8 +2,16 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@color/bg_card">
+    android:layout_height="match_parent">
+
+    <include
+        android:id="@+id/headerBack"
+        layout="@layout/layout_header_back"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layoutTopInfo"
@@ -12,7 +20,37 @@
         android:background="@color/white"
         android:elevation="4dp"
         android:padding="20dp"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/headerBack">
+
+        <ImageButton
+            android:id="@+id/ibtSet"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Tùy chọn phiếu"
+            app:layout_constraintBottom_toBottomOf="@+id/tvDialogReaderName"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/tvDialogReaderName"
+            app:srcCompat="@drawable/ic_3_dots" />
+
+        <TextView
+            android:id="@+id/tvDialogStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
+            android:background="@drawable/bg_status"
+            android:backgroundTint="@color/status_info"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="4dp"
+            android:text="Đang mượn"
+            android:textColor="@color/text_status_info"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/tvDialogReaderName"
+            app:layout_constraintEnd_toStartOf="@+id/ibtSet"
+            app:layout_constraintTop_toTopOf="@+id/tvDialogReaderName" />
 
         <TextView
             android:id="@+id/tvDialogReaderName"
@@ -34,8 +72,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:background="@drawable/bg_status"
-            android:backgroundTint="@color/bg_chip_primary"
+            android:background="@drawable/bg_chip_primary"
             android:paddingHorizontal="8dp"
             android:paddingVertical="2dp"
             android:text="@string/loanId"
@@ -57,25 +94,9 @@
             android:textColor="@color/text_secondary"
             android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="@+id/tvMa"
-            app:layout_constraintEnd_toStartOf="@+id/tvDialogStatus"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/tvMa"
             app:layout_constraintTop_toTopOf="@+id/tvMa" />
-
-        <TextView
-            android:id="@+id/tvDialogStatus"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/bg_status"
-            android:backgroundTint="@color/status_info"
-            android:paddingHorizontal="12dp"
-            android:paddingVertical="4dp"
-            android:text="Đang mượn"
-            android:textColor="@color/text_status_info"
-            android:textSize="11sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@+id/tvMa"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/tvDialogReaderName" />
 
         <View
             android:id="@+id/divider"
@@ -91,8 +112,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:background="@drawable/bg_status"
-            android:backgroundTint="@color/bg_chip_secondary"
+            android:background="@drawable/bg_chip_secondary"
             android:paddingHorizontal="8dp"
             android:paddingVertical="2dp"
             android:text="@string/ngayMuon"
@@ -117,75 +137,26 @@
             app:layout_constraintStart_toEndOf="@+id/tvDialogNM"
             app:layout_constraintTop_toTopOf="@+id/tvDialogNM" />
 
-        <Button
-            android:id="@+id/btChange"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:layout_marginTop="4dp"
-            android:text="@string/extend_action"
-            android:textColor="@color/chip_primary"
-            android:textSize="12sp"
-            app:cornerRadius="24dp"
-            app:icon="@android:drawable/ic_menu_edit"
-            app:iconPadding="4dp"
-            app:iconSize="14dp"
-            app:iconTint="@color/chip_primary"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvDialogNM"
-            app:strokeColor="@color/chip_primary"
-            app:strokeWidth="1dp" />
-
-        <TextView
-            android:id="@+id/tvDialogNT"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/bg_status"
-            android:backgroundTint="@color/bg_chip_primary"
-            android:paddingHorizontal="8dp"
-            android:paddingVertical="2dp"
-            android:text="@string/dueDate"
-            android:textColor="@color/chip_primary"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@+id/btChange"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/btChange" />
-
-        <TextView
-            android:id="@+id/tvDialogDueDate"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:text="20/06/2026"
-            android:textColor="@color/text_secondary"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@+id/btChange"
-            app:layout_constraintEnd_toStartOf="@+id/btChange"
-            app:layout_constraintStart_toEndOf="@+id/tvDialogNT"
-            app:layout_constraintTop_toTopOf="@+id/btChange" />
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layoutBottomList"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="12dp"
         android:background="@drawable/bg_list_container"
         android:elevation="2dp"
-        android:padding="12dp"
+        android:paddingTop="12dp"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/layoutTopInfo">
 
         <TextView
             android:id="@+id/tvBorrowedBooksLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
             android:letterSpacing="0.1"
             android:text="@string/borrowed_books_label"
             android:textColor="@color/text_primary"
@@ -197,15 +168,18 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvBorrowedBooks"
             android:layout_width="match_parent"
-            android:layout_height="320dp"
+            android:layout_height="0dp"
             android:layout_marginTop="12dp"
+            android:clipToPadding="false"
+            android:paddingBottom="20dp"
             android:fadeScrollbars="false"
             android:scrollbarSize="4dp"
             android:scrollbarThumbVertical="@color/text_tertiary"
             android:scrollbars="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tvBorrowedBooksLabel" />
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/bg_card"
+    android:padding="20dp">
+
+    <View
+        android:id="@+id/dragHandle"
+        android:layout_width="40dp"
+        android:layout_height="4dp"
+        android:alpha="0.5"
+        android:background="@color/text_tertiary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tvDialogTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Cập nhật thông tin sách"
+        android:textColor="@color/text_primary"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/dragHandle" />
+
+    <TextView
+        android:id="@+id/tvEditBookLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Tên sách:"
+        android:textColor="@color/text_primary"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvDialogTitle" />
+
+    <EditText
+        android:id="@+id/edtEditBookTitle"
+        android:layout_width="0dp"
+        android:layout_height="52dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_search"
+        android:hint="Nhập tên sách"
+        android:inputType="text"
+        android:paddingHorizontal="16dp"
+        android:text="Lập trình Java"
+        android:textColor="@color/text_primary"
+        android:textColorHint="@color/text_tertiary"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvEditBookLabel" />
+    <View
+        android:id="@+id/dividerEdit"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginTop="16dp"
+        android:alpha="0.2"
+        android:background="@color/text_tertiary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edtEditBookTitle" />
+
+    <TextView
+        android:id="@+id/tvEditAuthorLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Tác giả:"
+        android:textColor="@color/text_primary"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/dividerEdit" />
+
+    <EditText
+        android:id="@+id/edtEditAuthor"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_search"
+        android:hint="Nhập tên tác giả"
+        android:inputType="textPersonName"
+        android:paddingHorizontal="16dp"
+        android:textColor="@color/text_primary"
+        android:textColorHint="@color/text_tertiary"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvEditAuthorLabel" />
+
+    <TextView
+        android:id="@+id/tvEditCategoryLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Thể loại:"
+        android:textColor="@color/text_primary"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edtEditAuthor" />
+
+    <EditText
+        android:id="@+id/edtEditCategory"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_search"
+        android:hint="Nhập thể loại"
+        android:inputType="text"
+        android:paddingHorizontal="16dp"
+        android:textColor="@color/text_primary"
+        android:textColorHint="@color/text_tertiary"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvEditCategoryLabel" />
+
+    <TextView
+        android:id="@+id/tvEditStatusLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Trạng thái:"
+        android:textColor="@color/text_primary"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edtEditCategory" />
+
+    <Spinner
+        android:id="@+id/spnEditStatus"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_search"
+        android:paddingHorizontal="12dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvEditStatusLabel" />
+
+    <TextView
+        android:id="@+id/tvEditDueDateLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Hạn trả:"
+        android:textColor="@color/text_primary"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/spnEditStatus" />
+
+    <EditText
+        android:id="@+id/edtEditDueDate"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_search"
+        android:clickable="true"
+        android:drawableEnd="@android:drawable/ic_menu_today"
+        android:drawableTint="@color/btn_primary"
+        android:focusable="false"
+        android:inputType="none"
+        android:paddingHorizontal="16dp"
+        android:text="20/06/2026"
+        android:textColor="@color/text_primary"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvEditDueDateLabel" />
+
+    <Button
+        android:id="@+id/btnCancelEdit"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="0dp"
+        android:layout_height="54dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="8dp"
+        android:text="Hủy"
+        android:textColor="@color/chip_primary"
+        app:cornerRadius="12dp"
+        app:layout_constraintEnd_toStartOf="@+id/btnSaveEdit"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edtEditDueDate"
+        app:strokeColor="@color/chip_primary" />
+
+    <Button
+        android:id="@+id/btnSaveEdit"
+        android:layout_width="0dp"
+        android:layout_height="54dp"
+        android:layout_marginStart="8dp"
+        android:text="Lưu thay đổi"
+        app:cornerRadius="12dp"
+        app:layout_constraintBottom_toBottomOf="@+id/btnCancelEdit"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/btnCancelEdit"
+        app:layout_constraintTop_toTopOf="@+id/btnCancelEdit" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

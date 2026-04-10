@@ -2,6 +2,7 @@ package com.example.quanlythuvien.data.entity.enums
 
 enum class LoanStatus(val value: String) {
     BORROWING("BORROWING"),
+    OVERDUE("OVERDUE"),
     RETURNED("RETURNED");
 
     companion object {

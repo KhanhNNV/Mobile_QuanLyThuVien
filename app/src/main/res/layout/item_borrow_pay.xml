@@ -33,8 +33,7 @@
             android:id="@+id/tvLoanStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/bg_status"
-            android:backgroundTint="@color/status_info"
+            android:background="@drawable/bg_status_info"
             android:paddingHorizontal="8dp"
             android:paddingVertical="2dp"
             android:text="Đang mượn"
@@ -50,8 +49,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:background="@drawable/bg_status"
-            android:backgroundTint="@color/bg_chip_primary"
+            android:background="@drawable/bg_chip_primary"
             android:paddingHorizontal="8dp"
             android:paddingVertical="2dp"
             android:text="@string/loanId"
@@ -63,49 +61,42 @@
 
         <TextView
             android:id="@+id/tvLoanId"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_marginEnd="12dp"
-            android:ellipsize="end"
-            android:maxLines="1"
             android:text="RV01"
             android:textColor="@color/text_secondary"
             android:textSize="13sp"
             app:layout_constraintBottom_toBottomOf="@+id/tvMa"
-            app:layout_constraintEnd_toStartOf="@+id/tvLoanStatus"
             app:layout_constraintStart_toEndOf="@+id/tvMa"
             app:layout_constraintTop_toTopOf="@+id/tvMa" />
 
         <TextView
-            android:id="@+id/tvTitleDate"
+            android:id="@+id/tvTitleBorrowDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:background="@drawable/bg_status"
-            android:backgroundTint="@color/bg_chip_secondary"
+            android:background="@drawable/bg_chip_secondary"
             android:paddingHorizontal="8dp"
             android:paddingVertical="2dp"
-            android:text="@string/dueDate"
+            android:text="Ngày mượn:"
             android:textColor="@color/chip_secondary"
             android:textSize="14sp"
+            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tvMa" />
 
         <TextView
-            android:id="@+id/tvDueDate"
+            android:id="@+id/tvBorrowDate"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:text="20/06/2026"
+            android:text="20/05/2026"
             android:textColor="@color/text_secondary"
-            android:textSize="14sp"
-            app:layout_constraintBottom_toBottomOf="@+id/tvTitleDate"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/tvTitleDate"
-            app:layout_constraintTop_toTopOf="@+id/tvTitleDate" />
+            android:textSize="13sp"
+            app:layout_constraintBottom_toBottomOf="@+id/tvTitleBorrowDate"
+            app:layout_constraintStart_toEndOf="@+id/tvTitleBorrowDate"
+            app:layout_constraintTop_toTopOf="@+id/tvTitleBorrowDate" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

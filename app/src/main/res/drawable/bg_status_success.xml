@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
-    <solid android:color="@color/bg_chip_secondary" />
+    <solid android:color="@color/status_success" />
     <corners android:radius="5dp" />
-
     <stroke
         android:width="2dp"
-        android:color="@color/stroke_chip_secondary" />
+        android:color="@color/stroke_status_success" />
 </shape>

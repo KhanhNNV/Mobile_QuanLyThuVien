@@ -103,7 +103,7 @@
                     android:textStyle="bold"
                     android:textColor="@color/chip_primary"
                     android:text="Còn 8 bản"
-                    android:background="@drawable/bg_chip_primary_rounded"
+                    android:background="@drawable/bg_chip_primary"
                     android:layout_marginEnd="6dp" />
 
                 <TextView
@@ -113,9 +113,10 @@
                     android:paddingHorizontal="10dp"
                     android:gravity="center"
                     android:text="CNTT"
+                    android:textStyle="bold"
                     android:textColor="@color/chip_secondary"
                     android:textSize="11sp"
-                    android:background="@drawable/bg_chip_secondary_rounded"/>
+                    android:background="@drawable/bg_chip_secondary"/>
 
             </LinearLayout>
 
