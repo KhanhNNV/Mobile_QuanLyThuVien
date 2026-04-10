@@ -217,4 +217,9 @@
         android:name="com.example.quanlythuvien.ui.setting.StaffSettingFragment"
         android:label="Staff Setting"
         tools:layout="@layout/fragment_staff_setting"/>
+    <fragment
+        android:id="@+id/employeeAddFragment"
+        android:name="com.example.quanlythuvien.ui.employee.EmployeeAddFragment"
+        android:label="Thêm nhân viên "
+        tools:layout="@layout/fragment_employee_add"/>
 </navigation>
