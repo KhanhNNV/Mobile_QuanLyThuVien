@@ -156,7 +156,12 @@
     <fragment
         android:id="@+id/readerDetailFragment"
         android:name="com.example.quanlythuvien.ui.reader.ReaderDetailFragment"
-        android:label="Chi tiết Độc Giả" />
+        android:label="Chi tiết Độc Giả">
+        <action
+            android:id="@+id/actionReaderDetailToReaderAdd"
+            app:destination="@id/readerAddFragment" />
+
+    </fragment>
 
     <fragment
         android:id="@+id/settingFragment"

@@ -56,6 +56,7 @@ class MainActivity : AppCompatActivity() {
                 R.id.staffListFragment,
                 R.id.loanPolicyFragment,
                 R.id.categoryListFragment,
+                R.id.readerDetailFragment,
                 R.id.notificationFragment-> {
                     bottomNavigationView.visibility = View.GONE
                 }
