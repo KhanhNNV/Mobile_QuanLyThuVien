@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+
     <item
-        android:id="@+id/staffDashboardFragment"
+        android:id="@+id/dashboardFragment"
         android:icon="@drawable/ic_home"
         android:title="Trang chủ" />
 
     <item
-        android:id="@+id/staffBookListFragment"
+        android:id="@+id/bookListFragment"
         android:icon="@android:drawable/ic_menu_agenda"
         android:title="Kho Sách" />
 
-
     <item
-        android:id="@+id/staffBorrowPayListFragment"
+        android:id="@+id/borrowPayListFragment"
         android:icon="@drawable/ic_borrow_pay"
         android:title="Mượn/Trả" />
 
     <item
-        android:id="@+id/staffReaderListFragment"
+        android:id="@+id/readerListFragment"
         android:icon="@drawable/ic_group"
         android:title="Độc Giả" />
 
@@ -25,5 +25,4 @@
         android:id="@+id/staffSettingFragment"
         android:icon="@drawable/outline_settings_24"
         android:title="Cài đặt" />
-
 </menu>

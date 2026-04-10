@@ -29,12 +29,7 @@ class MainActivity : AppCompatActivity() {
 
         // Phân luồng Start Destination và Menu
         if (isLoggedIn) {
-            if (userRole == "STAFF") {
-                navGraph.setStartDestination(R.id.staffDashboardFragment)
-            } else {
-                navGraph.setStartDestination(R.id.dashboardFragment)
-            }
-
+            navGraph.setStartDestination(R.id.dashboardFragment)
             updateBottomNavigationMenu(userRole)
 
         } else {
