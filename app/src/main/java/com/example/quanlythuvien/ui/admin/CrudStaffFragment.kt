@@ -51,6 +51,10 @@ class CrudStaffFragment : Fragment() {
         setupHeaderWithBack(view, "Quản lý nhân viên")
         initViews(view)
 
+        fabAddStaff.setOnClickListener {
+            findNavController().navigate(R.id.employeeAddFragment)
+        }
+
         listStaff = getMockStaffData().toMutableList()
 
         adapter = CrudStaffAdapter { staffItem, action ->
