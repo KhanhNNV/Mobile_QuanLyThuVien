@@ -2,7 +2,7 @@ package com.example.quanlythuvien.ui.reader
 
 import android.os.Bundle
 import android.view.View
-import android.widget.PopupMenu
+import androidx.appcompat.widget.PopupMenu
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -27,6 +27,9 @@ class ReaderDetailFragment : Fragment(R.layout.fragment_reader_detail) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+
+
+
         //Lấy thông tin người dùng từ bundle
         var readerName = arguments?.getString("readerName")?: ""
         var readerPhone = arguments?.getString("readerPhone")?: ""
@@ -44,7 +47,7 @@ class ReaderDetailFragment : Fragment(R.layout.fragment_reader_detail) {
 
         //Nút 3 chấm
         view.findViewById<View>(R.id.ivMoreOption)?.setOnClickListener {
-           showOptionMenu(it,readerName, readerPhone,readerType)
+           showOptionMenu(it,readerName, readerPhone,readerType,role = currentUserRole)
         }
 
 
@@ -104,17 +107,27 @@ class ReaderDetailFragment : Fragment(R.layout.fragment_reader_detail) {
      * @param readerPhone SĐT liên lạc.
      * @param readerType Phân loại.
      */
+
+    //Giả sử người dùng là nhân viên
+    val currentUserRole = "STAFF"200
     private fun showOptionMenu(
         view: View,
         readerName: String,
         readerPhone: String,
-        readerType: String
+        readerType: String,
+        role:String
     ) {
         //Tạo đối tượng popMenu
         val popMenu = PopupMenu(requireContext(), view)
 
         //Chuyển file xml sang đối tượng popMenu
         popMenu.menuInflater.inflate(R.menu.menu_reader_options, popMenu.menu)
+
+        //Nếu là staff ẩn nút xóa
+        if (role == "STAFF") {
+            val deleteMenuItem = popMenu.menu.findItem(R.id.menuDeleteReader)
+            deleteMenuItem?.isVisible = false
+        }
 
         //Xữ lý sự kiện click
         popMenu.setOnMenuItemClickListener { item ->
@@ -139,6 +152,7 @@ class ReaderDetailFragment : Fragment(R.layout.fragment_reader_detail) {
                 else -> false
                 }
             }
+            popMenu.setForceShowIcon(true)
             popMenu.show()
         }
     /**
