@@ -108,7 +108,7 @@ class LoanDetailFragment : Fragment() {
             ibtLoanMenu.visibility = View.VISIBLE
             ibtLoanMenu.setOnClickListener { menuView ->
                 val popup = PopupMenu(requireContext(), menuView)
-                popup.menu.add(0, 1, 0, "Xóa phiếu mượn vĩnh viễn")
+                popup.menu.add(0, 1, 0, "Xóa phiếu mượn")
                 popup.setOnMenuItemClickListener { item ->
                     if (item.itemId == 1) handleDeleteLoan()
                     true
