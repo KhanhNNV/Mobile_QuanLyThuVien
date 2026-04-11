@@ -3,10 +3,10 @@ package com.example.quanlythuvien.ui.welcome
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.quanlythuvien.data.AppDatabase
-import com.example.quanlythuvien.data.entity.Book
-import com.example.quanlythuvien.data.entity.Category
-import com.example.quanlythuvien.data.repository.LibraryRepository
+import com.example.quanlythuvien.data2.AppDatabase
+import com.example.quanlythuvien.data2.entity.Book
+import com.example.quanlythuvien.data2.entity.Category
+import com.example.quanlythuvien.data2.repository.LibraryRepository
 import kotlinx.coroutines.launch
 
 class OnboardingViewModel(application: Application) : AndroidViewModel(application) {

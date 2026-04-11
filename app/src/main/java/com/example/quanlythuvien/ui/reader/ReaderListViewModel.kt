@@ -4,10 +4,10 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
-import com.example.quanlythuvien.data.AppDatabase
-import com.example.quanlythuvien.data.entity.Reader
-import com.example.quanlythuvien.data.entity.enums.ReaderType
-import com.example.quanlythuvien.data.repository.ReaderRepository
+import com.example.quanlythuvien.data2.AppDatabase
+import com.example.quanlythuvien.data2.entity.Reader
+import com.example.quanlythuvien.data2.entity.enums.ReaderType
+import com.example.quanlythuvien.data2.repository.ReaderRepository
 import kotlinx.coroutines.launch
 
 class ReaderListViewModel(application: Application): AndroidViewModel(application) {

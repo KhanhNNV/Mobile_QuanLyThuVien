@@ -109,7 +109,7 @@ class ReaderDetailFragment : Fragment(R.layout.fragment_reader_detail) {
      */
 
     //Giả sử người dùng là nhân viên
-    val currentUserRole = "STAFF"200
+    val currentUserRole = "STAFF"
     private fun showOptionMenu(
         view: View,
         readerName: String,

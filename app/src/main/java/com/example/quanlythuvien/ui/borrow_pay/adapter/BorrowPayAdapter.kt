@@ -1,7 +1,6 @@
 package com.example.quanlythuvien.ui.borrow_pay.adapter
 
 import android.content.Context
-import android.content.res.ColorStateList
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,7 +10,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quanlythuvien.R
-import com.example.quanlythuvien.data.entity.enums.LoanStatus
+import com.example.quanlythuvien.data2.entity.enums.LoanStatus
 import com.example.quanlythuvien.ui.borrow_pay.data.LoanItemData
 import java.text.SimpleDateFormat
 import java.util.Calendar

@@ -20,7 +20,7 @@ import com.google.android.material.textfield.TextInputEditText
 import java.io.File
 import java.io.FileOutputStream
 import androidx.navigation.fragment.findNavController
-import com.example.quanlythuvien.data.entity.enums.ReaderType
+import com.example.quanlythuvien.data2.entity.enums.ReaderType
 
 class ReaderAddFragment : Fragment() {
 

@@ -9,6 +9,7 @@ import com.uth.mobileBE.dto.response.LoginResponse;
 import com.uth.mobileBE.models.Library;
 import com.uth.mobileBE.models.User;
 import com.uth.mobileBE.models.enums.Role;
+import com.uth.mobileBE.models.enums.StatusLibrary;
 import com.uth.mobileBE.repository.LibraryRepository;
 import com.uth.mobileBE.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +18,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.beans.Transient;
 import java.text.ParseException;
 
 @Service
@@ -46,20 +49,29 @@ public class AuthenticationService {
                 .build();
     }
 
-
+    @Transactional
     public void register(RegisterRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new RuntimeException("Username đã được sử dụng!");
         }
 
-        Library library = libraryRepository.findById(request.getLibraryId())
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy Thư viện với ID này!"));
+        Library newLibrary = Library.builder()
+                .name(request.getLibraryName())
+                .address(request.getAddress())
+                .hasStudentDiscount(request.getHasStudentDiscount() != null && request.getHasStudentDiscount())
+                .status(StatusLibrary.ACTIVE)
+                .createdAt(System.currentTimeMillis())
+                // Tặng 30 ngày (tính bằng milliseconds) dùng thử phí nền tảng
+                .platformFeeExpiry(System.currentTimeMillis() + (30L * 24 * 60 * 60 * 1000))
+                .build();
+
+        Library savedLibrary = libraryRepository.save(newLibrary);
 
         User newUser = User.builder()
                 .username(request.getUsername())
                 .passwordHash(passwordEncoder.encode(request.getPassword()))
                 .fullname(request.getFullName())
-                .library(library)
+                .library(savedLibrary)
                 .role(Role.ADMIN)
                 .isActive(true)
                 .build();

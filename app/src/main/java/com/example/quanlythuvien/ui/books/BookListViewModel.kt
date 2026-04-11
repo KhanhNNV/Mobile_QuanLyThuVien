@@ -5,9 +5,9 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.switchMap
-import com.example.quanlythuvien.data.AppDatabase
-import com.example.quanlythuvien.data.entity.Book
-import com.example.quanlythuvien.data.repository.LibraryRepository
+import com.example.quanlythuvien.data2.AppDatabase
+import com.example.quanlythuvien.data2.entity.Book
+import com.example.quanlythuvien.data2.repository.LibraryRepository
 
 class BookListViewModel(application: Application) : AndroidViewModel(application) {
     private val repository: LibraryRepository

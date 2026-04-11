@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quanlythuvien.R
-import com.example.quanlythuvien.data.entity.Book // Nhớ import đúng đường dẫn Entity của bạn
+import com.example.quanlythuvien.data2.entity.Book // Nhớ import đúng đường dẫn Entity của bạn
 
 class BookAdapter(private val bookList: MutableList<Book>) : RecyclerView.Adapter<BookAdapter.BookViewHolder>() {
 

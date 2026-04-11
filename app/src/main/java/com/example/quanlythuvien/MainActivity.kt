@@ -5,6 +5,8 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
+import com.example.quanlythuvien.utils.JwtUtils
+import com.example.quanlythuvien.utils.TokenManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity() {
@@ -22,17 +24,20 @@ class MainActivity : AppCompatActivity() {
 
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation)
 
-        // Đọc trạng thái đăng nhập và quyền (Role)
-        val sharedPreferences = getSharedPreferences("LibraryAppPrefs", MODE_PRIVATE)
-        val isLoggedIn = sharedPreferences.getBoolean("isLoggedIn", false)
-        val userRole = sharedPreferences.getString("userRole", "ADMIN") ?: "ADMIN"
 
-        // Phân luồng Start Destination và Menu
-        if (isLoggedIn) {
+        // Đọc AccessToken từ TokenManager
+        val tokenManager = TokenManager(this)
+        val accessToken = tokenManager.getAccessToken()
+
+        if (!accessToken.isNullOrEmpty()) {
+            // Đã đăng nhập: Giải mã Token để lấy Role
+            val userRole = JwtUtils.getRoleFromToken(accessToken)
+
             navGraph.setStartDestination(R.id.dashboardFragment)
             updateBottomNavigationMenu(userRole)
 
         } else {
+            // Chưa đăng nhập (hoặc token bị xóa)
             navGraph.setStartDestination(R.id.welcomeFragment)
             // Setup mặc định khi chưa đăng nhập
             bottomNavigationView.setupWithNavController(navController)

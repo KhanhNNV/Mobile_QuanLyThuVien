@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quanlythuvien.R
-import com.example.quanlythuvien.data.entity.Reader
+import com.example.quanlythuvien.data2.entity.Reader
 
 open class ReaderDiffCallback {
 

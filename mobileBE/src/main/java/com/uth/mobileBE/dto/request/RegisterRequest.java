@@ -9,8 +9,10 @@ import lombok.*;
 @AllArgsConstructor
 
 public class RegisterRequest {
-    String username;
-    String password;
-    String fullName;
-    Long libraryId;
+    private String username;
+    private String password;
+    private String fullName;
+    private String libraryName;
+    private String address;
+    private Boolean hasStudentDiscount;
 }

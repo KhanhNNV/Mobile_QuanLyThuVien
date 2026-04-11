@@ -18,9 +18,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quanlythuvien.R
-import com.example.quanlythuvien.data.entity.Book
+import com.example.quanlythuvien.data2.entity.Book
 import com.google.android.material.textfield.TextInputEditText
-import android.content.res.ColorStateList
 import androidx.core.content.ContextCompat
 import com.example.quanlythuvien.utils.BookWarehousePermissions
 import com.example.quanlythuvien.utils.setupCustomHeader

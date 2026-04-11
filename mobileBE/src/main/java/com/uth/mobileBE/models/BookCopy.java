@@ -24,6 +24,7 @@ public class BookCopy {
     private String barcode;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "book_condition")
     private ConditionBookCopy condition; // NEW/GOOD/FAIR/POOR
 
     @Enumerated(EnumType.STRING)

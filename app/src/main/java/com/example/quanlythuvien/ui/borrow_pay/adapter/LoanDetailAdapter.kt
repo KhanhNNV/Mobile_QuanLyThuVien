@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quanlythuvien.R
-import com.example.quanlythuvien.data.entity.enums.LoanDetailStatus
+import com.example.quanlythuvien.data2.entity.enums.LoanDetailStatus
 import com.example.quanlythuvien.ui.borrow_pay.data.LoanDetailItemData
 import java.text.SimpleDateFormat
 import java.util.Calendar
