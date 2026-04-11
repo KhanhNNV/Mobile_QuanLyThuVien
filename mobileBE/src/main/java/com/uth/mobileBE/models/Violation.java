@@ -29,6 +29,7 @@ public class Violation {
 
     private String reason;
 
+    @Enumerated(EnumType.STRING)
     private StatusViolation status;
 
     private Long createdAt;

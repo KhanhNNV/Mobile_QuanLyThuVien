@@ -19,6 +19,7 @@ public class FeeConfig {
     @JoinColumn(name = "library_id", nullable = false)
     private Library library;
 
+    @Enumerated(EnumType.STRING)
     private TypeFeeConfig feeType;
 
     private Double amount;

@@ -23,7 +23,9 @@ public class BookCopy {
     @Column(unique = true, nullable = false)
     private String barcode;
 
+    @Enumerated(EnumType.STRING)
     private ConditionBookCopy condition; // NEW/GOOD/FAIR/POOR
 
+    @Enumerated(EnumType.STRING)
     private StatusBookCopy status; // AVAILABLE/BORROWED/LOST/DAMAGED
 }

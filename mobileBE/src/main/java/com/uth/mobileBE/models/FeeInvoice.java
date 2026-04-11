@@ -28,11 +28,12 @@ public class FeeInvoice {
     @JoinColumn(name = "loan_id") // Nullable
     private Loan loan;
 
-
+    @Enumerated(EnumType.STRING)
     private TypeFeeInvoice type;
 
     private Double totalAmount;
 
+    @Enumerated(EnumType.STRING)
     private StatusFeeInvoice status;
 
     private Long createdAt;

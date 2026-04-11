@@ -30,6 +30,7 @@ public class Loan {
 
     private Long borrowDate;
 
+    @Enumerated(EnumType.STRING)
     private StatusLoan status;
 
     @OneToMany(mappedBy = "loan", cascade = CascadeType.ALL)

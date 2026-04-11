@@ -32,6 +32,7 @@ public class LoanDetail {
 
     private Long returnDate;
 
+    @Enumerated(EnumType.STRING)
     private StatusLoanDetail status;
 
     private Double penaltyAmount;

@@ -21,6 +21,7 @@ public class Library {
     private Boolean hasStudentDiscount;
     private Long platformFeeExpiry;
 
+    @Enumerated(EnumType.STRING)
     private StatusLibrary status = StatusLibrary.ACTIVE;
 
     private Long createdAt;

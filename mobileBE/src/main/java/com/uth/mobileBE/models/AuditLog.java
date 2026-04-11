@@ -23,6 +23,7 @@ public class AuditLog {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @Enumerated(EnumType.STRING)
     private ActionAuditLog action;
 
     private String entityName;
