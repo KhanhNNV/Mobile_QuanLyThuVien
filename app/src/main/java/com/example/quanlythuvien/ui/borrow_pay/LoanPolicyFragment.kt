@@ -1,5 +1,6 @@
 package com.example.quanlythuvien.ui.borrow_pay
 
+import android.app.AlertDialog
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -27,6 +28,13 @@ class LoanPolicyFragment : Fragment(R.layout.fragment_loan_policy) {
     private lateinit var rvPolicies: RecyclerView
     private lateinit var policyAdapter: LoanPolicyAdapter
 
+    private val dummyData = mutableListOf(
+        LoanPolicy("P01", "Sách Giáo Khoa", 30, "Học sinh"),
+        LoanPolicy("P02", "Tiểu Thuyết", 7, "Học sinh"),
+        LoanPolicy("P03", "Truyện Tranh", 3, "Thường"),
+        LoanPolicy("P04", "Tài Liệu Chuyên Ngành", 14, "Thường")
+    )
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupHeaderWithBack(view, "Quản lý chính sách mượn trả")
@@ -45,19 +53,16 @@ class LoanPolicyFragment : Fragment(R.layout.fragment_loan_policy) {
     private fun setupRecyclerView() {
         rvPolicies.layoutManager = LinearLayoutManager(requireContext())
 
-        // Dữ liệu mẫu (Sample Data)
-        val dummyData = mutableListOf(
-            LoanPolicy("P01", "Sách Giáo Khoa", 30, "Học sinh"),
-            LoanPolicy("P02", "Tiểu Thuyết", 7, "Học sinh"),
-            LoanPolicy("P03", "Truyện Tranh", 3, "Thường"),
-            LoanPolicy("P04", "Tài Liệu Chuyên Ngành", 14, "Thường")
-        )
-
         // Khởi tạo Adapter với callback khi bấm nút Sửa (Cây bút)
-        policyAdapter = LoanPolicyAdapter(dummyData) { selectedPolicy ->
-            // Mở hộp thoại và truyền dữ liệu cũ vào để Sửa
-            showPolicyDialog(selectedPolicy)
-        }
+        policyAdapter = LoanPolicyAdapter(
+            policyList = dummyData,
+            onEditClick = { selectedPolicy ->
+                showPolicyDialog(selectedPolicy)
+            },
+            onDeleteClick = { selectedPolicy, position ->
+                showDeleteConfirmDialog(selectedPolicy, position)
+            }
+        )
         rvPolicies.adapter = policyAdapter
     }
 
@@ -136,6 +141,26 @@ class LoanPolicyFragment : Fragment(R.layout.fragment_loan_policy) {
         }
 
         dialog.show()
+    }
+    private fun showDeleteConfirmDialog(policy: LoanPolicy, position: Int) {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Xóa chính sách")
+            .setMessage("Bạn có chắc chắn muốn xóa chính sách cho loại sách này không?")
+            .setPositiveButton("Xóa") { dialog, _ ->
+                // Xóa khỏi danh sách
+                dummyData.removeAt(position)
+                // Thông báo cho adapter biết item ở vị trí này đã bị xóa để update giao diện mượt mà
+                policyAdapter.notifyItemRemoved(position)
+                // Cập nhật lại vị trí của các item bên dưới (tránh lỗi crash khi xóa tiếp)
+                policyAdapter.notifyItemRangeChanged(position, dummyData.size)
+
+                Toast.makeText(requireContext(), "Đã xóa chính sách", Toast.LENGTH_SHORT).show()
+                dialog.dismiss()
+            }
+            .setNegativeButton("Hủy") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .show()
     }
 
 }

@@ -68,7 +68,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
         }
 
         cvTotalDelayed.setOnClickListener {
-            sharedViewModel.setFilter("DELAYED") // Cập nhật ViewModel
+            sharedViewModel.setFilter("OVERDUE") // Cập nhật ViewModel
             findNavController().navigate(R.id.action_dashboard_to_borrowPay)
         }
 

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menuEditReader"
+        android:icon="@drawable/ic_edit"
+        android:iconTint="@color/blue"
+        android:title="Chỉnh sửa" />
+
+    <item
+        android:id="@+id/menuDeleteReader"
+        android:icon="@android:drawable/ic_delete"
+        android:iconTint="@color/red"
+        android:title="Xóa" />
+
+
+</menu>

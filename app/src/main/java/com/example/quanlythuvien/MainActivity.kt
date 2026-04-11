@@ -29,12 +29,7 @@ class MainActivity : AppCompatActivity() {
 
         // Phân luồng Start Destination và Menu
         if (isLoggedIn) {
-            if (userRole == "STAFF") {
-                navGraph.setStartDestination(R.id.staffDashboardFragment)
-            } else {
-                navGraph.setStartDestination(R.id.dashboardFragment)
-            }
-
+            navGraph.setStartDestination(R.id.dashboardFragment)
             updateBottomNavigationMenu(userRole)
 
         } else {
@@ -56,6 +51,7 @@ class MainActivity : AppCompatActivity() {
                 R.id.staffListFragment,
                 R.id.loanPolicyFragment,
                 R.id.categoryListFragment,
+                R.id.readerDetailFragment,
                 R.id.notificationFragment-> {
                     bottomNavigationView.visibility = View.GONE
                 }

@@ -35,20 +35,7 @@
             android:inputType="textPersonName"
             android:textSize="14sp" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Tên thư viện"
-            android:textStyle="bold" />
-        <EditText
-            android:id="@+id/edtEditLibName"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_marginTop="4dp"
-            android:layout_marginBottom="12dp"
-            android:background="@drawable/bg_search"
-            android:paddingHorizontal="12dp"
-            android:textSize="14sp" />
+
 
         <TextView
             android:layout_width="wrap_content"

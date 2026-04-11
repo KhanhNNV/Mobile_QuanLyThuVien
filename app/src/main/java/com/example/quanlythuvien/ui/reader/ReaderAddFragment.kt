@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AutoCompleteTextView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.quanlythuvien.R
@@ -36,6 +37,7 @@ class ReaderAddFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         // 1. Ánh xạ nút "Lưu Độc Giả" từ file XML sang biến Kotlin
+        val tvTitle = view.findViewById<TextView>(R.id.tvTitle) //Thông thêm
         val edtReaderCode = view.findViewById<TextInputEditText>(R.id.edtReaderCode)
         val edtReaderName = view.findViewById<TextInputEditText>(R.id.edtReaderName)
         val edtReaderPhone = view.findViewById<TextInputEditText>(R.id.edtReaderPhone)
@@ -47,6 +49,26 @@ class ReaderAddFragment : Fragment() {
 
         val adapter = android.widget.ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, displayTypes)
         spinnerReaderType.setAdapter(adapter)
+
+        // Hứng dữ liệu bundle từ bên detail_reader vào các ô edittext
+        val editName = arguments?.getString("readerName")
+        val editPhone = arguments?.getString("readerPhone")
+        val editType = arguments?.getString("readerType")
+
+        val isModeEdit = !editName.isNullOrEmpty()
+        if (isModeEdit) {
+            // Đổi giao diện sang chế độ CẬP NHẬT
+            tvTitle.text = "Cập nhật Độc giả"
+            btnSaveReader.text = "Cập nhật"
+            // Đổ dữ liệu cũ vào các ô
+            edtReaderName.setText(editName)
+            edtReaderPhone.setText(editPhone)
+            // Lệnh set text cho Spinner (AutoCompleteTextView), tham số 'false' để tránh nó tự động bung list ra khi gán
+            spinnerReaderType.setText(editType, false)
+
+            edtReaderCode.setText("123#")
+            //edtReaderCode.isEnabled = false
+        }
 
 
         btnCancelReader.setOnClickListener {

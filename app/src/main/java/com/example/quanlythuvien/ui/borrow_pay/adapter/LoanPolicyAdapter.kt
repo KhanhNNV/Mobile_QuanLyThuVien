@@ -12,7 +12,8 @@ import com.example.quanlythuvien.ui.borrow_pay.data.LoanPolicy
 class LoanPolicyAdapter(
     private var policyList: MutableList<LoanPolicy>,
     // Thêm hàm callback để xử lý sự kiện bấm nút Edit
-    private val onEditClick: (LoanPolicy) -> Unit
+    private val onEditClick: (LoanPolicy) -> Unit,
+    private val onDeleteClick: (LoanPolicy, Int) -> Unit
 ) : RecyclerView.Adapter<LoanPolicyAdapter.PolicyViewHolder>() {
 
     class PolicyViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -20,6 +21,8 @@ class LoanPolicyAdapter(
         val tvLoanObject: TextView = view.findViewById(R.id.tvLoanObject)
         val tvLoanExp: TextView = view.findViewById(R.id.tvLoanExp)
         val btnEditPolicy: ImageButton = view.findViewById(R.id.btnEditPolicy)
+
+        val btnDelete: ImageButton= view.findViewById(R.id.btnDelete)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PolicyViewHolder {
@@ -38,6 +41,10 @@ class LoanPolicyAdapter(
         // Bắt sự kiện click nút Edit
         holder.btnEditPolicy.setOnClickListener {
             onEditClick(policy)
+        }
+
+        holder.btnDelete.setOnClickListener {
+            onDeleteClick(policy, position)
         }
     }
 
