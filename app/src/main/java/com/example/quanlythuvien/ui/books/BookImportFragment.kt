@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.AutoCompleteTextView
 import android.widget.Toast
 import com.example.quanlythuvien.R
+import com.example.quanlythuvien.utils.BookWarehousePermissions
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
@@ -25,6 +26,11 @@ class BookImportFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        if (!BookWarehousePermissions.canCreateOrUpdateCatalog(requireContext())) {
+            Toast.makeText(requireContext(), "Cần đăng nhập nhân viên hoặc thủ thư để thêm sách.", Toast.LENGTH_SHORT).show()
+            findNavController().popBackStack()
+            return
+        }
 
         val btnCancel = view.findViewById<MaterialButton>(R.id.btnCancel)
         val edtBookName = view.findViewById<TextInputEditText>(R.id.edtBookName)

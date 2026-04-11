@@ -10,6 +10,7 @@ import com.example.quanlythuvien.R
 
 class BookCopyAdapter(
     private val copyList: MutableList<BookCopyItem>,
+    private val allowDelete: Boolean,
     private val onDeleteClick: (BookCopyItem, Int) -> Unit
 ) : RecyclerView.Adapter<BookCopyAdapter.CopyViewHolder>() {
 
@@ -30,8 +31,14 @@ class BookCopyAdapter(
         holder.tvCopyStatus.text = item.statusText
         holder.tvCopyStatus.setTextColor(item.statusColor)
 
-        holder.ivDeleteCopy.setOnClickListener {
-            onDeleteClick(item, holder.bindingAdapterPosition)
+        if (allowDelete) {
+            holder.ivDeleteCopy.visibility = View.VISIBLE
+            holder.ivDeleteCopy.setOnClickListener {
+                onDeleteClick(item, holder.bindingAdapterPosition)
+            }
+        } else {
+            holder.ivDeleteCopy.visibility = View.GONE
+            holder.ivDeleteCopy.setOnClickListener(null)
         }
     }
 
