@@ -12,5 +12,9 @@
         android:iconTint="@color/red"
         android:title="Xóa" />
 
-
+    <item
+        android:id="@+id/menuExtendReader"
+        android:icon="@drawable/ic_autorenew"
+        android:iconTint="@color/red"
+        android:title="Gia hạn" />
 </menu>
