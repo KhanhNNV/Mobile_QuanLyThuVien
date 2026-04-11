@@ -1,6 +1,7 @@
 package com.example.quanlythuvien.ui.borrow_pay
 
 import android.app.DatePickerDialog
+import android.content.Context
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -95,27 +96,41 @@ class LoanDetailFragment : Fragment() {
         // ==========================================
         // 2. LOGIC NÚT 3 CHẤM CỦA TỔNG PHIẾU MƯỢN
         // ==========================================
-        ibtLoanMenu.setOnClickListener { menuView ->
-            val popup = PopupMenu(requireContext(), menuView)
-            // Chỉ thêm chức năng Xóa
-            popup.menu.add(0, 1, 0, "Xóa phiếu mượn")
 
-            popup.setOnMenuItemClickListener { item ->
-                if (item.itemId == 1) {
-                    handleDeleteLoan()
+
+        // 1. Lấy SharedPreferences
+        val sharedPreferences = requireActivity().getSharedPreferences("LibraryAppPrefs", Context.MODE_PRIVATE)
+        val currentRole = sharedPreferences.getString("userRole", "STAFF")
+        val isAdmin = currentRole == "ADMIN" // Tạo một biến boolean cho dễ dùng
+
+        // 2. Xử lý nút 3 chấm (Xóa tổng phiếu)
+        if (isAdmin) {
+            ibtLoanMenu.visibility = View.VISIBLE
+            ibtLoanMenu.setOnClickListener { menuView ->
+                val popup = PopupMenu(requireContext(), menuView)
+                popup.menu.add(0, 1, 0, "Xóa phiếu mượn")
+                popup.setOnMenuItemClickListener { item ->
+                    if (item.itemId == 1) handleDeleteLoan()
+                    true
                 }
-                true
+                popup.show()
             }
-            popup.show()
+        } else {
+            ibtLoanMenu.visibility = View.GONE
         }
 
-        // 3. Setup Danh sách sách (Của từng cuốn sách bên dưới)
-        bookAdapter = LoanDetailAdapter { targetBook, action ->
+        // 3. Khởi tạo Adapter (Truyền thêm biến isAdmin vào để Adapter tự biết đường ẩn nút)
+        bookAdapter = LoanDetailAdapter(isAdmin) { targetBook, action ->
             when (action) {
-                "EDIT" -> handleEditBook(targetBook)//Sửa thông tin sách đã mượn
-                "DELETE" -> handleDeleteBook(targetBook)//Xoá thông tin sách đã mượn
+                "EDIT" -> handleEditBook(targetBook)
+                "DELETE" -> {
+                    // Check lại 1 lần nữa cho chắc chắn an toàn tuyệt đối
+                    if (isAdmin) handleDeleteBook(targetBook)
+                }
             }
         }
+
+
 
         rvBooks.layoutManager = LinearLayoutManager(requireContext())
         rvBooks.adapter = bookAdapter
