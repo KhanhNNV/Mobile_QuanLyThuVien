@@ -1,6 +1,5 @@
 package com.example.quanlythuvien.ui.borrow_pay
 
-import android.content.res.ColorStateList
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,6 +20,7 @@ import java.util.Locale
 
 class LoanDetailAdapter(
     // Kênh liên lạc để báo cáo với Fragment khi người dùng chọn SỬA hoặc XÓA
+    private val isAdmin: Boolean,
     private val onMenuActionClick: (LoanDetailItemData, String) -> Unit
 ) : ListAdapter<LoanDetailItemData, LoanDetailAdapter.BookViewHolder>(BookDiffCallback()) {
 
@@ -36,7 +36,7 @@ class LoanDetailAdapter(
         private val tvStatus: TextView = itemView.findViewById(R.id.tvDetailStatus)
         private val ibtSet: ImageButton = itemView.findViewById(R.id.ibtSet)
 
-        // 2. Ánh xạ các View liên quan đến thời gian (Ngày trả, Hạn trả, Cảnh báo)
+        // 2. Ánh xạ các View liên quan đến thời gian
         private val tvNgayTraTitle: TextView = itemView.findViewById(R.id.tvNgayTraTitle)
         private val tvReturnDate: TextView = itemView.findViewById(R.id.tvReturnDate)
         private val tvDueDate: TextView = itemView.findViewById(R.id.tvDetailDueDate)
@@ -52,7 +52,6 @@ class LoanDetailAdapter(
             tvCategory.text = item.categoryName
             tvDueDate.text = item.dueDate
 
-            // Lấy Trạng thái sách dưới dạng Enum để dễ xử lý
             val currentStatus = LoanDetailStatus.fromValue(item.status)
 
             // --- BƯỚC 2: Xử lý màu sắc và nội dung cho Tag Trạng Thái ---
@@ -63,13 +62,10 @@ class LoanDetailAdapter(
             }
 
             tvStatus.text = text
-           // 1. Cập nhật màu chữ (Dùng getColor là đúng)
             tvStatus.setTextColor(ContextCompat.getColor(context, textColorRes))
-            // 2. CẬP NHẬT NỀN
             tvStatus.setBackgroundResource(bgDrawableRes)
 
             // --- BƯỚC 3: Xử lý ẩn/hiện Ngày Trả thực tế ---
-            // Chỉ hiển thị ngày trả khi sách "Đã trả" và có dữ liệu ngày trả
             if (currentStatus == LoanDetailStatus.RETURNED && !item.returnDate.isNullOrEmpty()) {
                 tvNgayTraTitle.visibility = View.VISIBLE
                 tvReturnDate.visibility = View.VISIBLE
@@ -80,7 +76,6 @@ class LoanDetailAdapter(
             }
 
             // --- BƯỚC 4: Xử lý Cảnh báo Trễ hạn ---
-            // Nếu sách KHÁC "Đã trả" (Nghĩa là Đang mượn, Bị mất, hoặc lỗi dữ liệu) thì đều xét trễ hạn
             if (currentStatus != LoanDetailStatus.RETURNED) {
                 try {
                     val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
@@ -89,39 +84,47 @@ class LoanDetailAdapter(
                         set(Calendar.HOUR_OF_DAY, 0); set(Calendar.MINUTE, 0); set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0)
                     }.time
 
-                    // Nếu ngày hạn trả nằm trước ngày hôm nay -> Trễ hạn
                     if (dueDate != null && dueDate.before(today)) {
                         ivWarningOverdue.visibility = View.VISIBLE
-                        tvDueDate.setTextColor(ContextCompat.getColor(context, R.color.text_status_error)) // Chữ đỏ
+                        tvDueDate.setTextColor(ContextCompat.getColor(context, R.color.text_status_error))
                     } else {
                         ivWarningOverdue.visibility = View.GONE
-                        tvDueDate.setTextColor(ContextCompat.getColor(context, R.color.text_primary)) // Chữ đen bình thường
+                        tvDueDate.setTextColor(ContextCompat.getColor(context, R.color.text_primary))
                     }
                 } catch (e: Exception) {
                     ivWarningOverdue.visibility = View.GONE
                     tvDueDate.setTextColor(ContextCompat.getColor(context, R.color.text_primary))
                 }
             } else {
-                // Chỉ khi sách "Đã trả" -> Mới xóa hẳn cảnh báo và làm mờ màu chữ hạn trả
                 ivWarningOverdue.visibility = View.GONE
                 tvDueDate.setTextColor(ContextCompat.getColor(context, R.color.text_secondary))
             }
 
-            // --- BƯỚC 5: Xử lý sự kiện click Nút 3 chấm (Menu) ---
+            // --- BƯỚC 5: XỬ LÝ PHÂN QUYỀN TRONG MENU 3 CHẤM ---
             ibtSet.setOnClickListener { view ->
                 val popup = PopupMenu(context, view)
-                // Thêm 2 tùy chọn: ID 1 là Sửa, ID 2 là Xóa
+
+                // Mọi người (Admin và Staff) đều có quyền Sửa
                 popup.menu.add(0, 1, 0, "Sửa")
-                popup.menu.add(0, 2, 0, "Xóa")
+
+                // Chỉ ADMIN mới thấy nút Xóa hiện lên trong Menu
+                if (isAdmin) {
+                    popup.menu.add(0, 2, 0, "Xóa")
+                }
 
                 popup.setOnMenuItemClickListener { menuItem ->
                     when (menuItem.itemId) {
-                        1 -> onMenuActionClick(item, "EDIT")   // Báo ra ngoài là chọn Sửa
-                        2 -> onMenuActionClick(item, "DELETE") // Báo ra ngoài là chọn Xóa
+                        1 -> onMenuActionClick(item, "EDIT")
+                        2 -> onMenuActionClick(item, "DELETE")
                     }
                     true
                 }
                 popup.show()
+            }
+
+            // Tiện ích: Bấm thẳng vào dòng sách cũng kích hoạt chức năng Sửa (Rất tiện cho người dùng)
+            itemView.setOnClickListener {
+                onMenuActionClick(item, "EDIT")
             }
         }
     }
@@ -135,6 +138,7 @@ class LoanDetailAdapter(
     }
 
     override fun onBindViewHolder(holder: BookViewHolder, position: Int) {
+        // Chỉ gọi hàm bind() là đủ, toàn bộ logic đã được đưa vào bên trong bind()
         holder.bind(getItem(position))
     }
 
