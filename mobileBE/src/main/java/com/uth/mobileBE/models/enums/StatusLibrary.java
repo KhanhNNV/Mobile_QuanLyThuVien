@@ -1,4 +1,4 @@
-package com.uth.mobileBE.models;
+package com.uth.mobileBE.models.enums;
 
 public enum StatusLibrary {
     ACTIVE,

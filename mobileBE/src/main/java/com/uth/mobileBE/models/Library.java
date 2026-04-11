@@ -1,5 +1,6 @@
 package com.uth.mobileBE.models;
 
+import com.uth.mobileBE.models.enums.StatusLibrary;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,7 +21,6 @@ public class Library {
     private Boolean hasStudentDiscount;
     private Long platformFeeExpiry;
 
-    @Column(length = 20)
     private StatusLibrary status = StatusLibrary.ACTIVE;
 
     private Long createdAt;
