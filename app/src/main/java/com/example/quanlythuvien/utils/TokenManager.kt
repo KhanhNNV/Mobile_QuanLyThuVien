@@ -30,4 +30,23 @@ class TokenManager(context: Context) {
     fun clearTokens() {
         prefs.edit().clear().apply()
     }
+
+    fun getLibraryId(): Long? {
+        val token = getAccessToken()
+        return if (token != null) {
+            JwtUtils.getLibraryIdFromToken(token)
+        } else {
+            null
+        }
+    }
+
+    fun getRole(): String? {
+        val token = getAccessToken()
+        return if (token != null) {
+            JwtUtils.getRoleFromToken(token)
+        } else {
+            null
+        }
+    }
+
 }

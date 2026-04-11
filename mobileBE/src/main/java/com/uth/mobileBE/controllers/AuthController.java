@@ -1,4 +1,4 @@
-package com.uth.mobileBE.controller;
+package com.uth.mobileBE.controllers;
 
 import com.uth.mobileBE.dto.request.LoginRequest;
 import com.uth.mobileBE.dto.request.LogoutRequest;

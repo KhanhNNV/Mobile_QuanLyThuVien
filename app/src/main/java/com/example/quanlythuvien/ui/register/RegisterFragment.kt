@@ -73,16 +73,13 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
 
                         val tokenManager = TokenManager(requireContext())
                         tokenManager.saveTokens(state.accessToken, state.refreshToken)
-                        val mainActivity = requireActivity() as MainActivity
 
                         val role = JwtUtils.getRoleFromToken(state.accessToken)
 
                         if (role.contains("ADMIN", ignoreCase = true)) {
-                            mainActivity.updateBottomNavigationMenu("ADMIN")
-                            findNavController().navigate(R.id.dashboardFragment)
+                            findNavController().navigate(R.id.createCategoryFragment)
                         } else {
-                            mainActivity.updateBottomNavigationMenu("STAFF")
-                            findNavController().navigate(R.id.dashboardFragment)
+                            Toast.makeText(requireContext(), "Bạn là staff!! thật vô lý :) ", Toast.LENGTH_LONG).show()
                         }
                     }
                     is RegisterState.Error -> {

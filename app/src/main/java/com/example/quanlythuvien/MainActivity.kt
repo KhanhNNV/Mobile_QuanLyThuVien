@@ -34,6 +34,7 @@ class MainActivity : AppCompatActivity() {
             val userRole = JwtUtils.getRoleFromToken(accessToken)
 
             navGraph.setStartDestination(R.id.dashboardFragment)
+
             updateBottomNavigationMenu(userRole)
 
         } else {

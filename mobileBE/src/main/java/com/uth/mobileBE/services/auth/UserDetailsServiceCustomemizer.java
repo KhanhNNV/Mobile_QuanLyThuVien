@@ -1,7 +1,6 @@
 package com.uth.mobileBE.service.auth;
 
-import com.uth.mobileBE.models.User;
-import com.uth.mobileBE.repository.UserRepository;
+import com.uth.mobileBE.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

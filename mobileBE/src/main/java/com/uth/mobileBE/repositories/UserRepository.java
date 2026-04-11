@@ -1,4 +1,4 @@
-package com.uth.mobileBE.repository;
+package com.uth.mobileBE.repositories;
 
 import com.uth.mobileBE.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;

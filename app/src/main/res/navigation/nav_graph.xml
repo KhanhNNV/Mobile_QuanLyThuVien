@@ -35,15 +35,16 @@
         tools:layout="@layout/fragment_register">
     </fragment>
 
+
     <fragment
         android:id="@+id/createCategoryFragment"
-        android:name="com.example.quanlythuvien.ui.welcome.CreateCategoryFragment"
+        android:name="com.example.quanlythuvien.ui.welcome.category.CreateCategoryFragment"
         android:label="Create Category"
-        tools:layout="@layout/fragment_create_category" />
+        tools:layout="@layout/fragment_create_category"/>
 
     <fragment
         android:id="@+id/createBookFragment"
-        android:name="com.example.quanlythuvien.ui.welcome.CreateBookFragment"
+        android:name="com.example.quanlythuvien.ui.welcome.book.CreateBookFragment"
         android:label="Create Book"
         tools:layout="@layout/fragment_create_book" />
 

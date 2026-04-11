@@ -1,4 +1,4 @@
-package com.uth.mobileBE.controller;
+package com.uth.mobileBE.controllers;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
