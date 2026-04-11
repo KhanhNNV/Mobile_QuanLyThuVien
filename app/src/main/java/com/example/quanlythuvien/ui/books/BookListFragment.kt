@@ -22,6 +22,7 @@ import com.example.quanlythuvien.data.entity.Book
 import com.google.android.material.textfield.TextInputEditText
 import android.content.res.ColorStateList
 import androidx.core.content.ContextCompat
+import com.example.quanlythuvien.utils.BookWarehousePermissions
 import com.example.quanlythuvien.utils.setupCustomHeader
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
@@ -48,12 +49,6 @@ class BookListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setupCustomHeader(
-            view = view,
-            title = "Kho Sách",
-            subtitle = "Quản lý và cập nhật sách"
-        )
-
         recyclerView = view.findViewById(R.id.recyclerViewBooks)
         btnToggleFilter = view.findViewById(R.id.btnToggleFilter)
         llFilterContainer = view.findViewById(R.id.llFilterContainer)
@@ -63,8 +58,13 @@ class BookListFragment : Fragment() {
         btnResetFilter = view.findViewById(R.id.btnResetFilter)
         btnApplyFilter = view.findViewById(R.id.btnApplyFilter)
         fabAddBook = view.findViewById(R.id.fabAddBook)
+        applyWarehouseUiPermissions(view)
 
         fabAddBook.setOnClickListener {
+            if (!BookWarehousePermissions.canCreateOrUpdateCatalog(requireContext())) {
+                Toast.makeText(requireContext(), "Bạn không có quyền thêm sách vào kho.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
             findNavController().navigate(R.id.bookImportFragment)
         }
 
@@ -80,6 +80,27 @@ class BookListFragment : Fragment() {
         setupFilterToggle()
         setupCategorySpinner()
         setupFilterActions()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        view?.let { applyWarehouseUiPermissions(it) }
+    }
+
+    private fun warehouseHeaderSubtitle(): String = when {
+        BookWarehousePermissions.canManageCatalog(requireContext()) ->
+            "Quản lý và cập nhật sách"
+        BookWarehousePermissions.canCreateOrUpdateCatalog(requireContext()) ->
+            "Nhân viên: thêm & sửa kho (không xóa bản sao)"
+        else ->
+            "Xem kho — cần đăng nhập nhân viên hoặc thủ thư"
+    }
+
+    /** FAB + subtitle theo quyền */
+    private fun applyWarehouseUiPermissions(headerRoot: View) {
+        val canCrud = BookWarehousePermissions.canCreateOrUpdateCatalog(requireContext())
+        fabAddBook.visibility = if (canCrud) View.VISIBLE else View.GONE
+        setupCustomHeader(headerRoot, "Kho Sách", warehouseHeaderSubtitle())
     }
 
     private fun setupFilterActions() {
@@ -160,6 +181,9 @@ class BookListFragment : Fragment() {
 
         // 1. ÁNH XẠ NÚT THÊM BẢN SAO TỪ UI
         val btnAddCopy = dialog.findViewById<Button>(R.id.btnAddCopy)
+        val canCrudWarehouse = BookWarehousePermissions.canCreateOrUpdateCatalog(requireContext())
+        btnEdit?.visibility = if (canCrudWarehouse) View.VISIBLE else View.GONE
+        btnAddCopy?.visibility = if (canCrudWarehouse) View.VISIBLE else View.GONE
 
         val categoryName = when (book.categoryId) {
             1 -> "Công nghệ thông tin (CNTT)"
@@ -200,7 +224,8 @@ class BookListFragment : Fragment() {
             copyList.add(BookCopyItem("Mã cuốn: B${book.bookId}-$i", statusText, statusColor))
         }
         lateinit var copyAdapter: BookCopyAdapter
-        copyAdapter = BookCopyAdapter(copyList) { item, position ->
+        val allowDeleteCopy = BookWarehousePermissions.canDeleteBookCopiesInWarehouseUi(requireContext())
+        copyAdapter = BookCopyAdapter(copyList, allowDelete = allowDeleteCopy) { item, position ->
             // Validation: đang mượn thì không cho xóa
             if (item.statusText == "Đang mượn") {
                 Toast.makeText(requireContext(), "Bản sao đang mượn — không thể xóa!", Toast.LENGTH_SHORT).show()
@@ -236,6 +261,7 @@ class BookListFragment : Fragment() {
     }
 
     private fun showEditBookDialog(book: Book, onUpdated: () -> Unit) {
+        if (!BookWarehousePermissions.canCreateOrUpdateCatalog(requireContext())) return
         val context = requireContext()
 
         val container = LinearLayout(context).apply {
@@ -297,6 +323,7 @@ class BookListFragment : Fragment() {
 
     // 3. HÀM XỬ LÝ DIALOG THÊM BẢN SAO (FORM NHẬP LIỆU)
     private fun showAddCopyDialog(parentBook: Book) {
+        if (!BookWarehousePermissions.canCreateOrUpdateCatalog(requireContext())) return
         val addDialog = android.app.Dialog(requireContext())
         addDialog.setContentView(R.layout.dialog_add_book_copy)
 
