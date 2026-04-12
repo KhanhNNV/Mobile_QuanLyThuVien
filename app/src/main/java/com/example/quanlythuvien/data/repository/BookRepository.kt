@@ -5,4 +5,6 @@ import com.example.quanlythuvien.data.remote.BookApiService
 
 class BookRepository(private val apiService: BookApiService) {
     suspend fun createInitialBook(request: InitialBookRequest) = apiService.createInitialBook(request)
+
+    suspend fun countBooksByLibrary(libraryId: Long) = apiService.countBooksByLibrary(libraryId)
 }

@@ -16,6 +16,7 @@ import com.example.quanlythuvien.core.api.RetrofitClient
 import com.example.quanlythuvien.data.model.request.RegisterRequest
 import com.example.quanlythuvien.data.remote.AuthApiService
 import com.example.quanlythuvien.data.repository.AuthRepository
+import com.example.quanlythuvien.utils.GenericViewModelFactory
 import com.example.quanlythuvien.utils.JwtUtils
 import com.example.quanlythuvien.utils.TokenManager
 import kotlinx.coroutines.flow.collectLatest
@@ -52,7 +53,7 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
     private fun setupViewModel() {
         val apiService = RetrofitClient.getInstance(requireContext()).create(AuthApiService::class.java)
          val repository = AuthRepository(apiService)
-         val factory = RegisterViewModelFactory(repository)
+         val factory = GenericViewModelFactory{ RegisterViewModel(repository) }
          viewModel = ViewModelProvider(this, factory)[RegisterViewModel::class.java]
     }
 

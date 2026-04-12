@@ -16,6 +16,7 @@ import com.example.quanlythuvien.core.api.RetrofitClient
 import com.example.quanlythuvien.data.model.request.InitialBookRequest
 import com.example.quanlythuvien.data.remote.BookApiService
 import com.example.quanlythuvien.data.repository.BookRepository
+import com.example.quanlythuvien.utils.GenericViewModelFactory
 import com.example.quanlythuvien.utils.JwtUtils
 import com.example.quanlythuvien.utils.TokenManager
 import kotlinx.coroutines.flow.collectLatest
@@ -55,7 +56,7 @@ class CreateBookFragment : Fragment(R.layout.fragment_create_book) {
     private fun setupViewModel() {
         val apiService = RetrofitClient.getInstance(requireContext()).create(BookApiService::class.java)
         val repository = BookRepository(apiService)
-        val factory = CreateBookViewModelFactory(repository)
+        val factory = GenericViewModelFactory{ CreateBookViewModel(repository) }
         viewModel = ViewModelProvider(this, factory)[CreateBookViewModel::class.java]
     }
 

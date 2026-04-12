@@ -18,6 +18,7 @@ import com.example.quanlythuvien.core.api.RetrofitClient
 import com.example.quanlythuvien.data.model.request.LoginRequest
 import com.example.quanlythuvien.data.remote.AuthApiService
 import com.example.quanlythuvien.data.repository.AuthRepository
+import com.example.quanlythuvien.utils.GenericViewModelFactory
 import com.example.quanlythuvien.utils.TokenManager
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -47,7 +48,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
     private fun setupViewModel() {
         val apiService = RetrofitClient.getInstance(requireContext()).create(AuthApiService::class.java)
         val repository = AuthRepository(apiService)
-        val factory = LoginViewModelFactory(repository)
+        val factory = GenericViewModelFactory { LoginViewModel(repository) }
         viewModel = ViewModelProvider(this, factory)[LoginViewModel::class.java]
     }
 

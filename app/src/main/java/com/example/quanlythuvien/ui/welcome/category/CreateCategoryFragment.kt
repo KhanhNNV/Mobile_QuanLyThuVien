@@ -14,6 +14,7 @@ import com.example.quanlythuvien.R
 import com.example.quanlythuvien.core.api.RetrofitClient
 import com.example.quanlythuvien.data.remote.CategoryApiService
 import com.example.quanlythuvien.data.repository.CategoryRepository
+import com.example.quanlythuvien.utils.GenericViewModelFactory
 import com.example.quanlythuvien.utils.JwtUtils
 import com.example.quanlythuvien.utils.TokenManager
 import kotlinx.coroutines.flow.collectLatest
@@ -42,7 +43,7 @@ class CreateCategoryFragment : Fragment(R.layout.fragment_create_category) {
     private fun setupViewModel() {
         val apiService = RetrofitClient.getInstance(requireContext()).create(CategoryApiService::class.java)
         val repository = CategoryRepository(apiService)
-        val factory = CategoryViewModelFactory(repository)
+        val factory = GenericViewModelFactory{ CreateCategoryViewModel(repository) }
         viewModel = ViewModelProvider(this, factory)[CreateCategoryViewModel::class.java]
     }
 

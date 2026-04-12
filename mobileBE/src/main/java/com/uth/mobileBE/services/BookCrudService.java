@@ -66,6 +66,10 @@ public class BookCrudService {
         return mapToResponse(book);
     }
 
+    public Long countAllBookByLibrary(Long libraryId) {
+        return bookRepository.countByLibrary_LibraryId(libraryId);
+    }
+
     @Transactional
     public BookResponse updateBook(Long bookId, BookRequest request) {
         Book book = bookRepository.findById(bookId)

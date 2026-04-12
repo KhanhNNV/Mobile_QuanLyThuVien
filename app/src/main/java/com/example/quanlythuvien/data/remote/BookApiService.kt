@@ -4,9 +4,15 @@ import com.example.quanlythuvien.data.model.request.InitialBookRequest
 import com.example.quanlythuvien.data.model.response.InitialBookResponse
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Path
 
+private const val BOOK_ENDPOINT = "api/books"
 interface BookApiService {
-    @POST("api/books/welcome")
+    @POST("$BOOK_ENDPOINT/welcome")
     suspend fun createInitialBook(@Body request: InitialBookRequest): Response<InitialBookResponse>
+
+    @GET("$BOOK_ENDPOINT/library/{libraryId}/count")
+    suspend fun countBooksByLibrary(@Path("libraryId") libraryId: Long): Response<Long>
 }

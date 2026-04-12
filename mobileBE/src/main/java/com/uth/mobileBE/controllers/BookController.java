@@ -54,4 +54,9 @@ public class BookController {
         bookCrudService.deleteBook(bookId);
         return ResponseEntity.ok("Xóa sách thành công!");
     }
+
+    @GetMapping("/library/{libraryId}/count")
+    public ResponseEntity<Long> countBooksByLibrary(@PathVariable Long libraryId) {
+        return ResponseEntity.ok(bookCrudService.countAllBookByLibrary(libraryId));
+    }
 }
