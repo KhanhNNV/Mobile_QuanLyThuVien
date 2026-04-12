@@ -4,6 +4,8 @@ import com.uth.mobileBE.models.enums.StatusLibrary;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 
 @Data
 @NoArgsConstructor
@@ -24,5 +26,6 @@ public class Library {
     @Enumerated(EnumType.STRING)
     private StatusLibrary status = StatusLibrary.ACTIVE;
 
-    private Long createdAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updateAt;
 }

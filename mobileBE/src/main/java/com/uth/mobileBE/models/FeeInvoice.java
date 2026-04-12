@@ -5,6 +5,8 @@ import com.uth.mobileBE.models.enums.TypeFeeInvoice;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -36,5 +38,6 @@ public class FeeInvoice {
     @Enumerated(EnumType.STRING)
     private StatusFeeInvoice status;
 
-    private Long createdAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updateAt;
 }

@@ -1,7 +1,6 @@
 package com.uth.mobileBE.dto.response;
 
 
-import com.uth.mobileBE.models.enums.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,14 +12,14 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserResponse {
-    private Long userId;
-    private Long libraryId;
+public class LoanPolicyResponse {
+    private Long policyId;
 
-    private String username;
-    private String fullname;
-    private Role role;
-    private Boolean isActive;
+    private Long libraryId;
+    private Long categoryId;
+
+    private Boolean applyForStudent;
+    private Integer maxBorrowDays;
 
     private LocalDateTime createdAt;
     private LocalDateTime updateAt;
