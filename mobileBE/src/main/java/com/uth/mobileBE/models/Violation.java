@@ -3,6 +3,10 @@ package com.uth.mobileBE.models;
 import com.uth.mobileBE.models.enums.StatusViolation;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -32,5 +36,8 @@ public class Violation {
     @Enumerated(EnumType.STRING)
     private StatusViolation status;
 
-    private Long createdAt;
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+
+    private LocalDateTime updatedAt;
 }
