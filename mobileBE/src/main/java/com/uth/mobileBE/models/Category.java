@@ -2,6 +2,10 @@ package com.uth.mobileBE.models;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -19,4 +23,12 @@ public class Category {
     private Library library;
 
     private String name;
+    // Tự động lấy giờ hệ thống lúc mới tạo
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+
+    // Tự động cập nhật giờ mỗi khi có thay đổi (update)
+    @UpdateTimestamp
+    private LocalDateTime updateAt;
+
 }
