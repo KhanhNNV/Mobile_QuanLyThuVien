@@ -2,6 +2,9 @@ package com.uth.mobileBE.models;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -26,7 +29,10 @@ public class Reader {
 
     private Boolean isStudent;
 
-    private Long membershipExpiry;
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+
+    private LocalDateTime membershipExpiry;
 
     private Boolean isBlocked;
 }
