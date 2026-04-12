@@ -16,6 +16,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class BookService {
@@ -63,5 +66,12 @@ public class BookService {
                 .condition(copy.getCondition().name())
                 .status(copy.getStatus().name())
                 .build();
+    }
+
+    public List<String> getLowCopyAlerts(Long libraryId) {
+        List<String> titles = bookRepository.findBooksWithLowAvailableCopies(libraryId);
+        return titles.stream()
+                .map(title -> "Sách '" + title + "' có số lượng bản khả dụng dưới 2.")
+                .collect(Collectors.toList());
     }
 }

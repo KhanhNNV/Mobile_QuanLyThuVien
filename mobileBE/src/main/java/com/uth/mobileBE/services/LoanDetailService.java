@@ -11,6 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -65,6 +68,20 @@ public class LoanDetailService {
 
     public void deleteDetail(Long loanId, Long copyId) {
         loanDetailRepository.deleteById(new LoanDetailId(loanId, copyId));
+    }
+
+
+    public List<String> getDueTodayAlerts(Long libraryId) {
+        LocalDateTime startOfDay = LocalDate.now().atStartOfDay(); // 00:00:00 hôm nay
+        LocalDateTime endOfDay = LocalDate.now().atTime(LocalTime.MAX); // 23:59:59 hôm nay
+
+        List<LoanDetail> dueDetails = loanDetailRepository.findDueToday(libraryId, startOfDay, endOfDay);
+
+        return dueDetails.stream()
+                .map(ld -> "Phiếu mượn #" + ld.getLoan().getLoanId() +
+                        " (Sách: " + ld.getBookCopy().getBook().getTitle() +
+                        ") đến hạn trả ngay hôm nay!")
+                .collect(Collectors.toList());
     }
 
     private LoanDetailResponse mapToResponse(LoanDetail detail) {
