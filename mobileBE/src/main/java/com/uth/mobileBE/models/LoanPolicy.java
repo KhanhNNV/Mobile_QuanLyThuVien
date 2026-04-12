@@ -3,6 +3,8 @@ package com.uth.mobileBE.models;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -25,4 +27,7 @@ public class LoanPolicy {
     private Boolean applyForStudent;
 
     private Integer maxBorrowDays;
+
+    private LocalDateTime createdAt;
+    private LocalDateTime updateAt;
 }
