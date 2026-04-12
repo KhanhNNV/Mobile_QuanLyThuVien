@@ -6,6 +6,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -28,12 +32,18 @@ public class LoanDetail {
     @JoinColumn(name = "copy_id")
     private BookCopy bookCopy;
 
-    private Long dueDate;
+    private LocalDateTime dueDate;
 
-    private Long returnDate;
+    private LocalDateTime returnDate;
 
     @Enumerated(EnumType.STRING)
     private StatusLoanDetail status;
 
     private Double penaltyAmount;
+    @CreationTimestamp
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    private LocalDateTime updateAt;
 }
