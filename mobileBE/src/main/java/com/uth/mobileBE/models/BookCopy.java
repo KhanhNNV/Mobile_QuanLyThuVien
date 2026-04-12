@@ -4,6 +4,10 @@ import com.uth.mobileBE.models.enums.ConditionBookCopy;
 import com.uth.mobileBE.models.enums.StatusBookCopy;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -29,4 +33,12 @@ public class BookCopy {
 
     @Enumerated(EnumType.STRING)
     private StatusBookCopy status; // AVAILABLE/BORROWED/LOST/DAMAGED
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at", nullable = false)
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
 }
