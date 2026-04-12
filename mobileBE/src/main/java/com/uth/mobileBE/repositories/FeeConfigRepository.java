@@ -12,7 +12,7 @@ import java.util.Optional;
 public interface FeeConfigRepository extends JpaRepository<FeeConfig, Long> {
 
     // Lấy tất cả cấu hình phí của một thư viện
-    List<FeeConfig> findByLibrary_LibraryId(Long libraryId);
+    List<FeeConfig> findByLibraryId(Long libraryId);
 
     // Lấy 1 cấu hình phí cụ thể (Dùng để tính tiền mượn/phạt sau này)
     Optional<FeeConfig> findByLibrary_LibraryIdAndFeeType(Long libraryId, TypeFeeConfig feeType);

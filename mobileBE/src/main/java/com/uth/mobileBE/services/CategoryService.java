@@ -65,7 +65,7 @@ public class CategoryService {
 
     // 2. LẤY TẤT CẢ THỂ LOẠI CỦA 1 THƯ VIỆN
     public List<CategoryResponse> getAllCategoriesByLibrary(Long libraryId) {
-        List<Category> categories = categoryRepository.findByLibrary_LibraryId(libraryId);
+        List<Category> categories = categoryRepository.findByLibraryId(libraryId);
         return categories.stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());

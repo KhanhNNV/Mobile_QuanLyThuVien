@@ -21,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
-import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -60,7 +59,7 @@ public class AuthenticationService {
                 .address(request.getAddress())
                 .hasStudentDiscount(request.getHasStudentDiscount() != null && request.getHasStudentDiscount())
                 .status(StatusLibrary.ACTIVE)
-                .createdAt(LocalDateTime.now())
+                .createdAt(System.currentTimeMillis())
                 // Tặng 30 ngày (tính bằng milliseconds) dùng thử phí nền tảng
                 .platformFeeExpiry(System.currentTimeMillis() + (30L * 24 * 60 * 60 * 1000))
                 .build();

@@ -8,7 +8,7 @@ import java.util.List;
 
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, Long> {
-    List<Category> findByLibrary_LibraryId(Long libraryId);
+    List<Category> findByLibraryId(Long libraryId);
     boolean existsByNameAndLibrary_LibraryId(String name, Long libraryId);
 
 }
