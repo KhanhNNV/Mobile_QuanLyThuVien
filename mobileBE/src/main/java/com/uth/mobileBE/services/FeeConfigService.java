@@ -41,7 +41,7 @@ public class FeeConfigService {
 
     // 2. LẤY DANH SÁCH PHÍ CỦA THƯ VIỆN
     public List<FeeConfigResponse> getFeeConfigsByLibrary(Long libraryId) {
-        List<FeeConfig> configs = feeConfigRepository.findByLibrary_LibraryId(libraryId);
+        List<FeeConfig> configs = feeConfigRepository.findByLibraryId(libraryId);
         return configs.stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
