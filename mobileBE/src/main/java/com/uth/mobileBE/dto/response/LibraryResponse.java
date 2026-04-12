@@ -1,7 +1,6 @@
 package com.uth.mobileBE.dto.response;
 
-
-import com.uth.mobileBE.models.enums.Role;
+import com.uth.mobileBE.models.enums.StatusLibrary;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,15 +12,13 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserResponse {
-    private Long userId;
+public class LibraryResponse {
     private Long libraryId;
-
-    private String username;
-    private String fullname;
-    private Role role;
-    private Boolean isActive;
-
+    private String name;
+    private String address;
+    private Boolean hasStudentDiscount;
+    private Long platformFeeExpiry;
+    private StatusLibrary status;
     private LocalDateTime createdAt;
     private LocalDateTime updateAt;
 }
