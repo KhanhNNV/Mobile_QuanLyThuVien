@@ -19,7 +19,7 @@ class CreateCategoryViewModel(private val repository: CategoryRepository) : View
             _state.value = CategoryState.Loading
             try {
                 val request = CategoryRequest(name, libraryId)
-                val response = repository.createCategory(request)
+                val response = repository.createFirstCategory(request)
                 if (response.isSuccessful && response.body() != null) {
                     // Truyền ID nhận được từ API vào state
                     _state.value = CategoryState.Success(response.body()!!.categoryId)

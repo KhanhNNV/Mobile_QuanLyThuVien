@@ -14,9 +14,9 @@ public class CategoryController {
 
     private final CategoryService categoryService;
 
-    @PostMapping()
-    public ResponseEntity<CategoryResponse> createCategory(@RequestBody CategoryRequest request) {
-        CategoryResponse response = categoryService.createCategory(request);
+    @PostMapping("/welcome")
+    public ResponseEntity<CategoryResponse> createFirstCategory(@RequestBody CategoryRequest request) {
+        CategoryResponse response = categoryService.createFirstCategory(request);
         return ResponseEntity.ok(response);
     }
 }

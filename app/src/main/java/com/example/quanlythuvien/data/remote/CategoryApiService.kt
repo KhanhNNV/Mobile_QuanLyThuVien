@@ -7,6 +7,6 @@ import retrofit2.http.Body
 import retrofit2.http.POST
 
 interface CategoryApiService {
-    @POST("api/categories")
-    suspend fun createCategory(@Body request: CategoryRequest): Response<CategoryResponse>
+    @POST("api/categories/welcome")
+    suspend fun createFirstCategory(@Body request: CategoryRequest): Response<CategoryResponse>
 }

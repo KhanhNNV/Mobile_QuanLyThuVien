@@ -18,7 +18,7 @@ public class CategoryService {
     private final LibraryRepository libraryRepository;
 
     @Transactional
-    public CategoryResponse createCategory(CategoryRequest request) {
+    public CategoryResponse createFirstCategory(CategoryRequest request) {
         Library library = libraryRepository.findById(request.getLibraryId())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy thư viện"));
 

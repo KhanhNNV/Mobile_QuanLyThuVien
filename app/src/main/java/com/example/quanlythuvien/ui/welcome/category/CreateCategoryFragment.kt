@@ -83,7 +83,6 @@ class CreateCategoryFragment : Fragment(R.layout.fragment_create_category) {
                 return@setOnClickListener
             }
 
-
             val libraryId = TokenManager(requireContext()).getLibraryId()
 
             if (libraryId != null) {
