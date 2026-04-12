@@ -83,6 +83,10 @@ public class ReaderService {
         readerRepository.deleteById(id);
     }
 
+    public Long countReaders(Long libraryId) {
+        return readerRepository.countByLibrary_LibraryId(libraryId);
+    }
+
     private ReaderResponse mapToReaderResponse(Reader reader) {
         return ReaderResponse.builder()
                              .readerId(reader.getReaderId())

@@ -55,6 +55,7 @@ public class BookController {
         return ResponseEntity.ok("Xóa sách thành công!");
     }
 
+    //lấy tổng số đầu sách
     @GetMapping("/library/{libraryId}/count")
     public ResponseEntity<Long> countBooksByLibrary(@PathVariable Long libraryId) {
         return ResponseEntity.ok(bookCrudService.countAllBookByLibrary(libraryId));

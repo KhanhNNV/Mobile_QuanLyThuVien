@@ -95,7 +95,7 @@
                         android:src="@android:drawable/ic_menu_sort_by_size"
                         app:tint="@color/yellow" />
                     <TextView
-                        android:id="@+id/tvTotalBookBorrowing"
+                        android:id="@+id/tvTotalLoanBorrowing"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
@@ -106,7 +106,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/tvTitleTotalBookBorrowing"
+                        android:text="@string/tvTitleTotalLoanBorrowing"
                         android:textColor="@color/text_secondary"
                         android:textSize="12sp" />
 
@@ -149,7 +149,7 @@
                         android:src="@android:drawable/stat_sys_warning"
                         app:tint="@color/red" />
                     <TextView
-                        android:id="@+id/tvTotalBookDelayed"
+                        android:id="@+id/tvTotalLoanDelayed"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
@@ -160,7 +160,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/tvTitleTotalBookDelayed"
+                        android:text="@string/tvTitleTotalLoanDelayed"
                         android:textColor="@color/text_secondary"
                         android:textSize="12sp" />
                 </LinearLayout>

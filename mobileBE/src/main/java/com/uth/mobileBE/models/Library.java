@@ -3,6 +3,8 @@ package com.uth.mobileBE.models;
 import com.uth.mobileBE.models.enums.StatusLibrary;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -26,6 +28,9 @@ public class Library {
     @Enumerated(EnumType.STRING)
     private StatusLibrary status = StatusLibrary.ACTIVE;
 
+    @CreationTimestamp
     private LocalDateTime createdAt;
+
+    @UpdateTimestamp
     private LocalDateTime updateAt;
 }

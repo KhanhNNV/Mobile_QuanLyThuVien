@@ -40,4 +40,9 @@ public class ReaderController {
         readerService.deleteReader(id);
         return ResponseEntity.ok("Xóa độc giả thành công");
     }
+
+    @GetMapping("/library/{libraryId}/count")
+    public ResponseEntity<Long> countReaders(@PathVariable Long libraryId) {
+        return ResponseEntity.ok(readerService.countReaders(libraryId));
+    }
 }

@@ -104,8 +104,8 @@
     <!--    dashboard-->
     <string name="tvTempQuantity">0</string>
     <string name="tvTitleTotalBookQuantity">Tổng đầu sách</string>
-    <string name="tvTitleTotalBookBorrowing">Tổng đang mượn</string>
-    <string name="tvTitleTotalBookDelayed">Trả trễ hạn</string>
+    <string name="tvTitleTotalLoanBorrowing">Tổng phiếu đang mượn</string>
+    <string name="tvTitleTotalLoanDelayed">Trả trễ hạn</string>
     <string name="tvTitleTotalReader">Tổng độc giả</string>
 
     <string name="tvTitleWarning">CẢNH BÁO</string>

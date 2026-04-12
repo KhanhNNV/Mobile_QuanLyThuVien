@@ -4,6 +4,8 @@ import com.uth.mobileBE.models.enums.StatusFeeInvoice;
 import com.uth.mobileBE.models.enums.TypeFeeInvoice;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -38,6 +40,9 @@ public class FeeInvoice {
     @Enumerated(EnumType.STRING)
     private StatusFeeInvoice status;
 
+    @CreationTimestamp
     private LocalDateTime createdAt;
+
+    @UpdateTimestamp
     private LocalDateTime updateAt;
 }

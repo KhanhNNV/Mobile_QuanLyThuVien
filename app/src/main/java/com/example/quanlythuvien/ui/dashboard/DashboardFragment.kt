@@ -1,12 +1,8 @@
 package com.example.quanlythuvien.ui.dashboard
 
-import android.content.Context
 import android.icu.text.SimpleDateFormat
-import android.media.session.MediaSession
 import android.os.Bundle
-import android.util.Log
 import android.view.View
-import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -15,15 +11,15 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import com.example.quanlythuvien.R
 import com.example.quanlythuvien.core.api.RetrofitClient
 import com.example.quanlythuvien.data.remote.BookApiService
-import com.example.quanlythuvien.data.remote.CategoryApiService
+import com.example.quanlythuvien.data.remote.LoanApiService
+import com.example.quanlythuvien.data.remote.ReaderApiService
 import com.example.quanlythuvien.data.repository.BookRepository
-import com.example.quanlythuvien.data.repository.CategoryRepository
-import com.example.quanlythuvien.ui.welcome.category.CreateCategoryViewModel
+import com.example.quanlythuvien.data.repository.LoanRepository
+import com.example.quanlythuvien.data.repository.ReaderRepository
 import com.example.quanlythuvien.utils.GenericViewModelFactory
 import com.example.quanlythuvien.utils.TokenManager
 import com.example.quanlythuvien.utils.setupCustomHeader
@@ -43,6 +39,9 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
     private lateinit var cvTotalReader: MaterialCardView
     private lateinit var cvTotalDelayed: MaterialCardView
     private lateinit var tvTotalBookQuantity: TextView
+    private lateinit var tvTotalLoanBorrowing: TextView
+    private lateinit var tvTotalLoanDelayed: TextView
+    private lateinit var tvTotalReader: TextView
     private lateinit var viewModel: DashboardViewModel
 
 
@@ -57,13 +56,11 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
             subtitle = currentDate
         )
 
-
         initViews(view)
         setupViewModel()
         observeViewModel()
         handleEvents()
         loadCountAllBooks()
-
 
     }
 
@@ -72,14 +69,28 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
         cvTotalBorrowing = view.findViewById(R.id.cvTotalBorrowing)
         cvTotalReader=view.findViewById(R.id.cvTotalReader)
         cvTotalDelayed=view.findViewById(R.id.cvTotalDelayed)
-        tvTotalBookQuantity=view.findViewById(R.id.tvTotalBookQuantity)
+        tvTotalBookQuantity = view.findViewById(R.id.tvTotalBookQuantity)
+        tvTotalLoanBorrowing = view.findViewById(R.id.tvTotalLoanBorrowing)
+        tvTotalLoanDelayed = view.findViewById(R.id.tvTotalLoanDelayed)
+        tvTotalReader = view.findViewById(R.id.tvTotalReader)
     }
 
     private fun setupViewModel() {
-        val apiService = RetrofitClient.getInstance(requireContext()).create(BookApiService::class.java)
-        val repository = BookRepository(apiService)
+        val retrofit = RetrofitClient.getInstance(requireContext())
 
-        val factory = GenericViewModelFactory { DashboardViewModel(repository) }
+        // Khởi tạo 3 API Service
+        val bookApi = retrofit.create(BookApiService::class.java)
+        val loanApi = retrofit.create(LoanApiService::class.java)
+        val readerApi = retrofit.create(ReaderApiService::class.java)
+
+        // Khởi tạo 3 Repository
+        val bookRepo = BookRepository(bookApi)
+        val loanRepo = LoanRepository(loanApi)
+        val readerRepo = ReaderRepository(readerApi)
+
+        val factory = GenericViewModelFactory {
+            DashboardViewModel(bookRepo, loanRepo, readerRepo)
+        }
         viewModel = ViewModelProvider(this, factory)[DashboardViewModel::class.java]
 
     }
@@ -88,29 +99,53 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
 
-                // Lắng nghe State
-                viewModel.bookCountState.collectLatest { state ->
-                    when (state) {
-                        is DashboardBookCountState.Idle -> {
-                            Log.d("DASHBOARD","Tổng sách + ${tvTotalBookQuantity.text}")
-                        }
-                        is DashboardBookCountState.Loading -> {
-                            // Đang gọi API
-                            tvTotalBookQuantity.text = "..."
-                            Log.d("DASHBOARD","Tổng sách + ${tvTotalBookQuantity.text}")
-                        }
-                        is DashboardBookCountState.Success -> {
-                            tvTotalBookQuantity.text = state.totalBooks.toString()
-                            Log.d("DASHBOARD","Tổng sách + ${tvTotalBookQuantity.text}")
-                        }
-                        is DashboardBookCountState.Error -> {
-                            tvTotalBookQuantity.text = "0"
-                            Log.d("DASHBOARD","Tổng sách lỗi + ${tvTotalBookQuantity.text}")
-                            Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
+                // Observe Sách
+                launch {
+                    viewModel.bookCountState.collectLatest { state ->
+                        when (state) {
+                            is CountState.Loading -> tvTotalBookQuantity.text = "..."
+                            is CountState.Success -> tvTotalBookQuantity.text = state.count.toString()
+                            is CountState.Error -> tvTotalBookQuantity.text = "0"
+                            else -> {}
                         }
                     }
                 }
 
+                // Observe Đang mượn
+                launch {
+                    viewModel.borrowingLoanState.collectLatest { state ->
+                        when (state) {
+                            is CountState.Loading -> tvTotalLoanBorrowing.text = "..."
+                            is CountState.Success -> tvTotalLoanBorrowing.text = state.count.toString()
+                            is CountState.Error -> tvTotalLoanBorrowing.text = "0"
+                            else -> {}
+                        }
+                    }
+                }
+
+                // Observe Trễ hạn
+                launch {
+                    viewModel.overdueLoanState.collectLatest { state ->
+                        when (state) {
+                            is CountState.Loading -> tvTotalLoanDelayed.text = "..."
+                            is CountState.Success -> tvTotalLoanDelayed.text = state.count.toString()
+                            is CountState.Error -> tvTotalLoanDelayed.text = "0"
+                            else -> {}
+                        }
+                    }
+                }
+
+                // Observe Độc giả
+                launch {
+                    viewModel.readerCountState.collectLatest { state ->
+                        when (state) {
+                            is CountState.Loading -> tvTotalReader.text = "..."
+                            is CountState.Success -> tvTotalReader.text = state.count.toString()
+                            is CountState.Error -> tvTotalReader.text = "0"
+                            else -> {}
+                        }
+                    }
+                }
             }
         }
     }
@@ -143,9 +178,11 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
 
     private fun loadCountAllBooks(){
         val libraryId = TokenManager(requireContext()).getLibraryId()
-        Log.d("DASHBOARD","Đang gọi ${libraryId}")
         if (libraryId != null && libraryId != -1L) {
             viewModel.loadTotalBooks(libraryId)
+            viewModel.loadBorrowingLoans(libraryId)
+            viewModel.loadOverdueLoans(libraryId)
+            viewModel.loadTotalReaders(libraryId)
         } else {
             Toast.makeText(requireContext(), "Lỗi: Không lấy được ID thư viện", Toast.LENGTH_SHORT).show()
         }
