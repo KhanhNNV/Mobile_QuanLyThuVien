@@ -41,4 +41,14 @@ public class LoanController {
         loanService.deleteLoan(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/library/{libraryId}/borrowing/count")
+    public ResponseEntity<Long> countBorrowingLoans(@PathVariable Long libraryId) {
+        return ResponseEntity.ok(loanService.countBorrowingLoans(libraryId));
+    }
+
+    @GetMapping("/library/{libraryId}/overdue/count")
+    public ResponseEntity<Long> countOverdueLoans(@PathVariable Long libraryId) {
+        return ResponseEntity.ok(loanService.countOverdueLoans(libraryId));
+    }
 }

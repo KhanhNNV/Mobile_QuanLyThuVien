@@ -3,6 +3,7 @@ package com.uth.mobileBE.services;
 import com.uth.mobileBE.dto.request.LoanRequest;
 import com.uth.mobileBE.dto.response.LoanResponse;
 import com.uth.mobileBE.models.Loan;
+import com.uth.mobileBE.models.enums.StatusLoan;
 import com.uth.mobileBE.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -80,6 +81,15 @@ public class LoanService {
 
     public void deleteLoan(Long id) {
         loanRepository.deleteById(id);
+    }
+
+
+    public Long countBorrowingLoans(Long libraryId) {
+        return loanRepository.countByLibrary_LibraryIdAndStatus(libraryId, StatusLoan.BORROWING);
+    }
+
+    public Long countOverdueLoans(Long libraryId) {
+        return loanRepository.countByLibrary_LibraryIdAndStatus(libraryId, StatusLoan.OVERDUE);
     }
 
     private LoanResponse mapToResponse(Loan loan) {

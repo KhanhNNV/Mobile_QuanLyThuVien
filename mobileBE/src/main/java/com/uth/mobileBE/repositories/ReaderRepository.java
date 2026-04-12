@@ -6,5 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ReaderRepository extends JpaRepository<Reader, Long> {
+    long countByLibrary_LibraryId(Long libraryId);
 }
 
