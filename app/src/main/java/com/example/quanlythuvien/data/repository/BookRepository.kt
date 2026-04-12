@@ -7,4 +7,6 @@ class BookRepository(private val apiService: BookApiService) {
     suspend fun createInitialBook(request: InitialBookRequest) = apiService.createInitialBook(request)
 
     suspend fun countBooksByLibrary(libraryId: Long) = apiService.countBooksByLibrary(libraryId)
+
+    suspend fun getLowCopyAlerts(libraryId: Long) = apiService.getLowCopyAlerts(libraryId)
 }

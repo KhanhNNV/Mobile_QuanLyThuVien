@@ -15,4 +15,7 @@ interface BookApiService {
 
     @GET("$BOOK_ENDPOINT/library/{libraryId}/count")
     suspend fun countBooksByLibrary(@Path("libraryId") libraryId: Long): Response<Long>
+
+    @GET("$BOOK_ENDPOINT/library/{libraryId}/alerts/low-copies")
+    suspend fun getLowCopyAlerts(@Path("libraryId") libraryId: Long): Response<List<String>>
 }

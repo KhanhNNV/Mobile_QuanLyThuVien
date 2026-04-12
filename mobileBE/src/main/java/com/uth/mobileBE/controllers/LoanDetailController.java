@@ -38,4 +38,9 @@ public class LoanDetailController {
         loanDetailService.deleteDetail(loanId, copyId);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/library/{libraryId}/alerts/due-today")
+    public ResponseEntity<List<String>> getDueTodayAlerts(@PathVariable Long libraryId) {
+        return ResponseEntity.ok(loanDetailService.getDueTodayAlerts(libraryId));
+    }
 }

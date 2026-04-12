@@ -60,4 +60,10 @@ public class BookController {
     public ResponseEntity<Long> countBooksByLibrary(@PathVariable Long libraryId) {
         return ResponseEntity.ok(bookCrudService.countAllBookByLibrary(libraryId));
     }
+
+    //lấy số sách có copy available <2
+    @GetMapping("/library/{libraryId}/alerts/low-copies")
+    public ResponseEntity<List<String>> getLowCopyAlerts(@PathVariable Long libraryId) {
+        return ResponseEntity.ok(bookService.getLowCopyAlerts(libraryId));
+    }
 }
