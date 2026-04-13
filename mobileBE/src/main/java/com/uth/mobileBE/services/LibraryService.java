@@ -77,6 +77,13 @@ public class LibraryService {
         libraryRepository.delete(library);
     }
 
+    public Boolean getHasStudentDiscount(Long libraryId) {
+        Library library = libraryRepository.findById(libraryId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy thư viện"));
+
+        return library.getHasStudentDiscount();
+    }
+
     // --- CÁC HÀM HỖ TRỢ DÙNG NỘI BỘ ---
 
     private Library getLibraryEntityById(Long id) {

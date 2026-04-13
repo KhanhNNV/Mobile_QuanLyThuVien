@@ -1,4 +1,4 @@
-package com.example.quanlythuvien.ui.borrow_pay.adapter
+package com.example.quanlythuvien.ui.LoanPolicy
 
 import android.view.LayoutInflater
 import android.view.View
@@ -7,13 +7,13 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quanlythuvien.R
-import com.example.quanlythuvien.ui.borrow_pay.data.LoanPolicy
+// Thêm dòng import model LoanPolicyResponse
+import com.example.quanlythuvien.data.model.response.LoanPolicyResponse
 
 class LoanPolicyAdapter(
-    private var policyList: MutableList<LoanPolicy>,
-    // Thêm hàm callback để xử lý sự kiện bấm nút Edit
-    private val onEditClick: (LoanPolicy) -> Unit,
-    private val onDeleteClick: (LoanPolicy, Int) -> Unit
+    private var policyList: MutableList<LoanPolicyResponse>,
+    private val onEditClick: (LoanPolicyResponse) -> Unit,
+    private val onDeleteClick: (LoanPolicyResponse, Int) -> Unit
 ) : RecyclerView.Adapter<LoanPolicyAdapter.PolicyViewHolder>() {
 
     class PolicyViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -21,8 +21,7 @@ class LoanPolicyAdapter(
         val tvLoanObject: TextView = view.findViewById(R.id.tvLoanObject)
         val tvLoanExp: TextView = view.findViewById(R.id.tvLoanExp)
         val btnEditPolicy: ImageButton = view.findViewById(R.id.btnEditPolicy)
-
-        val btnDelete: ImageButton= view.findViewById(R.id.btnDelete)
+        val btnDelete: ImageButton = view.findViewById(R.id.btnDelete)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PolicyViewHolder {
@@ -32,13 +31,17 @@ class LoanPolicyAdapter(
 
     override fun onBindViewHolder(holder: PolicyViewHolder, position: Int) {
         val policy = policyList[position]
+       holder.tvItemCategory.text = policy.categoryName ?: "Mặc định"
 
-        // Đổ dữ liệu vào các View
-        holder.tvItemCategory.text = policy.categoryName
-        holder.tvLoanObject.text = policy.targetCustomer
-        holder.tvLoanExp.text = "${policy.maxDays} ngày"
+        if (policy.applyForStudent) {
+            holder.tvLoanObject.text = "Sinh viên"
+        } else {
+            holder.tvLoanObject.text = "Thông thường"
+        }
 
-        // Bắt sự kiện click nút Edit
+        holder.tvLoanExp.text = "${policy.maxBorrowDays} ngày"
+
+
         holder.btnEditPolicy.setOnClickListener {
             onEditClick(policy)
         }
@@ -50,7 +53,7 @@ class LoanPolicyAdapter(
 
     override fun getItemCount() = policyList.size
 
-    fun updateData(newList: List<LoanPolicy>) {
+    fun updateData(newList: List<LoanPolicyResponse>) {
         policyList.clear()
         policyList.addAll(newList)
         notifyDataSetChanged()

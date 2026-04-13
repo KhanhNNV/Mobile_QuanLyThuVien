@@ -10,9 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class LoanPolicyRequest {
-    private Long libraryId;  // Bắt buộc
-    private Long categoryId; // Có thể null (áp dụng chung cho toàn thư viện)
-
+    private Long categoryId;
     private Boolean applyForStudent;
     private Integer maxBorrowDays;
 }

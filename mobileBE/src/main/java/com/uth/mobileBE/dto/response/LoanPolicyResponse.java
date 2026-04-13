@@ -14,13 +14,8 @@ import java.time.LocalDateTime;
 @Builder
 public class LoanPolicyResponse {
     private Long policyId;
-
-    private Long libraryId;
     private Long categoryId;
-
+    private String categoryName;
     private Boolean applyForStudent;
     private Integer maxBorrowDays;
-
-    private LocalDateTime createdAt;
-    private LocalDateTime updateAt;
 }

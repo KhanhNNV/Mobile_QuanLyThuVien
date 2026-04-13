@@ -2,6 +2,8 @@ package com.uth.mobileBE.models;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -28,6 +30,9 @@ public class LoanPolicy {
 
     private Integer maxBorrowDays;
 
+    @CreationTimestamp
     private LocalDateTime createdAt;
+
+    @UpdateTimestamp
     private LocalDateTime updateAt;
 }
