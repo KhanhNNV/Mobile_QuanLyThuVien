@@ -1,5 +1,6 @@
 package com.uth.mobileBE.controllers;
 
+import com.uth.mobileBE.Utils.SecurityUtils;
 import com.uth.mobileBE.dto.request.LoanRequest;
 import com.uth.mobileBE.dto.response.LoanResponse;
 import com.uth.mobileBE.services.LoanService;
@@ -42,13 +43,15 @@ public class LoanController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/library/{libraryId}/borrowing/count")
-    public ResponseEntity<Long> countBorrowingLoans(@PathVariable Long libraryId) {
+    @GetMapping("/borrowing/count")
+    public ResponseEntity<Long> countBorrowingLoans() {
+        Long libraryId = SecurityUtils.getLibraryId();
         return ResponseEntity.ok(loanService.countBorrowingLoans(libraryId));
     }
 
-    @GetMapping("/library/{libraryId}/overdue/count")
-    public ResponseEntity<Long> countOverdueLoans(@PathVariable Long libraryId) {
+    @GetMapping("/overdue/count")
+    public ResponseEntity<Long> countOverdueLoans() {
+        Long libraryId = SecurityUtils.getLibraryId();
         return ResponseEntity.ok(loanService.countOverdueLoans(libraryId));
     }
 }

@@ -2,37 +2,34 @@ package com.example.quanlythuvien.utils
 
 import android.content.Context
 
-/**
- * Quyền UI module Kho sách (Book / BookCopy), theo User.role ADMIN / STAFF.
- * - STAFF: CRU — thêm đầu sách, sửa metadata, thêm bản sao; không xóa bản sao (không D).
- * - ADMIN: đầy đủ, gồm xóa BookCopy.
- */
+// Xử lý phân quyền UI cho kho sách
 object BookWarehousePermissions {
 
-    private const val PREFS_NAME = "LibraryAppPrefs"
-    private const val KEY_LOGGED_IN = "isLoggedIn"
-    private const val KEY_USER_ROLE = "userRole"
-
+    // Lấy Role trực tiếp từ TokenManager
     private fun currentRole(context: Context): String {
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        if (!prefs.getBoolean(KEY_LOGGED_IN, false)) return ""
-        return prefs.getString(KEY_USER_ROLE, "").orEmpty()
+        val role = TokenManager(context).getRole() ?: ""
+
+        // Chuẩn hóa role
+        if (role.contains("ADMIN", true)) return "ADMIN"
+        if (role.contains("STAFF", true)) return "STAFF"
+        return ""
     }
 
-    /** Admin — quyền đầy đủ trên kho, gồm xóa BookCopy. */
+    // Chỉ ADMIN được quản lý toàn bộ
     fun canManageCatalog(context: Context): Boolean =
         currentRole(context) == "ADMIN"
 
-    /** STAFF hoặc ADMIN — thêm/sửa đầu sách và thêm bản sao (CRU cho staff). */
+    // ADMIN + STAFF được thêm/sửa sách
     fun canCreateOrUpdateCatalog(context: Context): Boolean {
         val role = currentRole(context)
         return role == "ADMIN" || role == "STAFF"
     }
 
+    // Kiểm tra có phải STAFF không
     fun isStaffUser(context: Context): Boolean =
         currentRole(context) == "STAFF"
 
-    /** Chỉ admin xóa được từng BookCopy trên UI. */
+    // Chỉ ADMIN được xóa
     fun canDeleteBookCopiesInWarehouseUi(context: Context): Boolean =
         canManageCatalog(context)
 }

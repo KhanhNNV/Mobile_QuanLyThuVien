@@ -5,6 +5,6 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 
 interface LoanDetailApiService {
-    @GET("api/loan-details/library/{libraryId}/alerts/due-today")
-    suspend fun getDueTodayAlerts(@Path("libraryId") libraryId: Long): Response<List<String>>
+    @GET("api/loan-details/alerts/due-today")
+    suspend fun getDueTodayAlerts(): Response<List<String>>
 }

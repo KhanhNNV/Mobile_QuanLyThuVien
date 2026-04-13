@@ -28,13 +28,19 @@ class BookCopyAdapter(
     override fun onBindViewHolder(holder: CopyViewHolder, position: Int) {
         val item = copyList[position]
         holder.tvCopyId.text = item.copyId
+
+        // Trạng thái và màu sắc Text và Color đã được map từ bên ngoài truyền vào qua BookCopyItem
         holder.tvCopyStatus.text = item.statusText
         holder.tvCopyStatus.setTextColor(item.statusColor)
 
         if (allowDelete) {
             holder.ivDeleteCopy.visibility = View.VISIBLE
             holder.ivDeleteCopy.setOnClickListener {
-                onDeleteClick(item, holder.bindingAdapterPosition)
+                // CHỐNG CRASH: Kiểm tra NO_POSITION trước khi thao tác xóa
+                val currentPos = holder.bindingAdapterPosition
+                if (currentPos != RecyclerView.NO_POSITION) {
+                    onDeleteClick(item, currentPos)
+                }
             }
         } else {
             holder.ivDeleteCopy.visibility = View.GONE
@@ -48,6 +54,7 @@ class BookCopyAdapter(
         if (position < 0 || position >= copyList.size) return
         copyList.removeAt(position)
         notifyItemRemoved(position)
+        // Cập nhật lại index cho các item bên dưới để tránh lỗi IndexOutOfBounds
+        notifyItemRangeChanged(position, copyList.size - position)
     }
 }
-
