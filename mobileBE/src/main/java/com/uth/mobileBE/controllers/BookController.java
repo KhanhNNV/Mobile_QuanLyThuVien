@@ -1,5 +1,6 @@
 package com.uth.mobileBE.controllers;
 
+import com.uth.mobileBE.Utils.SecurityUtils;
 import com.uth.mobileBE.dto.request.BookRequest;
 import com.uth.mobileBE.dto.request.InitialBookRequest;
 import com.uth.mobileBE.dto.response.BookResponse;
@@ -9,6 +10,8 @@ import com.uth.mobileBE.services.BookService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -55,15 +58,17 @@ public class BookController {
         return ResponseEntity.ok("Xóa sách thành công!");
     }
 
-    //lấy tổng số đầu sách
-    @GetMapping("/library/{libraryId}/count")
-    public ResponseEntity<Long> countBooksByLibrary(@PathVariable Long libraryId) {
+
+    @GetMapping("/count")
+    public ResponseEntity<Long> countBooksByLibrary() {
+        Long libraryId = SecurityUtils.getLibraryId();
         return ResponseEntity.ok(bookCrudService.countAllBookByLibrary(libraryId));
     }
 
     //lấy số sách có copy available <2
-    @GetMapping("/library/{libraryId}/alerts/low-copies")
-    public ResponseEntity<List<String>> getLowCopyAlerts(@PathVariable Long libraryId) {
+    @GetMapping("/alerts/low-copies")
+    public ResponseEntity<List<String>> getLowCopyAlerts() {
+        Long libraryId = SecurityUtils.getLibraryId();
         return ResponseEntity.ok(bookService.getLowCopyAlerts(libraryId));
     }
 }
