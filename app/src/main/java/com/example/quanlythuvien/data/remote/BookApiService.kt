@@ -13,9 +13,9 @@ interface BookApiService {
     @POST("$BOOK_ENDPOINT/welcome")
     suspend fun createInitialBook(@Body request: InitialBookRequest): Response<InitialBookResponse>
 
-    @GET("$BOOK_ENDPOINT/library/{libraryId}/count")
-    suspend fun countBooksByLibrary(@Path("libraryId") libraryId: Long): Response<Long>
+    @GET("$BOOK_ENDPOINT/count")
+    suspend fun countBooksByLibrary(): Response<Long>
 
-    @GET("$BOOK_ENDPOINT/library/{libraryId}/alerts/low-copies")
-    suspend fun getLowCopyAlerts(@Path("libraryId") libraryId: Long): Response<List<String>>
+    @GET("$BOOK_ENDPOINT/alerts/low-copies")
+    suspend fun getLowCopyAlerts(): Response<List<String>>
 }

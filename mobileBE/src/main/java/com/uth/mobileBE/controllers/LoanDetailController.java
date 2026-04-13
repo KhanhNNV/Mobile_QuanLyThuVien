@@ -1,5 +1,6 @@
 package com.uth.mobileBE.controllers;
 
+import com.uth.mobileBE.Utils.SecurityUtils;
 import com.uth.mobileBE.dto.request.LoanDetailRequest;
 import com.uth.mobileBE.dto.response.LoanDetailResponse;
 import com.uth.mobileBE.services.LoanDetailService;
@@ -39,8 +40,9 @@ public class LoanDetailController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/library/{libraryId}/alerts/due-today")
-    public ResponseEntity<List<String>> getDueTodayAlerts(@PathVariable Long libraryId) {
+    @GetMapping("/alerts/due-today")
+    public ResponseEntity<List<String>> getDueTodayAlerts() {
+        Long libraryId = SecurityUtils.getLibraryId();
         return ResponseEntity.ok(loanDetailService.getDueTodayAlerts(libraryId));
     }
 }

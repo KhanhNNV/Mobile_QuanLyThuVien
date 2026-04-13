@@ -1,5 +1,6 @@
 package com.uth.mobileBE.controllers;
 
+import com.uth.mobileBE.Utils.SecurityUtils;
 import com.uth.mobileBE.dto.request.ReaderRequest;
 import com.uth.mobileBE.dto.response.ReaderResponse;
 import com.uth.mobileBE.services.ReaderService;
@@ -41,8 +42,9 @@ public class ReaderController {
         return ResponseEntity.ok("Xóa độc giả thành công");
     }
 
-    @GetMapping("/library/{libraryId}/count")
-    public ResponseEntity<Long> countReaders(@PathVariable Long libraryId) {
+    @GetMapping("/count")
+    public ResponseEntity<Long> countReaders() {
+        Long libraryId = SecurityUtils.getLibraryId();
         return ResponseEntity.ok(readerService.countReaders(libraryId));
     }
 }

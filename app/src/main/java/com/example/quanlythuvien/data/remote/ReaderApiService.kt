@@ -5,6 +5,6 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 
 interface ReaderApiService {
-    @GET("api/readers/library/{libraryId}/count")
-    suspend fun countReaders(@Path("libraryId") libraryId: Long): Response<Long>
+    @GET("api/readers/count")
+    suspend fun countReaders(): Response<Long>
 }
