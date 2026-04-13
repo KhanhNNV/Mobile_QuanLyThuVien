@@ -172,7 +172,7 @@
 
     <fragment
         android:id="@+id/loanPolicyFragment"
-        android:name="com.example.quanlythuvien.ui.borrow_pay.LoanPolicyFragment"
+        android:name="com.example.quanlythuvien.ui.LoanPolicy.LoanPolicyFragment"
         android:label="Chính sách mượn trả">
     </fragment>
 

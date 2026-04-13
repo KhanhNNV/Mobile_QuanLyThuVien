@@ -3,9 +3,11 @@ package com.example.quanlythuvien.ui.dashboard
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.quanlythuvien.data.repository.BookRepository
+import com.example.quanlythuvien.data.repository.LibraryRepository
 import com.example.quanlythuvien.data.repository.LoanDetailRepository
 import com.example.quanlythuvien.data.repository.LoanRepository
 import com.example.quanlythuvien.data.repository.ReaderRepository
+import com.example.quanlythuvien.utils.LibraryConfigManager
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,7 +17,9 @@ class DashboardViewModel(
     private val bookRepository: BookRepository,
     private val loanRepository: LoanRepository,
     private val readerRepository: ReaderRepository,
-    private val loanDetailRepository: LoanDetailRepository
+    private val loanDetailRepository: LoanDetailRepository,
+    private val libraryRepository: LibraryRepository,
+    private val configManager: LibraryConfigManager
 ) : ViewModel() {
 
     // State Tổng sách
@@ -136,6 +140,20 @@ class DashboardViewModel(
 
             } catch (e: Exception) {
                 _alertState.value = AlertState.Error("Không thể tải cảnh báo: Mất kết nối")
+            }
+        }
+    }
+
+    fun loadLibraryConfig() {
+        viewModelScope.launch {
+            try {
+                val response = libraryRepository.getLibraryConfig()
+                if (response.isSuccessful && response.body() != null) {
+                    val hasDiscount = response.body()!!.hasStudentDiscount
+                    // Lưu thẳng vào SharedPreferences
+                    configManager.saveHasStudentDiscount(hasDiscount)
+                }
+            } catch (e: Exception) {
             }
         }
     }
