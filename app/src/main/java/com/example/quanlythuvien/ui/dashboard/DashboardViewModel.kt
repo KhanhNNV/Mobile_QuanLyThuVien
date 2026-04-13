@@ -39,11 +39,11 @@ class DashboardViewModel(
     val alertState: StateFlow<AlertState> = _alertState
 
 
-    fun loadTotalBooks(libraryId: Long) {
+    fun loadTotalBooks() {
         viewModelScope.launch {
             _bookCountState.value = CountState.Loading
             try {
-                val response = bookRepository.countBooksByLibrary(libraryId)
+                val response = bookRepository.countBooksByLibrary()
                 if (response.isSuccessful && response.body() != null) {
                     _bookCountState.value = CountState.Success(response.body()!!)
                 } else {
@@ -56,11 +56,11 @@ class DashboardViewModel(
         }
     }
 
-    fun loadBorrowingLoans(libraryId: Long) {
+    fun loadBorrowingLoans() {
         viewModelScope.launch {
             _borrowingLoanState.value = CountState.Loading
             try {
-                val response = loanRepository.countBorrowingLoans(libraryId)
+                val response = loanRepository.countBorrowingLoans()
                 if (response.isSuccessful && response.body() != null) {
                     _borrowingLoanState.value = CountState.Success(response.body()!!)
                 } else {
@@ -73,11 +73,11 @@ class DashboardViewModel(
         }
     }
 
-    fun loadOverdueLoans(libraryId: Long) {
+    fun loadOverdueLoans() {
         viewModelScope.launch {
             _overdueLoanState.value = CountState.Loading
             try {
-                val response = loanRepository.countOverdueLoans(libraryId)
+                val response = loanRepository.countOverdueLoans()
                 if (response.isSuccessful && response.body() != null) {
                     _overdueLoanState.value = CountState.Success(response.body()!!)
                 } else {
@@ -90,11 +90,11 @@ class DashboardViewModel(
         }
     }
 
-    fun loadTotalReaders(libraryId: Long) {
+    fun loadTotalReaders() {
         viewModelScope.launch {
             _readerCountState.value = CountState.Loading
             try {
-                val response = readerRepository.countReaders(libraryId)
+                val response = readerRepository.countReaders()
                 if (response.isSuccessful && response.body() != null) {
                     _readerCountState.value = CountState.Success(response.body()!!)
                 } else {
@@ -106,13 +106,13 @@ class DashboardViewModel(
             }
         }
     }
-    fun loadAlerts(libraryId: Long) {
+    fun loadAlerts() {
         viewModelScope.launch {
             _alertState.value = AlertState.Loading
             try {
                 // Gọi đồng thời 2 API
-                val bookAlertsDeferred = async { bookRepository.getLowCopyAlerts(libraryId) }
-                val loanAlertsDeferred = async { loanDetailRepository.getDueTodayAlerts(libraryId) }
+                val bookAlertsDeferred = async { bookRepository.getLowCopyAlerts() }
+                val loanAlertsDeferred = async { loanDetailRepository.getDueTodayAlerts() }
 
                 // Đợi 2 API trả về kết quả
                 val bookResponse = bookAlertsDeferred.await()

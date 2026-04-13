@@ -207,11 +207,11 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
     private fun loadCountAllBooks(){
         val libraryId = TokenManager(requireContext()).getLibraryId()
         if (libraryId != null && libraryId != -1L) {
-            viewModel.loadTotalBooks(libraryId)
-            viewModel.loadBorrowingLoans(libraryId)
-            viewModel.loadOverdueLoans(libraryId)
-            viewModel.loadTotalReaders(libraryId)
-            viewModel.loadAlerts(libraryId)
+            viewModel.loadTotalBooks()
+            viewModel.loadBorrowingLoans()
+            viewModel.loadOverdueLoans()
+            viewModel.loadTotalReaders()
+            viewModel.loadAlerts()
         } else {
             Toast.makeText(requireContext(), "Lỗi: Không lấy được ID thư viện", Toast.LENGTH_SHORT).show()
         }
