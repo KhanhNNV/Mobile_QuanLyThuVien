@@ -16,6 +16,9 @@ interface BookApiService {
     @POST("$BOOK_ENDPOINT/welcome")
     suspend fun createInitialBook(@Body request: InitialBookRequest): Response<InitialBookResponse>
 
+    @GET("$BOOK_ENDPOINT/current-library-id")
+    suspend fun getCurrentLibraryId(): Response<Long>
+
     @GET("$BOOK_ENDPOINT/count")
     suspend fun countBooksByLibrary(): Response<Long>
 
@@ -34,6 +37,6 @@ interface BookApiService {
         @Body request: BookRequest
     ): Response<BookResponse>
 
-    @POST("api/books")
+    @POST(BOOK_ENDPOINT)
     suspend fun createBook(@Body request: BookRequest): Response<BookResponse>
 }

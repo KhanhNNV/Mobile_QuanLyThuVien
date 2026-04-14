@@ -21,7 +21,6 @@ import com.example.quanlythuvien.ui.books.addBook.AddBookState
 import com.example.quanlythuvien.ui.books.addBook.AddBookViewModel
 import com.example.quanlythuvien.utils.BookWarehousePermissions
 import com.example.quanlythuvien.utils.GenericViewModelFactory
-import com.example.quanlythuvien.utils.TokenManager
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.flow.collectLatest
@@ -169,13 +168,7 @@ class AddBookFragment : Fragment(R.layout.fragment_add_book) {
                 return@setOnClickListener
             }
 
-            val libraryId = TokenManager(requireContext()).getLibraryId()
-            if (libraryId == null) {
-                Toast.makeText(requireContext(), "Lỗi: Không tìm thấy thông tin thư viện!", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            // 💡 BÍ KÍP Ở ĐÂY: Dò tìm ID của Thể loại dựa vào cái Tên mà User vừa chọn
+            // Dò tìm ID của thể loại dựa vào tên user đã chọn
             val selectedCategory = categoryList.find { it.name == selectedCategoryName }
             val categoryIdToSave = selectedCategory?.categoryId
 
@@ -185,8 +178,7 @@ class AddBookFragment : Fragment(R.layout.fragment_add_book) {
             }
 
             val request = BookRequest(
-                libraryId = libraryId,
-                categoryId = categoryIdToSave, // Giờ nó đã lấy ID thật rồi nè!
+                categoryId = categoryIdToSave,
                 isbn = isbn,
                 title = bookName,
                 author = author,
