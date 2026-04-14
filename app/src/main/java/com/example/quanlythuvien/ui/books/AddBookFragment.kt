@@ -46,7 +46,6 @@ class AddBookFragment : Fragment(R.layout.fragment_add_book) {
             return
         }
 
-        // Gọi 4 hàm chuẩn form sếp
         initViews(view)
         setupViewModel()
         observeViewModel()
@@ -131,7 +130,6 @@ class AddBookFragment : Fragment(R.layout.fragment_add_book) {
                 return@setOnClickListener
             }
 
-            // Lấy LibraryId thông minh từ TokenManager (Học từ sếp bạn)
             val libraryId = TokenManager(requireContext()).getLibraryId()
             if (libraryId == null) {
                 Toast.makeText(requireContext(), "Lỗi: Không tìm thấy thông tin thư viện!", Toast.LENGTH_SHORT).show()
