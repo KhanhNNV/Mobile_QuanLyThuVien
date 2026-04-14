@@ -29,9 +29,9 @@ public class BookCrudService {
     private final CategoryRepository categoryRepository;
 
     @Transactional
-    public BookResponse createBook(BookRequest request) {
-        Library library = libraryRepository.findById(request.getLibraryId())
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy thư viện với ID: " + request.getLibraryId()));
+    public BookResponse createBook(Long currentLibraryId, BookRequest request) {
+        Library library = libraryRepository.findById(currentLibraryId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy thư viện với ID: " + currentLibraryId));
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy thể loại với ID: " + request.getCategoryId()));
 
@@ -101,9 +101,10 @@ public class BookCrudService {
     }
 
     @Transactional
-    public BookResponse updateBook(Long bookId, BookRequest request) {
+    public BookResponse updateBook(Long currentLibraryId, Long bookId, BookRequest request) {
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy sách với ID: " + bookId));
+        assertBookBelongsToLibrary(book, currentLibraryId);
 
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy thể loại với ID: " + request.getCategoryId()));
@@ -141,6 +142,13 @@ public class BookCrudService {
         if (category.getLibrary() == null
                 || !category.getLibrary().getLibraryId().equals(library.getLibraryId())) {
             throw new RuntimeException("Thể loại không thuộc thư viện này");
+        }
+    }
+
+    private void assertBookBelongsToLibrary(Book book, Long currentLibraryId) {
+        if (book.getLibrary() == null
+                || !book.getLibrary().getLibraryId().equals(currentLibraryId)) {
+            throw new RuntimeException("Sách không thuộc thư viện hiện tại");
         }
     }
 
