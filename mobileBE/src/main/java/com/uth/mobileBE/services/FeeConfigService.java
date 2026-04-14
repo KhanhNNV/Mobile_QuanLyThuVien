@@ -1,11 +1,14 @@
 package com.uth.mobileBE.services;
 
+import com.uth.mobileBE.Utils.SecurityUtils;
 import com.uth.mobileBE.dto.request.FeeConfigRequest;
 import com.uth.mobileBE.dto.response.FeeConfigResponse;
 import com.uth.mobileBE.models.FeeConfig;
 import com.uth.mobileBE.models.Library;
+import com.uth.mobileBE.models.enums.TypeFeeConfig;
 import com.uth.mobileBE.repositories.FeeConfigRepository;
 import com.uth.mobileBE.repositories.LibraryRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,9 +23,9 @@ public class FeeConfigService {
     private final LibraryRepository libraryRepository;
 
     // 1. TẠO CẤU HÌNH PHÍ MỚI
-    public FeeConfigResponse createFeeConfig(FeeConfigRequest request) {
-        Library library = libraryRepository.findById(request.getLibraryId())
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy thư viện với ID: " + request.getLibraryId()));
+    public FeeConfigResponse createFeeConfig(FeeConfigRequest request,Long libraryId) {
+        Library library = libraryRepository.findById(libraryId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy thư viện với ID: " + libraryId));
 
         // Kiểm tra xem thư viện này đã cài đặt loại phí này chưa
         if (feeConfigRepository.existsByLibrary_LibraryIdAndFeeType(library.getLibraryId(), request.getFeeType())) {
@@ -48,9 +51,16 @@ public class FeeConfigService {
     }
 
     // 3. CẬP NHẬT MỨC PHÍ
+    @Transactional
     public FeeConfigResponse updateFeeConfig(Long configId, FeeConfigRequest request) {
         FeeConfig feeConfig = feeConfigRepository.findById(configId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy cấu hình phí với ID: " + configId));
+
+        if(!feeConfig.getLibrary().getHasStudentDiscount()){
+           if(request.getFeeType().equals(TypeFeeConfig.REG_STUDENT)){
+               throw new RuntimeException("Thư viện không áp dụng giảm giá cho sinh viên");
+            }
+        }
 
         // Cập nhật lại số tiền (thường chỉ update giá tiền chứ không đổi loại phí)
         feeConfig.setAmount(request.getAmount());
@@ -71,7 +81,6 @@ public class FeeConfigService {
     private FeeConfigResponse mapToResponse(FeeConfig feeConfig) {
         return FeeConfigResponse.builder()
                 .configId(feeConfig.getConfigId())
-                .libraryId(feeConfig.getLibrary() != null ? feeConfig.getLibrary().getLibraryId() : null)
                 .feeType(feeConfig.getFeeType())
                 .amount(feeConfig.getAmount())
                 .build();

@@ -150,16 +150,37 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <TextView
+        <LinearLayout
+            android:id="@+id/layoutFeeHeader"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:text="QUẢN LÝ CÁC LOẠI PHÍ"
-            android:textColor="@color/text_primary"
-            android:textSize="14sp"
-            android:textStyle="bold" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="8dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="QUẢN LÝ CÁC LOẠI PHÍ"
+                android:textColor="@color/text_primary"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:id="@+id/imgToggleFee"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/baseline_arrow_forward_ios_24"
+                app:tint="@color/theme_primary"/>
+        </LinearLayout>
+
 
         <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardFeeContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
@@ -167,7 +188,8 @@
             app:cardElevation="0dp"
             app:strokeColor="#E0E0E0"
             app:strokeWidth="1dp"
-            android:backgroundTint="@color/bg_card">
+            android:backgroundTint="@color/bg_card"
+            android:visibility="gone">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -218,16 +240,18 @@
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="16dp"
-                        android:hint="Mức giảm giá"
-                        app:suffixText="%">
+                        android:layout_marginBottom="12dp"
+                        android:hint="Phí làm thẻ độc giả cho sinh viên"
+                        app:suffixText="VNĐ">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/edtStudentDiscount"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:inputType="number" />
+                            android:inputType="number"
+                            android:text="0"/>
                     </com.google.android.material.textfield.TextInputLayout>
+
                 </LinearLayout>
 
                 <View

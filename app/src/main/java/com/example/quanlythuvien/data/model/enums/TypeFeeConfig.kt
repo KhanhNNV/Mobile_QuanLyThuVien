@@ -1,6 +1,6 @@
-package com.uth.mobileBE.models.enums;
+package com.example.quanlythuvien.data.model.enums
 
-public enum TypeFeeConfig {
+enum class TypeFeeConfig {
     REG_NORMAL,
     REG_STUDENT,
     LATE_PER_DAY,
