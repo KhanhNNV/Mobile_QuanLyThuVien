@@ -34,7 +34,9 @@ class BookCopyAdapter(
         if (allowDelete) {
             holder.ivDeleteCopy.visibility = View.VISIBLE
             holder.ivDeleteCopy.setOnClickListener {
-                onDeleteClick(item, holder.bindingAdapterPosition)
+                val adapterPos = holder.bindingAdapterPosition
+                if (adapterPos == RecyclerView.NO_POSITION) return@setOnClickListener
+                onDeleteClick(item, adapterPos)
             }
         } else {
             holder.ivDeleteCopy.visibility = View.GONE

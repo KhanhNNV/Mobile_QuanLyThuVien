@@ -12,6 +12,23 @@ class BookAdapter(private val bookList: MutableList<Book>) : RecyclerView.Adapte
 
     var onItemClick: ((Book) -> Unit)? = null
 
+    private fun categoryLabel(categoryId: Int): String = when (categoryId) {
+        1 -> "CNTT"
+        2 -> "Tâm lý"
+        3 -> "Tiểu thuyết"
+        4 -> "Lịch sử"
+        else -> "Khác"
+    }
+
+    private fun quantityLabel(book: Book): String {
+        val available = book.availableQuantity.coerceAtLeast(0)
+        val total = book.totalQuantity.coerceAtLeast(0)
+        val lost = book.lostQuantity.coerceAtLeast(0)
+
+        val base = "Có sẵn $available / $total"
+        return if (lost > 0) "$base • Mất $lost" else base
+    }
+
     class BookViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tvTitle: TextView = view.findViewById(R.id.tvBookTitle)
         val tvAuthor: TextView = view.findViewById(R.id.tvBookAuthor)
@@ -33,8 +50,8 @@ class BookAdapter(private val bookList: MutableList<Book>) : RecyclerView.Adapte
         holder.tvTitle.text = book.title
         holder.tvAuthor.text = book.author
         holder.tvIsbn.text = "ISBN: ${book.isbnCode}"
-        holder.tvQuantity.text = "Còn ${book.availableQuantity} bản"
-        holder.tvCategory.text = book.categoryId.toString()
+        holder.tvQuantity.text = quantityLabel(book)
+        holder.tvCategory.text = categoryLabel(book.categoryId)
 
         // Bắt sự kiện khi người dùng bấm vào 1 dòng (itemView)
         holder.itemView.setOnClickListener {
