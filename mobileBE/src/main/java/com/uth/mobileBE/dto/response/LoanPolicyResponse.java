@@ -16,6 +16,5 @@ public class LoanPolicyResponse {
     private Long policyId;
     private Long categoryId;
     private String categoryName;
-    private Boolean applyForStudent;
     private Integer maxBorrowDays;
 }

@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "library")
+@Table(name = "libraries")
 public class Library {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,8 +22,6 @@ public class Library {
 
     private String name;
     private String address;
-    private Boolean hasStudentDiscount;
-    private Long platformFeeExpiry;
 
     @Enumerated(EnumType.STRING)
     private StatusLibrary status = StatusLibrary.ACTIVE;

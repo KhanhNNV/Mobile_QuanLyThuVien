@@ -28,7 +28,6 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
     private lateinit var edtPassword: EditText
     private lateinit var edtLibrary: EditText
     private lateinit var edtAddress: EditText
-    private lateinit var cbStudentDiscount: CheckBox
     private lateinit var btnRegister: Button
     private lateinit var viewModel: RegisterViewModel
 
@@ -46,7 +45,6 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
         edtPassword = view.findViewById(R.id.edtPassword)
         edtLibrary = view.findViewById(R.id.edtLibrary)
         edtAddress = view.findViewById(R.id.edtAddress)
-        cbStudentDiscount = view.findViewById(R.id.cbStudentDiscount)
         btnRegister = view.findViewById(R.id.btnRegister)
     }
 
@@ -99,7 +97,6 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
             val password = edtPassword.text.toString().trim()
             val libraryName = edtLibrary.text.toString().trim()
             val address = edtAddress.text.toString().trim()
-            val isStudentDiscount = cbStudentDiscount.isChecked
 
             if (username.isEmpty() || password.isEmpty() || libraryName.isEmpty()) {
                 Toast.makeText(requireContext(), "Vui lòng nhập đủ thông tin bắt buộc", Toast.LENGTH_SHORT).show()
@@ -111,8 +108,7 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
                 password = password,
                 fullName = username, // Lấy username làm fullName mặc định
                 libraryName = libraryName,
-                address = address,
-                hasStudentDiscount = isStudentDiscount
+                address = address
             )
 
             // Gọi ViewModel để xử lý

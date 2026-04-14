@@ -48,13 +48,4 @@ public class LibraryController {
         libraryService.deleteLibrary(id);
         return ResponseEntity.noContent().build();
     }
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/config")
-    public ResponseEntity<Map<String, Boolean>> getLibraryConfig() {
-        Long libraryId = SecurityUtils.getLibraryId();
-        Boolean hasStudentDiscount = libraryService.getHasStudentDiscount(libraryId);
-        return ResponseEntity.ok(Map.of("hasStudentDiscount", hasStudentDiscount));
-    }
-
 }
