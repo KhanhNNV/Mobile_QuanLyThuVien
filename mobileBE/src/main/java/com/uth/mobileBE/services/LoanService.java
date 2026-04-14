@@ -1,11 +1,14 @@
 package com.uth.mobileBE.services;
 
+import com.uth.mobileBE.Utils.LoanSpecification;
 import com.uth.mobileBE.dto.request.LoanRequest;
 import com.uth.mobileBE.dto.response.LoanResponse;
 import com.uth.mobileBE.models.Loan;
 import com.uth.mobileBE.models.enums.StatusLoan;
+import com.uth.mobileBE.models.enums.StatusLoanDetail;
 import com.uth.mobileBE.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,11 +24,29 @@ public class LoanService {
     @Autowired private ReaderRepository readerRepository;
     @Autowired private UserRepository userRepository;
 
-    public List<LoanResponse> getAllLoans() {
-        return loanRepository.findAll().stream()
+
+    @Transactional(readOnly = true) // Thêm dòng này
+    //Hàm lấy danh sách theo id thư viện có kèm theo bộ lọc
+    public List<LoanResponse> getLoansWithFilter(
+            Long libraryId,
+            String statusFilter,
+            LocalDateTime fromDate,
+            LocalDateTime toDate,
+            String searchQuery) {
+
+        // Gọi Specification để tự động sinh ra câu lệnh SQL có điều kiện
+        Specification<Loan> spec = LoanSpecification.filterLoans(
+                libraryId, statusFilter, fromDate, toDate, searchQuery
+        );
+
+        // Lấy danh sách từ DB và map sang Response
+        return loanRepository.findAll(spec).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
+
+
+
 
     public LoanResponse getLoanById(Long id) {
         Loan loan = loanRepository.findById(id)
@@ -93,13 +114,37 @@ public class LoanService {
     }
 
     private LoanResponse mapToResponse(Loan loan) {
+        // 1. Lấy trạng thái gốc từ Database
+        StatusLoan finalStatus = loan.getStatus();
+
+        // 2. LOGIC TÍNH TOÁN OVERDUE (Trễ hạn)
+        // Nếu phiếu đang mượn, ta phải kiểm tra xem có cuốn sách nào bị lố ngày không
+        if (finalStatus == StatusLoan.BORROWING && loan.getLoanDetails() != null) {
+            LocalDateTime now = LocalDateTime.now();
+
+            // Quét qua danh sách chi tiết mượn
+            boolean isOverdue = loan.getLoanDetails().stream()
+                    .anyMatch(detail ->
+                            // Sách chưa trả VÀ ngày hết hạn nhỏ hơn thời gian hiện tại
+                            detail.getStatus() == StatusLoanDetail.BORROWING &&
+                                    detail.getDueDate() != null &&
+                                    detail.getDueDate().isBefore(now)
+                    );
+
+            // Nếu phát hiện có sách trễ hạn, ghi đè trạng thái thành OVERDUE để gửi cho Mobile
+            if (isOverdue) {
+                finalStatus = StatusLoan.OVERDUE;
+            }
+        }
+
+        // 3. Build Response gửi về Mobile
         return LoanResponse.builder()
                 .loanId(loan.getLoanId())
                 .libraryName(loan.getLibrary().getName())
                 .readerName(loan.getReader().getFullName())
                 .processorName(loan.getProcessedBy().getFullname())
-                .borrowDate(loan.getBorrowDate()) // Không cần convert nữa
-                .status(loan.getStatus())
+                .borrowDate(loan.getBorrowDate())
+                .status(finalStatus) // Gửi trạng thái ĐÃ ĐƯỢC TÍNH TOÁN LẠI
                 .bookTitles(loan.getLoanDetails() != null ?
                         loan.getLoanDetails().stream()
                                 .map(d -> d.getBookCopy().getBook().getTitle())
