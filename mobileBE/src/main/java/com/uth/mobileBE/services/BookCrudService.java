@@ -6,6 +6,8 @@ import com.uth.mobileBE.models.Book;
 import com.uth.mobileBE.models.BookCopy;
 import com.uth.mobileBE.models.Category;
 import com.uth.mobileBE.models.Library;
+import com.uth.mobileBE.models.enums.ConditionBookCopy;
+import com.uth.mobileBE.models.enums.StatusBookCopy;
 import com.uth.mobileBE.repositories.BookCopyRepository;
 import com.uth.mobileBE.repositories.BookRepository;
 import com.uth.mobileBE.repositories.CategoryRepository;
@@ -50,7 +52,35 @@ public class BookCrudService {
                 .build();
 
         Book saved = bookRepository.save(book);
+
+        // --- ĐOẠN LOGIC TẠO BOOK COPY ĐÃ ĐƯỢC CHUYỂN QUA ĐÂY ---
+        String categoryAcronym = generateAcronym(category.getName());
+        String barcode = categoryAcronym + "-" + saved.getBookId() + "-1";
+
+        BookCopy bookCopy = BookCopy.builder()
+                .book(saved)
+                .barcode(barcode)
+                .condition(ConditionBookCopy.NEW)
+                .status(StatusBookCopy.AVAILABLE)
+                .build();
+        bookCopyRepository.save(bookCopy);
+        // -------------------------------------------------------
+
         return mapToResponse(saved);
+    }
+    // --- HÀM HỖ TRỢ TẠO BARCODE (Mang từ bên kia qua) ---
+    private String generateAcronym(String categoryName) {
+        if (categoryName == null || categoryName.trim().isEmpty()) {
+            return "BK";
+        }
+        StringBuilder acronym = new StringBuilder();
+        String[] words = categoryName.trim().split("\\s+");
+        for (String word : words) {
+            if (!word.isEmpty()) {
+                acronym.append(word.charAt(0));
+            }
+        }
+        return acronym.toString().toUpperCase();
     }
 
     public List<BookResponse> getBooksByLibrary(Long libraryId) {
