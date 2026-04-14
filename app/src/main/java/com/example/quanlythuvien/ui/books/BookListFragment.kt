@@ -64,7 +64,7 @@ class BookListFragment : Fragment() {
                 Toast.makeText(requireContext(), "Bạn không có quyền thêm sách vào kho.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            findNavController().navigate(R.id.bookImportFragment)
+            findNavController().navigate(R.id.bookAddFragment)
         }
 
         recyclerView.layoutManager = LinearLayoutManager(requireContext())

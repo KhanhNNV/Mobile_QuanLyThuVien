@@ -1,6 +1,8 @@
 package com.example.quanlythuvien.data.remote
 
+import com.example.quanlythuvien.data.model.request.BookRequest
 import com.example.quanlythuvien.data.model.request.InitialBookRequest
+import com.example.quanlythuvien.data.model.response.BookResponse
 import com.example.quanlythuvien.data.model.response.InitialBookResponse
 import retrofit2.Response
 import retrofit2.http.Body
@@ -18,4 +20,7 @@ interface BookApiService {
 
     @GET("$BOOK_ENDPOINT/alerts/low-copies")
     suspend fun getLowCopyAlerts(): Response<List<String>>
+
+    @POST("api/books")
+    suspend fun createBook(@Body request: BookRequest): Response<BookResponse>
 }
