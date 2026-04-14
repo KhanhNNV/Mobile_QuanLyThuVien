@@ -40,16 +40,29 @@ class BookRepository(private val apiService: BookApiService) {
         }
     }
 
-    suspend fun getBooksByLibrary(libraryId: Long): Result<List<BookResponse>> {
+    suspend fun getBooksByLibrary(): Result<List<BookResponse>> {
         return try {
-            val response = apiService.getBooksByLibrary(libraryId)
+            val response = apiService.getBooksByLibrary()
             if (response.isSuccessful) {
                 Result.success(response.body().orEmpty())
             } else {
-                Result.failure(Exception(response.errorBody()?.string().orEmpty().ifBlank { "Khong the tai danh sach sach." }))
+                Result.failure(Exception(extractUserFriendlyError(response.errorBody()?.string())))
             }
         } catch (exception: Exception) {
             Result.failure(exception)
+        }
+    }
+
+    private fun extractUserFriendlyError(rawError: String?): String {
+        if (rawError.isNullOrBlank()) {
+            return "Không thể tải danh sách sách. Vui lòng thử lại."
+        }
+        return when {
+            rawError.contains("Method Not Allowed", ignoreCase = true) ->
+                "API danh sách sách chưa được cấu hình đúng phương thức GET."
+            rawError.contains("Bad Request", ignoreCase = true) ->
+                "Yêu cầu chưa hợp lệ. Vui lòng thử lại."
+            else -> "Không thể tải danh sách sách. Vui lòng thử lại."
         }
     }
 }

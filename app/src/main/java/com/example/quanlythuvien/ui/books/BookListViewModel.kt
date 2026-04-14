@@ -40,8 +40,7 @@ sealed class BookCopyUiState {
 class BookListViewModel(
     private val repository: BookRepository,
     private val categoryRepository: CategoryRepository,
-    private val bookCopyRepository: BookCopyRepository,
-    private val libraryId: Long
+    private val bookCopyRepository: BookCopyRepository
 ) : ViewModel() {
 
     private val _bookListState = MutableStateFlow<BookListUiState>(BookListUiState.Idle)
@@ -68,7 +67,7 @@ class BookListViewModel(
     private fun loadBooks() {
         viewModelScope.launch {
             _bookListState.value = BookListUiState.Loading
-            val result = repository.getBooksByLibrary(libraryId)
+            val result = repository.getBooksByLibrary()
             result
                 .onSuccess { books ->
                     _allBooks.value = enrichBooksWithAvailableCopies(books)
@@ -149,7 +148,15 @@ class BookListViewModel(
         }
     }
 
-    fun updateBook(bookId: Long, categoryId: Long, isbn: String, title: String, author: String, basePrice: Double) {
+    fun updateBook(
+        bookId: Long,
+        libraryId: Long,
+        categoryId: Long,
+        isbn: String,
+        title: String,
+        author: String,
+        basePrice: Double
+    ) {
         viewModelScope.launch {
             _bookDetailState.value = BookDetailUiState.Loading
             val request = BookRequest(

@@ -33,7 +33,6 @@ import com.example.quanlythuvien.data.repository.BookRepository
 import com.example.quanlythuvien.data.repository.CategoryRepository
 import com.example.quanlythuvien.utils.BookWarehousePermissions
 import com.example.quanlythuvien.utils.GenericViewModelFactory
-import com.example.quanlythuvien.utils.TokenManager
 import com.example.quanlythuvien.utils.setupCustomHeader
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -127,14 +126,8 @@ class BookListFragment : Fragment() {
         val repository = BookRepository(bookApiService)
         val bookCopyRepository = BookCopyRepository(bookCopyApiService)
         val categoryRepository = CategoryRepository(categoryApiService)
-        val libraryId = TokenManager(requireContext()).getLibraryId()
-        if (libraryId == null) {
-            Toast.makeText(requireContext(), "Không tìm thấy thông tin thư viện.", Toast.LENGTH_LONG).show()
-            findNavController().popBackStack()
-            return
-        }
         val factory = GenericViewModelFactory {
-            BookListViewModel(repository, categoryRepository, bookCopyRepository, libraryId)
+            BookListViewModel(repository, categoryRepository, bookCopyRepository)
         }
         viewModel = ViewModelProvider(this, factory)[BookListViewModel::class.java]
     }
@@ -503,10 +496,16 @@ class BookListFragment : Fragment() {
                     Toast.makeText(context, "Không tìm thấy danh mục hợp lệ để cập nhật.", Toast.LENGTH_SHORT).show()
                     return@setPositiveButton
                 }
+                val libraryId = book.libraryId
+                if (libraryId == null) {
+                    Toast.makeText(context, "Không tìm thấy thông tin thư viện của sách.", Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
 
                 isUpdatingBook = true
                 viewModel.updateBook(
                     bookId = book.bookId,
+                    libraryId = libraryId,
                     categoryId = categoryId,
                     isbn = isbn,
                     title = title,

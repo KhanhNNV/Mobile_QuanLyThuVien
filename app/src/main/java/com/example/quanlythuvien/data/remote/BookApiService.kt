@@ -22,13 +22,13 @@ interface BookApiService {
     @GET("$BOOK_ENDPOINT/alerts/low-copies")
     suspend fun getLowCopyAlerts(): Response<List<String>>
 
-    @GET("$BOOK_ENDPOINT/library/{libraryId}")
-    suspend fun getBooksByLibrary(@Path("libraryId") libraryId: Long): Response<List<BookResponse>>
+    @GET(BOOK_ENDPOINT)
+    suspend fun getBooksByLibrary(): Response<List<BookResponse>>
 
-    @GET("$BOOK_ENDPOINT/{bookId}")
+    @GET("$BOOK_ENDPOINT/id/{bookId}")
     suspend fun getBookById(@Path("bookId") bookId: Long): Response<BookResponse>
 
-    @PUT("$BOOK_ENDPOINT/{bookId}")
+    @PUT("$BOOK_ENDPOINT/id/{bookId}")
     suspend fun updateBook(
         @Path("bookId") bookId: Long,
         @Body request: BookRequest
