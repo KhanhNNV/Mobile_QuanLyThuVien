@@ -43,6 +43,8 @@ class BookListViewModel(
     private val bookCopyRepository: BookCopyRepository
 ) : ViewModel() {
 
+    private val currentLibraryIdState = MutableStateFlow<Long?>(null)
+
     private val _bookListState = MutableStateFlow<BookListUiState>(BookListUiState.Idle)
     val bookListState: StateFlow<BookListUiState> = _bookListState.asStateFlow()
 
@@ -60,8 +62,10 @@ class BookListViewModel(
     val bookCopyState: StateFlow<BookCopyUiState> = _bookCopyState.asStateFlow()
 
     fun loadData() {
-        loadCategories()
-        loadBooks()
+        viewModelScope.launch {
+            loadCategories()
+            loadBooks()
+        }
     }
 
     private fun loadBooks() {
@@ -70,7 +74,7 @@ class BookListViewModel(
             val result = repository.getBooksByLibrary()
             result
                 .onSuccess { books ->
-                    _allBooks.value = enrichBooksWithAvailableCopies(books)
+                    _allBooks.value = books
                     applyFilters()
                     _bookListState.value = BookListUiState.Success(_allBooks.value)
                 }
@@ -150,7 +154,6 @@ class BookListViewModel(
 
     fun updateBook(
         bookId: Long,
-        libraryId: Long,
         categoryId: Long,
         isbn: String,
         title: String,
@@ -160,7 +163,6 @@ class BookListViewModel(
         viewModelScope.launch {
             _bookDetailState.value = BookDetailUiState.Loading
             val request = BookRequest(
-                libraryId = libraryId,
                 categoryId = categoryId,
                 isbn = isbn,
                 title = title,
@@ -226,20 +228,4 @@ class BookListViewModel(
         }
     }
 
-    private suspend fun enrichBooksWithAvailableCopies(books: List<BookResponse>): List<BookResponse> {
-        val deferred = books.map { book ->
-            viewModelScope.async {
-                val availableCount = bookCopyRepository
-                    .getBookCopiesByBook(book.bookId)
-                    .getOrNull()
-                    ?.count { it.status.equals("AVAILABLE", ignoreCase = true) }
-                if (availableCount == null) {
-                    book
-                } else {
-                    book.copy(availableCopies = availableCount)
-                }
-            }
-        }
-        return deferred.map { it.await() }
-    }
 }
