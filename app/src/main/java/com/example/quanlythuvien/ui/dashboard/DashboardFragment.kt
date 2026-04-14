@@ -27,7 +27,6 @@ import com.example.quanlythuvien.data.repository.LoanDetailRepository
 import com.example.quanlythuvien.data.repository.LoanRepository
 import com.example.quanlythuvien.data.repository.ReaderRepository
 import com.example.quanlythuvien.utils.GenericViewModelFactory
-import com.example.quanlythuvien.utils.LibraryConfigManager
 import com.example.quanlythuvien.utils.TokenManager
 import com.example.quanlythuvien.utils.setupCustomHeader
 import com.example.quanlythuvien.viewmodel.SharedFilterLoanViewModel
@@ -51,7 +50,6 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
     private lateinit var tvTotalReader: TextView
     private lateinit var viewModel: DashboardViewModel
     private lateinit var rvAlerts: RecyclerView
-    private lateinit var configManager: LibraryConfigManager
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -64,8 +62,6 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
             title = "Trang chủ",
             subtitle = currentDate
         )
-
-        configManager = LibraryConfigManager(requireContext())
 
         initViews(view)
         setupViewModel()
@@ -107,7 +103,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
         val libraryRepo = LibraryRepository(libraryApi)
 
         val factory = GenericViewModelFactory {
-            DashboardViewModel(bookRepo, loanRepo, readerRepo,loanDetailRepo,libraryRepo, configManager)
+            DashboardViewModel(bookRepo, loanRepo, readerRepo,loanDetailRepo)
         }
         viewModel = ViewModelProvider(this, factory)[DashboardViewModel::class.java]
 
@@ -220,7 +216,6 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
             viewModel.loadOverdueLoans()
             viewModel.loadTotalReaders()
             viewModel.loadAlerts()
-            viewModel.loadLibraryConfig()
         } else {
             Toast.makeText(requireContext(), "Lỗi: Không lấy được ID thư viện", Toast.LENGTH_SHORT).show()
         }

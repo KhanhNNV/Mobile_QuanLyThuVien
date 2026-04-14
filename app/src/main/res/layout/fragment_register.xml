@@ -88,14 +88,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/edtLibrary"/>
 
-    <CheckBox
-        android:id="@+id/cbStudentDiscount"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textColor="@color/text_primary"
-        android:textSize="16dp"
-        android:text="@string/cbStudentDiscount"
-        app:layout_constraintTop_toBottomOf="@+id/edtAddress"/>
     <Button
         android:id="@+id/btnRegister"
         android:layout_width="300dp"

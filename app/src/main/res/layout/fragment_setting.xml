@@ -213,46 +213,6 @@
                         android:text="50000" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <com.google.android.material.materialswitch.MaterialSwitch
-                    android:id="@+id/switchStudentDiscount"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Áp dụng giảm giá cho Sinh viên"
-                    android:textColor="@color/text_primary"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="8dp" />
-
-                <LinearLayout
-                    android:id="@+id/layoutStudentDiscountContainer"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:visibility="gone">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="* Chỉ áp dụng cho phí làm thẻ"
-                        android:textColor="#757575"
-                        android:textSize="12sp"
-                        android:layout_marginBottom="4dp"/>
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="12dp"
-                        android:hint="Phí làm thẻ độc giả cho sinh viên"
-                        app:suffixText="VNĐ">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/edtStudentDiscount"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:inputType="number"
-                            android:text="0"/>
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                </LinearLayout>
 
                 <View
                     android:layout_width="match_parent"

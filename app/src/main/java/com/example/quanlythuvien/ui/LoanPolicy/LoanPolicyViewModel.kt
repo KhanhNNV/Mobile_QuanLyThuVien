@@ -1,57 +1,24 @@
 package com.example.quanlythuvien.ui.LoanPolicy
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.quanlythuvien.data.model.request.LoanPolicyRequest
 import com.example.quanlythuvien.data.model.response.CategoryResponse
 import com.example.quanlythuvien.data.repository.CategoryRepository
-import com.example.quanlythuvien.data.repository.LibraryRepository
 import com.example.quanlythuvien.data.repository.LoanPolicyRepository
-import com.example.quanlythuvien.utils.LibraryConfigManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class LoanPolicyViewModel(
     private val repository: LoanPolicyRepository,
-    private val libraryRepository: LibraryRepository,
-    private val categoryRepository: CategoryRepository,
-    private val configManager: LibraryConfigManager
+    private val categoryRepository: CategoryRepository
 ) : ViewModel() {
     private val _state = MutableStateFlow<PolicyState>(PolicyState.Idle)
     val state: StateFlow<PolicyState> = _state
 
     private val _categories = MutableStateFlow<List<CategoryResponse>>(emptyList())
     val categories: StateFlow<List<CategoryResponse>> = _categories
-
-    private val _configState = MutableStateFlow<Boolean?>(null)
-    val configState: StateFlow<Boolean?> = _configState
-
-    // Hàm kiểm tra và lấy cấu hình
-    fun checkAndFetchConfig() {
-        val storedConfig = configManager.getHasStudentDiscount()
-        if (storedConfig != null) {
-            // Đã có trong Prefs -> Dùng luôn, báo cho UI
-            _configState.value = storedConfig
-        } else {
-            // Không có trong Prefs -> Gọi API lấy bù
-            viewModelScope.launch {
-                try {
-                    val response = libraryRepository.getLibraryConfig()
-                    if (response.isSuccessful && response.body() != null) {
-                        val hasDiscount = response.body()!!.hasStudentDiscount
-                        configManager.saveHasStudentDiscount(hasDiscount)
-                        _configState.value = hasDiscount
-                    } else {
-                        _configState.value = false // Mặc định nếu lỗi
-                    }
-                } catch (e: Exception) {
-                    _configState.value = false // Mặc định nếu mất mạng
-                }
-            }
-        }
-    }
 
     fun fetchPolicies() {
         viewModelScope.launch {
@@ -69,11 +36,11 @@ class LoanPolicyViewModel(
         }
     }
 
-    fun savePolicy(policyId: Long?, categoryId: Long?, applyForStudent: Boolean, maxDays: Int) {
+    fun savePolicy(policyId: Long?, categoryId: Long?, maxDays: Int) {
         viewModelScope.launch {
             _state.value = PolicyState.Loading
             try {
-                val req = LoanPolicyRequest(categoryId, applyForStudent, maxDays)
+                val req = LoanPolicyRequest(categoryId, maxDays)
                 val response = if (policyId == null) {
                     repository.createPolicy(req)
                 } else {

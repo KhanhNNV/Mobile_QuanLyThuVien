@@ -30,9 +30,6 @@ import kotlinx.coroutines.launch
 
 class SettingFragment : Fragment(R.layout.fragment_setting) {
 
-    private lateinit var switchStudentDiscount: MaterialSwitch
-    private lateinit var layoutStudentDiscountContainer: LinearLayout
-    private lateinit var edtStudentDiscount: TextInputEditText
     private lateinit var cvManageStaff: MaterialCardView
     private lateinit var cvLoanPolicy: MaterialCardView
     private lateinit var cvCategory: MaterialCardView
@@ -68,9 +65,6 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
     }
 
     private fun initViews(view: View) {
-        switchStudentDiscount = view.findViewById(R.id.switchStudentDiscount)
-        layoutStudentDiscountContainer = view.findViewById(R.id.layoutStudentDiscountContainer)
-        edtStudentDiscount = view.findViewById(R.id.edtStudentDiscount)
         cvManageStaff = view.findViewById(R.id.cvManageStaff)
         cvLoanPolicy = view.findViewById(R.id.cvLoanPolicy)
         cvCategory = view.findViewById(R.id.cvCategory)
@@ -130,33 +124,15 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
     }
 
     private fun bindDataToUI(configs: List<FeeConfigResponse>) {
-        var normalFee = 0.0
-        var studentFee = 0.0
 
         for (config in configs) {
             val amountStr = config.amount.toLong().toString() // Format số nguyên
             when (config.feeType) {
-                TypeFeeConfig.REG_NORMAL -> {
-                    normalFee = config.amount
-                    edtRegistrationFee.setText(amountStr)
-                }
-                TypeFeeConfig.REG_STUDENT -> {
-                    studentFee = config.amount
-                    edtStudentDiscount.setText(amountStr)
-                }
+                TypeFeeConfig.REG_NORMAL -> edtRegistrationFee.setText(amountStr)
                 TypeFeeConfig.LATE_PER_DAY -> edtLateFee.setText(amountStr)
                 TypeFeeConfig.LOST_BOOK -> edtLostFeeExtra.setText(amountStr)
                 TypeFeeConfig.DAMAGE_FEE -> edtDamageFee.setText(amountStr)
             }
-        }
-
-        // Xử lý bật/tắt UI giảm giá sinh viên
-        if (studentFee > 0 && studentFee != normalFee) {
-            switchStudentDiscount.isChecked = true
-            layoutStudentDiscountContainer.visibility = View.VISIBLE
-        } else {
-            switchStudentDiscount.isChecked = false
-            layoutStudentDiscountContainer.visibility = View.GONE
         }
     }
 
@@ -166,36 +142,18 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
         cvLoanPolicy.setOnClickListener { findNavController().navigate(R.id.loanPolicyFragment) }
         cvCategory.setOnClickListener { findNavController().navigate(R.id.categoryListFragment) }
 
-        // Switch Event
-        switchStudentDiscount.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                layoutStudentDiscountContainer.visibility = View.VISIBLE
-            } else {
-                layoutStudentDiscountContainer.visibility = View.GONE
-                edtStudentDiscount.text?.clear()
-            }
-        }
-
         // Accordion (Toggle) Event
         openLayoutFeeHeaderEvent()
 
         // Save Fees Event
         btnSaveFees.setOnClickListener {
             val regNormal = edtRegistrationFee.text.toString().toDoubleOrNull() ?: 0.0
-
-            val regStudent = if (switchStudentDiscount.isChecked) {
-                edtStudentDiscount.text.toString().toDoubleOrNull() ?: regNormal
-            } else {
-                regNormal
-            }
-
             val lateFee = edtLateFee.text.toString().toDoubleOrNull() ?: 0.0
             val lostFee = edtLostFeeExtra.text.toString().toDoubleOrNull() ?: 0.0
             val damageFee = edtDamageFee.text.toString().toDoubleOrNull() ?: 0.0
 
             val updates = mapOf(
                 TypeFeeConfig.REG_NORMAL to regNormal,
-                TypeFeeConfig.REG_STUDENT to regStudent,
                 TypeFeeConfig.LATE_PER_DAY to lateFee,
                 TypeFeeConfig.LOST_BOOK to lostFee,
                 TypeFeeConfig.DAMAGE_FEE to damageFee
