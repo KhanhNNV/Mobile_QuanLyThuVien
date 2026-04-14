@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class BookRequest {
+    private Long libraryId;
     private Long categoryId;
     private String isbn;
     private String title;

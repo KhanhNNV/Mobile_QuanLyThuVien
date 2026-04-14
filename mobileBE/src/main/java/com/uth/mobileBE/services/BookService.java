@@ -76,4 +76,35 @@ public class BookService {
                 .map(title -> "Sách '" + title + "' có số lượng bản khả dụng dưới 2.")
                 .collect(Collectors.toList());
     }
+    public BookResponse createBook(BookRequest request) {
+        Library library = libraryRepository.findById(request.getLibraryId())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy thư viện với ID: " + request.getLibraryId()));
+        Category category = categoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy thể loại với ID: " + request.getCategoryId()));
+        if (bookRepository.existsByIsbnAndLibrary_LibraryId(request.getIsbn(), request.getLibraryId())) {
+            throw new RuntimeException("Mã ISBN này đã tồn tại trong hệ thống!");
+        }
+
+        Book book = Book.builder()
+                .library(library)
+                .category(category)
+                .title(request.getTitle())
+                .author(request.getAuthor())
+                .isbn(request.getIsbn())
+                .basePrice(request.getBasePrice())
+                .build();
+        Book savedBook = bookRepository.save(book);
+
+        return BookResponse.builder()
+                .bookId(savedBook.getBookId())
+                .libraryId(savedBook.getLibrary().getLibraryId())
+                .categoryId(savedBook.getCategory().getCategoryId())
+                .isbn(savedBook.getIsbn())
+                .title(savedBook.getTitle())
+                .author(savedBook.getAuthor())
+                .basePrice(savedBook.getBasePrice())
+                .createdAt(savedBook.getCreatedAt()) // Trả về thời gian tạo
+                .updatedAt(savedBook.getUpdatedAt()) // Trả về thời gian cập nhật
+                .build();
+    }
 }

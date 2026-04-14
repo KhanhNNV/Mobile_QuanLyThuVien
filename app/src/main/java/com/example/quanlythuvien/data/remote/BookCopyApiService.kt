@@ -2,7 +2,6 @@ package com.example.quanlythuvien.data.remote
 
 import com.example.quanlythuvien.data.model.request.BookCopyRequest
 import com.example.quanlythuvien.data.model.response.BookCopyResponse
-import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -18,5 +17,5 @@ interface BookCopyApiService {
     suspend fun getBookCopiesByBook(@Path("bookId") bookId: Long): Response<List<BookCopyResponse>>
 
     @DELETE("api/book-copies/{copyId}")
-    suspend fun deleteBookCopy(@Path("copyId") copyId: Long): Response<ResponseBody>
+    suspend fun deleteBookCopy(@Path("copyId") copyId: Long): Response<String>
 }

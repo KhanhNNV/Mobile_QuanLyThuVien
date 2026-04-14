@@ -8,19 +8,6 @@ import com.example.quanlythuvien.data.remote.BookApiService
 class BookRepository(private val apiService: BookApiService) {
     suspend fun createInitialBook(request: InitialBookRequest) = apiService.createInitialBook(request)
 
-    suspend fun getCurrentLibraryId(): Result<Long> {
-        return try {
-            val response = apiService.getCurrentLibraryId()
-            if (response.isSuccessful && response.body() != null) {
-                Result.success(response.body()!!)
-            } else {
-                Result.failure(Exception(response.errorBody()?.string().orEmpty().ifBlank { "Không thể tải ID thư viện hiện tại." }))
-            }
-        } catch (exception: Exception) {
-            Result.failure(exception)
-        }
-    }
-
     suspend fun countBooksByLibrary() = apiService.countBooksByLibrary()
 
     suspend fun getLowCopyAlerts() = apiService.getLowCopyAlerts()
@@ -71,14 +58,10 @@ class BookRepository(private val apiService: BookApiService) {
             return "Không thể tải danh sách sách. Vui lòng thử lại."
         }
         return when {
-            rawError.contains("404", ignoreCase = true) || rawError.contains("Not Found", ignoreCase = true) ->
-                "Không tìm thấy API danh sách sách. Vui lòng kiểm tra backend."
             rawError.contains("Method Not Allowed", ignoreCase = true) ->
                 "API danh sách sách chưa được cấu hình đúng phương thức GET."
             rawError.contains("Bad Request", ignoreCase = true) ->
                 "Yêu cầu chưa hợp lệ. Vui lòng thử lại."
-            rawError.contains("<html", ignoreCase = true) || rawError.contains("<!doctype", ignoreCase = true) ->
-                "Backend đang trả về trang lỗi thay vì JSON hợp lệ."
             else -> "Không thể tải danh sách sách. Vui lòng thử lại."
         }
     }

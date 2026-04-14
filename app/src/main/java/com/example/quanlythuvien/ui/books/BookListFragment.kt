@@ -1,4 +1,4 @@
-package com.example.quanlythuvien.ui.books
+﻿package com.example.quanlythuvien.ui.books
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -141,11 +141,7 @@ class BookListFragment : Fragment() {
                             BookListUiState.Idle -> {
                                 hasLoadError = false
                             }
-                            BookListUiState.Loading -> {
-                                hasLoadError = false
-                                layoutEmptyState.visibility = View.GONE
-                                recyclerView.visibility = View.VISIBLE
-                            }
+                            BookListUiState.Loading -> Unit
                             is BookListUiState.Success -> {
                                 hasLoadError = false
                             }
@@ -500,9 +496,16 @@ class BookListFragment : Fragment() {
                     Toast.makeText(context, "Không tìm thấy danh mục hợp lệ để cập nhật.", Toast.LENGTH_SHORT).show()
                     return@setPositiveButton
                 }
+                val libraryId = book.libraryId
+                if (libraryId == null) {
+                    Toast.makeText(context, "Không tìm thấy thông tin thư viện của sách.", Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+
                 isUpdatingBook = true
                 viewModel.updateBook(
                     bookId = book.bookId,
+                    libraryId = libraryId,
                     categoryId = categoryId,
                     isbn = isbn,
                     title = title,
