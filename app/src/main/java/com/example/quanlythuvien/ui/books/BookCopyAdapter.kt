@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quanlythuvien.R
 
@@ -13,6 +14,23 @@ class BookCopyAdapter(
     private val allowDelete: Boolean,
     private val onDeleteClick: (BookCopyItem, Int) -> Unit
 ) : RecyclerView.Adapter<BookCopyAdapter.CopyViewHolder>() {
+
+    private fun displayStatus(rawStatus: String): String = when (rawStatus.uppercase()) {
+        "AVAILABLE" -> "Có sẵn"
+        "BORROWED" -> "Đang mượn"
+        "LOST" -> "Đã mất"
+        "DAMAGED" -> "Hư hỏng"
+        else -> rawStatus
+    }
+
+    private fun statusColor(holder: CopyViewHolder, rawStatus: String, fallbackColor: Int): Int {
+        return when (rawStatus.uppercase()) {
+            "AVAILABLE", "CÓ SẴN" -> ContextCompat.getColor(holder.itemView.context, R.color.green)
+            "BORROWED", "ĐANG MƯỢN" -> ContextCompat.getColor(holder.itemView.context, R.color.yellow)
+            "LOST", "ĐÃ MẤT", "DAMAGED", "HƯ HỎNG" -> ContextCompat.getColor(holder.itemView.context, R.color.red)
+            else -> fallbackColor
+        }
+    }
 
     class CopyViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tvCopyId: TextView = view.findViewById(R.id.tvCopyId)
@@ -28,8 +46,8 @@ class BookCopyAdapter(
     override fun onBindViewHolder(holder: CopyViewHolder, position: Int) {
         val item = copyList[position]
         holder.tvCopyId.text = item.copyId
-        holder.tvCopyStatus.text = item.statusText
-        holder.tvCopyStatus.setTextColor(item.statusColor)
+        holder.tvCopyStatus.text = displayStatus(item.statusText)
+        holder.tvCopyStatus.setTextColor(statusColor(holder, item.statusText, item.statusColor))
 
         if (allowDelete) {
             holder.ivDeleteCopy.visibility = View.VISIBLE

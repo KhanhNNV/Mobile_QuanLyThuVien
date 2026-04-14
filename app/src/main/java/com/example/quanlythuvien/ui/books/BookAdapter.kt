@@ -24,9 +24,13 @@ class BookAdapter(private val bookList: MutableList<Book>) : RecyclerView.Adapte
         val available = book.availableQuantity.coerceAtLeast(0)
         val total = book.totalQuantity.coerceAtLeast(0)
         val lost = book.lostQuantity.coerceAtLeast(0)
+        val borrowed = (total - available - lost).coerceAtLeast(0)
 
-        val base = "Có sẵn $available / $total"
-        return if (lost > 0) "$base • Mất $lost" else base
+        return buildString {
+            append("Có sẵn $available")
+            append(" • Mượn $borrowed")
+            if (lost > 0) append(" • Mất $lost")
+        }
     }
 
     class BookViewHolder(view: View) : RecyclerView.ViewHolder(view) {
