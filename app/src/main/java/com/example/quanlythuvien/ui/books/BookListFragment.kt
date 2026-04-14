@@ -1,10 +1,11 @@
-package com.example.quanlythuvien.ui.books
+﻿package com.example.quanlythuvien.ui.books
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.AdapterView
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
@@ -13,20 +14,35 @@ import android.widget.RadioGroup
 import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quanlythuvien.R
-import com.example.quanlythuvien.data2.entity.Book
-import com.google.android.material.textfield.TextInputEditText
-import androidx.core.content.ContextCompat
+import com.example.quanlythuvien.core.api.RetrofitClient
+import com.example.quanlythuvien.data.remote.BookApiService
+import com.example.quanlythuvien.data.remote.BookCopyApiService
+import com.example.quanlythuvien.data.remote.CategoryApiService
+import com.example.quanlythuvien.data.repository.BookCopyRepository
+import com.example.quanlythuvien.data.repository.BookRepository
+import com.example.quanlythuvien.data.repository.CategoryRepository
 import com.example.quanlythuvien.utils.BookWarehousePermissions
+import com.example.quanlythuvien.utils.GenericViewModelFactory
+import com.example.quanlythuvien.utils.TokenManager
 import com.example.quanlythuvien.utils.setupCustomHeader
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.textfield.TextInputEditText
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 class BookListFragment : Fragment() {
-
     private lateinit var recyclerView: RecyclerView
     private lateinit var bookAdapter: BookAdapter
     private lateinit var spinnerCategory: Spinner
@@ -34,20 +50,49 @@ class BookListFragment : Fragment() {
     private lateinit var rgStatusFilter: RadioGroup
     private lateinit var btnResetFilter: Button
     private lateinit var btnApplyFilter: Button
-    private lateinit var allBooks: MutableList<Book>
-
     private lateinit var btnToggleFilter: ImageView
     private lateinit var llFilterContainer: LinearLayout
+    private lateinit var layoutEmptyState: LinearLayout
+    private lateinit var tvEmptyState: TextView
+    private lateinit var btnRetryLoadBooks: MaterialButton
+    private lateinit var fabAddBook: FloatingActionButton
+    private lateinit var viewModel: BookListViewModel
     private var isFilterExpanded = false
-    private lateinit var fabAddBook : com.google.android.material.floatingactionbutton.FloatingActionButton
+    private var categoryOptions: List<Pair<Long?, String>> = listOf(null to "Tat ca danh muc")
+    private var selectedCategoryId: Long? = null
+    private var hasLoadError = false
+    private var isUpdatingBook = false
+    private var currentDialog: android.app.Dialog? = null
+    private var currentDialogBookId: Long? = null
+    private var currentStatusText: TextView? = null
+    private var currentCopyAdapter: BookCopyAdapter? = null
+    private val deletingCopyIds = mutableSetOf<Long>()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_book_list, container, false)
-    }
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View = inflater.inflate(R.layout.fragment_book_list, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        initViews(view)
+        applyWarehouseUiPermissions(view)
+        setupRecyclerView()
+        setupViewModel()
+        setupFilterToggle()
+        setupCategorySpinner(categoryOptions)
+        setupFilterActions()
+        observeViewModel()
+        viewModel.loadData()
+    }
 
+    override fun onResume() {
+        super.onResume()
+        view?.let { applyWarehouseUiPermissions(it) }
+    }
+
+    private fun initViews(view: View) {
         recyclerView = view.findViewById(R.id.recyclerViewBooks)
         btnToggleFilter = view.findViewById(R.id.btnToggleFilter)
         llFilterContainer = view.findViewById(R.id.llFilterContainer)
@@ -56,114 +101,266 @@ class BookListFragment : Fragment() {
         rgStatusFilter = view.findViewById(R.id.rgStatusFilter)
         btnResetFilter = view.findViewById(R.id.btnResetFilter)
         btnApplyFilter = view.findViewById(R.id.btnApplyFilter)
+        layoutEmptyState = view.findViewById(R.id.layoutEmptyState)
+        tvEmptyState = view.findViewById(R.id.tvEmptyState)
+        btnRetryLoadBooks = view.findViewById(R.id.btnRetryLoadBooks)
         fabAddBook = view.findViewById(R.id.fabAddBook)
-        applyWarehouseUiPermissions(view)
-
-        fabAddBook.setOnClickListener {
-            if (!BookWarehousePermissions.canCreateOrUpdateCatalog(requireContext())) {
-                Toast.makeText(requireContext(), "Bạn không có quyền thêm sách vào kho.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-            findNavController().navigate(R.id.bookAddFragment)
+        btnRetryLoadBooks.setOnClickListener {
+            viewModel.loadData()
         }
+    }
 
+    private fun setupRecyclerView() {
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        allBooks = createDummyData().toMutableList()
-        bookAdapter = BookAdapter(allBooks.toMutableList())
-
+        bookAdapter = BookAdapter()
         bookAdapter.onItemClick = { selectedBook ->
-            showBookDetailDialog(selectedBook)
+            viewModel.loadBookDetail(selectedBook.bookId)
         }
-
         recyclerView.adapter = bookAdapter
-        setupFilterToggle()
-        setupCategorySpinner()
-        setupFilterActions()
     }
 
-    override fun onResume() {
-        super.onResume()
-        view?.let { applyWarehouseUiPermissions(it) }
+    private fun setupViewModel() {
+        val retrofit = RetrofitClient.getInstance(requireContext())
+        val bookApiService = retrofit.create(BookApiService::class.java)
+        val bookCopyApiService = retrofit.create(BookCopyApiService::class.java)
+        val categoryApiService = retrofit.create(CategoryApiService::class.java)
+        val repository = BookRepository(bookApiService)
+        val bookCopyRepository = BookCopyRepository(bookCopyApiService)
+        val categoryRepository = CategoryRepository(categoryApiService)
+        val libraryId = TokenManager(requireContext()).getLibraryId()
+        if (libraryId == null) {
+            Toast.makeText(requireContext(), "Không tìm thấy thông tin thư viện.", Toast.LENGTH_LONG).show()
+            findNavController().popBackStack()
+            return
+        }
+        val factory = GenericViewModelFactory {
+            BookListViewModel(repository, categoryRepository, bookCopyRepository, libraryId)
+        }
+        viewModel = ViewModelProvider(this, factory)[BookListViewModel::class.java]
     }
 
-    private fun warehouseHeaderSubtitle(): String = when {
-        BookWarehousePermissions.canManageCatalog(requireContext()) ->
-            "Quản lý và cập nhật sách"
-        BookWarehousePermissions.canCreateOrUpdateCatalog(requireContext()) ->
-            "Nhân viên: thêm & sửa kho (không xóa bản sao)"
-        else ->
-            "Xem kho — cần đăng nhập nhân viên hoặc thủ thư"
-    }
-
-    /** FAB + subtitle theo quyền */
-    private fun applyWarehouseUiPermissions(headerRoot: View) {
-        val canCrud = BookWarehousePermissions.canCreateOrUpdateCatalog(requireContext())
-        fabAddBook.visibility = if (canCrud) View.VISIBLE else View.GONE
-        setupCustomHeader(headerRoot, "Kho Sách", warehouseHeaderSubtitle())
+    private fun observeViewModel() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.bookListState.collectLatest { state ->
+                        when (state) {
+                            BookListUiState.Idle -> {
+                                hasLoadError = false
+                            }
+                            BookListUiState.Loading -> Unit
+                            is BookListUiState.Success -> {
+                                hasLoadError = false
+                            }
+                            is BookListUiState.Error -> {
+                                hasLoadError = true
+                                tvEmptyState.text = state.message
+                                btnRetryLoadBooks.visibility = View.VISIBLE
+                                layoutEmptyState.visibility = View.VISIBLE
+                                recyclerView.visibility = View.GONE
+                            }
+                        }
+                    }
+                }
+                launch {
+                    viewModel.bookDetailState.collectLatest { state ->
+                        when (state) {
+                            BookDetailUiState.Idle -> Unit
+                            BookDetailUiState.Loading -> Unit
+                            is BookDetailUiState.Success -> {
+                                if (isUpdatingBook) {
+                                    isUpdatingBook = false
+                                    Toast.makeText(requireContext(), "Cập nhật sách thành công.", Toast.LENGTH_SHORT).show()
+                                } else {
+                                    showBookDetailDialog(state.book)
+                                }
+                            }
+                            is BookDetailUiState.Error -> {
+                                isUpdatingBook = false
+                                Toast.makeText(requireContext(), state.message, Toast.LENGTH_LONG).show()
+                            }
+                        }
+                    }
+                }
+                launch {
+                    viewModel.bookCopyState.collectLatest { state ->
+                        when (state) {
+                            BookCopyUiState.Idle -> Unit
+                            BookCopyUiState.Loading -> Unit
+                            is BookCopyUiState.Success -> {
+                                if (currentDialogBookId != state.bookId) return@collectLatest
+                                deletingCopyIds.clear()
+                                val copies = state.copies
+                                val availableCount = copies.count { it.status.equals("AVAILABLE", ignoreCase = true) }
+                                currentStatusText?.text = "Tổng quan: Còn $availableCount cuốn"
+                                val items = copies.map {
+                                    BookCopyItem(
+                                        copyIdValue = it.copyId,
+                                        copyId = "Mã cuốn: ${it.barcode}",
+                                        statusText = it.status,
+                                        statusColor = resources.getColor(R.color.text_secondary, null)
+                                    )
+                                }.toMutableList()
+                                val allowDeleteCopy = BookWarehousePermissions
+                                    .canDeleteBookCopiesInWarehouseUi(requireContext())
+                                currentCopyAdapter = BookCopyAdapter(
+                                    copyList = items,
+                                    allowDelete = allowDeleteCopy
+                                ) { item, position ->
+                                    if (!allowDeleteCopy) return@BookCopyAdapter
+                                    if (deletingCopyIds.contains(item.copyIdValue)) return@BookCopyAdapter
+                                    MaterialAlertDialogBuilder(requireContext())
+                                        .setTitle("Xóa bản sao")
+                                        .setMessage("Bạn chắc chắn muốn xóa ${item.copyId}?")
+                                        .setNegativeButton("Hủy", null)
+                                        .setPositiveButton("Xóa") { _, _ ->
+                                            deletingCopyIds.add(item.copyIdValue)
+                                            currentCopyAdapter?.removeAt(position)
+                                            viewModel.deleteBookCopy(item.copyIdValue, state.bookId)
+                                        }
+                                        .show()
+                                }
+                                val recycler = currentDialog?.findViewById<RecyclerView>(R.id.rvBookCopies)
+                                recycler?.adapter = currentCopyAdapter
+                            }
+                            is BookCopyUiState.Error -> {
+                                deletingCopyIds.clear()
+                                if (currentDialog?.isShowing == true) {
+                                    if (state.message.contains("Không tìm thấy bản sao", ignoreCase = true)) {
+                                        currentDialogBookId?.let { viewModel.loadBookCopies(it) }
+                                    } else {
+                                        Toast.makeText(requireContext(), state.message, Toast.LENGTH_LONG).show()
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                launch {
+                    viewModel.filteredBooks.collectLatest { books ->
+                        bookAdapter.setItems(books)
+                        if (hasLoadError) {
+                            return@collectLatest
+                        }
+                        if (books.isEmpty()) {
+                            tvEmptyState.text = "Không có sách phù hợp"
+                            btnRetryLoadBooks.visibility = View.GONE
+                            layoutEmptyState.visibility = View.VISIBLE
+                            recyclerView.visibility = View.GONE
+                        } else {
+                            btnRetryLoadBooks.visibility = View.GONE
+                            layoutEmptyState.visibility = View.GONE
+                            recyclerView.visibility = View.VISIBLE
+                        }
+                    }
+                }
+                launch {
+                    viewModel.categories.collectLatest { categories ->
+                        categoryOptions = buildList {
+                            add(null to "Tất cả danh mục")
+                            categories.forEach { category ->
+                                add(category.categoryId to category.name)
+                            }
+                        }
+                        setupCategorySpinner(categoryOptions)
+                    }
+                }
+            }
+        }
     }
 
     private fun setupFilterActions() {
         btnApplyFilter.setOnClickListener {
-            applyFilters()
+            viewModel.applyFilters(
+                query = etSearch.text?.toString().orEmpty(),
+                categoryId = selectedCategoryId
+            )
         }
 
         btnResetFilter.setOnClickListener {
             etSearch.text?.clear()
             rgStatusFilter.check(R.id.rbAll)
             spinnerCategory.setSelection(0)
-            bookAdapter.setItems(allBooks)
+            selectedCategoryId = null
+            viewModel.resetFilters()
         }
 
-        // Enter/ActionSearch cũng áp dụng lọc
         etSearch.setOnEditorActionListener { _, _, _ ->
-            applyFilters()
+            viewModel.applyFilters(
+                query = etSearch.text?.toString().orEmpty(),
+                categoryId = selectedCategoryId
+            )
             true
         }
     }
 
-    private fun applyFilters() {
-        val query = etSearch.text?.toString()?.trim().orEmpty().lowercase()
-
-        val selectedCategoryId = when (spinnerCategory.selectedItemPosition) {
-            1 -> 1 // CNTT
-            2 -> 2 // Tâm lý
-            3 -> 3 // Tiểu thuyết
-            4 -> 4 // Lịch sử
-            else -> null // Tất cả
-        }
-
-        val filtered = allBooks.filter { book ->
-            val matchesQuery =
-                query.isEmpty() ||
-                    book.title.lowercase().contains(query) ||
-                    book.author.lowercase().contains(query) ||
-                    book.isbnCode.lowercase().contains(query)
-
-            val matchesCategory =
-                selectedCategoryId == null || book.categoryId == selectedCategoryId
-
-            val matchesStatus = when (rgStatusFilter.checkedRadioButtonId) {
-                R.id.rbAvailable -> book.availableQuantity > 0
-                R.id.rbBorrowed -> (book.totalQuantity - book.availableQuantity - book.lostQuantity) > 0
-                R.id.rbLost -> book.lostQuantity > 0
-                else -> true // rbAll
+    private fun setupCategorySpinner(options: List<Pair<Long?, String>>) {
+        val labels = options.map { it.second }
+        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, labels)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinnerCategory.adapter = adapter
+        spinnerCategory.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                selectedCategoryId = options.getOrNull(position)?.first
+                viewModel.applyFilters(
+                    query = etSearch.text?.toString().orEmpty(),
+                    categoryId = selectedCategoryId
+                )
             }
 
-            matchesQuery && matchesCategory && matchesStatus
-        }
-
-        bookAdapter.setItems(filtered)
-
-        if (filtered.isEmpty()) {
-            Toast.makeText(requireContext(), "Không tìm thấy sách phù hợp!", Toast.LENGTH_SHORT).show()
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                selectedCategoryId = null
+            }
         }
     }
 
-    private fun showBookDetailDialog(book: Book) {
-        val dialog = android.app.Dialog(requireContext())
-        dialog.setContentView(R.layout.dialog_book_detail)
+    private fun setupFilterToggle() {
+        btnToggleFilter.setOnClickListener {
+            isFilterExpanded = !isFilterExpanded
+            if (isFilterExpanded) {
+                llFilterContainer.visibility = View.VISIBLE
+                btnToggleFilter.backgroundTintList =
+                    ContextCompat.getColorStateList(requireContext(), R.color.btn_primary)
+                btnToggleFilter.imageTintList =
+                    ContextCompat.getColorStateList(requireContext(), R.color.white)
+            } else {
+                llFilterContainer.visibility = View.GONE
+                btnToggleFilter.backgroundTintList = null
+                btnToggleFilter.imageTintList =
+                    ContextCompat.getColorStateList(requireContext(), R.color.btn_primary)
+            }
+        }
+    }
 
-        dialog.window?.setBackgroundDrawable(android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT))
+    private fun warehouseHeaderSubtitle(): String = when {
+        BookWarehousePermissions.canManageCatalog(requireContext()) -> "Quản lý và cập nhật sách"
+        BookWarehousePermissions.canCreateOrUpdateCatalog(requireContext()) ->
+            "Nhân viên: thêm và sửa kho (không xóa bản sao)"
+        else -> "Xem kho - cần đăng nhập nhân viên hoặc thủ thư"
+    }
+
+    private fun applyWarehouseUiPermissions(headerRoot: View) {
+        val canCrud = BookWarehousePermissions.canCreateOrUpdateCatalog(requireContext())
+        fabAddBook.visibility = if (canCrud) View.VISIBLE else View.GONE
+        fabAddBook.setOnClickListener {
+            if (!canCrud) {
+                Toast.makeText(requireContext(), "Bạn không có quyền thêm sách vào kho.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            findNavController().navigate(R.id.bookAddFragment)
+        }
+        setupCustomHeader(headerRoot, "Kho Sách", warehouseHeaderSubtitle())
+    }
+
+    private fun showBookDetailDialog(book: com.example.quanlythuvien.data.model.response.BookResponse) {
+        currentDialog?.dismiss()
+        val dialog = android.app.Dialog(requireContext())
+        currentDialog = dialog
+        currentDialogBookId = book.bookId
+        dialog.setContentView(R.layout.dialog_book_detail)
+        dialog.window?.setBackgroundDrawable(
+            android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT)
+        )
         dialog.window?.setLayout(
             android.view.ViewGroup.LayoutParams.MATCH_PARENT,
             android.view.ViewGroup.LayoutParams.WRAP_CONTENT
@@ -177,121 +374,110 @@ class BookListFragment : Fragment() {
         val rvBookCopies = dialog.findViewById<RecyclerView>(R.id.rvBookCopies)
         val btnClose = dialog.findViewById<Button>(R.id.btnCloseDialog)
         val btnEdit = dialog.findViewById<Button>(R.id.btnEditBook)
-
-        // 1. ÁNH XẠ NÚT THÊM BẢN SAO TỪ UI
         val btnAddCopy = dialog.findViewById<Button>(R.id.btnAddCopy)
+
+        val categoryText = book.categoryName ?: viewModel.categoryNameById(book.categoryId) ?: "Chưa cập nhật"
+        val priceText = book.basePrice?.let { "${it.toInt()} VND" } ?: "Chưa có"
+        tvTitle.text = book.title
+        tvAuthor.text = "Tác giả: ${book.author}"
+        tvCategory.text = "Thể loại: $categoryText"
+        tvBasePrice.text = "Giá gốc: $priceText"
+        tvStatus.text = "Tổng quan: Đang tải bản sao..."
+        tvStatus.setTextColor(resources.getColor(R.color.text_secondary, null))
+        currentStatusText = tvStatus
+
         val canCrudWarehouse = BookWarehousePermissions.canCreateOrUpdateCatalog(requireContext())
-        btnEdit?.visibility = if (canCrudWarehouse) View.VISIBLE else View.GONE
-        btnAddCopy?.visibility = if (canCrudWarehouse) View.VISIBLE else View.GONE
-
-        val categoryName = when (book.categoryId) {
-            1 -> "Công nghệ thông tin (CNTT)"
-            2 -> "Tâm lý"
-            3 -> "Tiểu thuyết"
-            4 -> "Lịch sử"
-            else -> "Danh mục khác"
+        btnAddCopy.visibility = if (canCrudWarehouse) View.VISIBLE else View.GONE
+        btnAddCopy.setOnClickListener {
+            if (!canCrudWarehouse) return@setOnClickListener
+            showAddCopyDialog(book.bookId, book.title)
         }
+        rvBookCopies.layoutManager = LinearLayoutManager(requireContext())
+        val placeholderCopies = mutableListOf<BookCopyItem>()
+        rvBookCopies.adapter = BookCopyAdapter(
+            copyList = placeholderCopies,
+            allowDelete = false
+        ) { _, _ -> }
 
-        tvTitle?.text = book.title
-        tvAuthor?.text = "Tác giả: ${book.author}"
-        tvCategory?.text = "Thể loại: $categoryName"
-        tvBasePrice?.text = "Giá gốc: ${book.basePrice.toInt()} VND"
-
-        val availableCount = book.availableQuantity.coerceAtLeast(0)
-        val lostCount = book.lostQuantity.coerceAtLeast(0)
-        val borrowedCount = (book.totalQuantity - availableCount - lostCount).coerceAtLeast(0)
-        tvStatus?.text = "Tổng quan: Có sẵn $availableCount • Đang mượn $borrowedCount • Đã mất $lostCount"
-        tvStatus?.setTextColor(
-            resources.getColor(
-                if (availableCount > 0) R.color.green else R.color.red,
-                null
-            )
-        )
-
-        rvBookCopies?.layoutManager = LinearLayoutManager(requireContext())
-        val copyList = mutableListOf<BookCopyItem>()
-        val maxLost = lostCount.coerceAtMost(book.totalQuantity)
-        val maxAvailable = availableCount.coerceAtMost((book.totalQuantity - maxLost).coerceAtLeast(0))
-        val maxBorrowed = (book.totalQuantity - maxAvailable - maxLost).coerceAtLeast(0)
-
-        for (i in 1..book.totalQuantity) {
-            val statusText: String
-            val statusColor: Int
-            if (i <= maxAvailable) {
-                statusText = "Có sẵn"
-                statusColor = resources.getColor(R.color.green, null)
-            } else if (i <= maxAvailable + maxBorrowed) {
-                statusText = "Đang mượn"
-                statusColor = resources.getColor(R.color.yellow, null)
-            } else {
-                statusText = "Đã mất"
-                statusColor = resources.getColor(R.color.red, null)
-            }
-            copyList.add(BookCopyItem("Mã cuốn: B${book.bookId}-$i", statusText, statusColor))
+        btnClose.setOnClickListener { dialog.dismiss() }
+        btnEdit.setOnClickListener {
+            dialog.dismiss()
+            showEditBookDialog(book)
         }
-        lateinit var copyAdapter: BookCopyAdapter
-        val allowDeleteCopy = BookWarehousePermissions.canDeleteBookCopiesInWarehouseUi(requireContext())
-        copyAdapter = BookCopyAdapter(copyList, allowDelete = allowDeleteCopy) { item, position ->
-            // Validation: đang mượn thì không cho xóa
-            if (item.statusText == "Đang mượn") {
-                Toast.makeText(requireContext(), "Bản sao đang mượn — không thể xóa!", Toast.LENGTH_SHORT).show()
-                return@BookCopyAdapter
-            }
-
-            androidx.appcompat.app.AlertDialog.Builder(requireContext())
-                .setTitle("Xóa bản sao")
-                .setMessage("Bạn chắc chắn muốn xóa ${item.copyId}?")
-                .setNegativeButton("Hủy", null)
-                .setPositiveButton("Xóa") { _, _ ->
-                    copyAdapter.removeAt(position)
-                }
-                .show()
-        }
-        rvBookCopies?.adapter = copyAdapter
-
-        btnClose?.setOnClickListener { dialog.dismiss() }
-
-        btnEdit?.setOnClickListener {
-            showEditBookDialog(book) {
-                // refresh theo bộ lọc hiện tại
-                applyFilters()
+        dialog.setOnDismissListener {
+            if (currentDialog === dialog) {
+                currentDialog = null
+                currentDialogBookId = null
+                currentStatusText = null
+                currentCopyAdapter = null
             }
         }
-
-        // 2. SỰ KIỆN CLICK MỞ DIALOG THÊM BẢN SAO
-        btnAddCopy?.setOnClickListener {
-            showAddCopyDialog(book)
-        }
-
         dialog.show()
+        viewModel.loadBookCopies(book.bookId)
     }
 
-    private fun showEditBookDialog(book: Book, onUpdated: () -> Unit) {
-        if (!BookWarehousePermissions.canCreateOrUpdateCatalog(requireContext())) return
-        val context = requireContext()
+    private fun showAddCopyDialog(bookId: Long, bookTitle: String) {
+        val addDialog = android.app.Dialog(requireContext())
+        addDialog.setContentView(R.layout.dialog_add_book_copy)
+        addDialog.window?.setBackgroundDrawable(
+            android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT)
+        )
+        addDialog.window?.setLayout(
+            android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+            android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+        )
 
+        val tvInfo = addDialog.findViewById<TextView>(R.id.tvAddCopyBookInfo)
+        val edtBarcode = addDialog.findViewById<TextInputEditText>(R.id.edtBarcode)
+        val spinnerCondition = addDialog.findViewById<Spinner>(R.id.spinnerCondition)
+        val btnCancel = addDialog.findViewById<Button>(R.id.btnCancelAddCopy)
+        val btnSave = addDialog.findViewById<Button>(R.id.btnSaveCopy)
+        tvInfo.text = "Sách: $bookTitle (ID: $bookId)"
+
+        val conditions = listOf("NEW", "GOOD", "FAIR", "POOR")
+        val spinnerAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, conditions)
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinnerCondition.adapter = spinnerAdapter
+
+        btnCancel.setOnClickListener { addDialog.dismiss() }
+        btnSave.setOnClickListener {
+            val barcode = edtBarcode.text?.toString()?.trim().orEmpty()
+            val condition = spinnerCondition.selectedItem?.toString().orEmpty()
+            if (barcode.isEmpty()) {
+                Toast.makeText(requireContext(), "Vui lòng nhập Barcode!", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            viewModel.createBookCopy(bookId = bookId, barcode = barcode, condition = condition)
+            addDialog.dismiss()
+        }
+        addDialog.show()
+    }
+
+    private fun showEditBookDialog(book: com.example.quanlythuvien.data.model.response.BookResponse) {
+        val context = requireContext()
         val container = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
             val pad = (16 * resources.displayMetrics.density).toInt()
             setPadding(pad, pad, pad, 0)
         }
 
-        fun input(hint: String, value: String, inputType: Int): EditText {
-            return EditText(context).apply {
-                this.hint = hint
-                setText(value)
-                this.inputType = inputType
-            }
+        val edtTitle = EditText(context).apply {
+            hint = "Tên sách"
+            setText(book.title)
         }
-
-        val edtTitle = input("Tên sách", book.title, android.text.InputType.TYPE_CLASS_TEXT)
-        val edtAuthor = input("Tác giả", book.author, android.text.InputType.TYPE_CLASS_TEXT)
-        val edtIsbn = input("ISBN", book.isbnCode, android.text.InputType.TYPE_CLASS_TEXT)
-        val edtBasePrice = input(
-            "Giá gốc (VND)",
-            book.basePrice.toInt().toString(),
-            android.text.InputType.TYPE_CLASS_NUMBER
-        )
+        val edtAuthor = EditText(context).apply {
+            hint = "Tác giả"
+            setText(book.author)
+        }
+        val edtIsbn = EditText(context).apply {
+            hint = "ISBN"
+            setText(book.isbn)
+        }
+        val edtBasePrice = EditText(context).apply {
+            hint = "Giá gốc"
+            inputType = android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL
+            setText((book.basePrice ?: 0.0).toString())
+        }
 
         container.addView(edtTitle)
         container.addView(edtAuthor)
@@ -303,116 +489,31 @@ class BookListFragment : Fragment() {
             .setView(container)
             .setNegativeButton("Hủy", null)
             .setPositiveButton("Lưu") { _, _ ->
-                val newTitle = edtTitle.text.toString().trim()
-                val newAuthor = edtAuthor.text.toString().trim()
-                val newIsbn = edtIsbn.text.toString().trim()
-                val newBasePrice = edtBasePrice.text.toString().trim().toDoubleOrNull()
-
-                if (newTitle.isEmpty() || newAuthor.isEmpty() || newIsbn.isEmpty() || newBasePrice == null) {
-                    Toast.makeText(context, "Vui lòng nhập đầy đủ thông tin!", Toast.LENGTH_SHORT).show()
+                val title = edtTitle.text.toString().trim()
+                val author = edtAuthor.text.toString().trim()
+                val isbn = edtIsbn.text.toString().trim()
+                val basePrice = edtBasePrice.text.toString().trim().toDoubleOrNull()
+                if (title.isEmpty() || author.isEmpty() || isbn.isEmpty() || basePrice == null) {
+                    Toast.makeText(context, "Vui lòng nhập đầy đủ thông tin hợp lệ.", Toast.LENGTH_SHORT).show()
                     return@setPositiveButton
                 }
 
-                val idx = allBooks.indexOfFirst { it.bookId == book.bookId }
-                if (idx >= 0) {
-                    allBooks[idx] = allBooks[idx].copy(
-                        title = newTitle,
-                        author = newAuthor,
-                        isbnCode = newIsbn,
-                        basePrice = newBasePrice
-                    )
-                    onUpdated()
+                val categoryId = book.categoryId ?: categoryOptions.firstOrNull { it.first != null }?.first
+                if (categoryId == null) {
+                    Toast.makeText(context, "Không tìm thấy danh mục hợp lệ để cập nhật.", Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
                 }
+
+                isUpdatingBook = true
+                viewModel.updateBook(
+                    bookId = book.bookId,
+                    categoryId = categoryId,
+                    isbn = isbn,
+                    title = title,
+                    author = author,
+                    basePrice = basePrice
+                )
             }
             .show()
-    }
-
-    // 3. HÀM XỬ LÝ DIALOG THÊM BẢN SAO (FORM NHẬP LIỆU)
-    private fun showAddCopyDialog(parentBook: Book) {
-        if (!BookWarehousePermissions.canCreateOrUpdateCatalog(requireContext())) return
-        val addDialog = android.app.Dialog(requireContext())
-        addDialog.setContentView(R.layout.dialog_add_book_copy)
-
-        addDialog.window?.setBackgroundDrawable(android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT))
-        addDialog.window?.setLayout(
-            android.view.ViewGroup.LayoutParams.MATCH_PARENT,
-            android.view.ViewGroup.LayoutParams.WRAP_CONTENT
-        )
-
-        val tvInfo = addDialog.findViewById<TextView>(R.id.tvAddCopyBookInfo)
-        val edtBarcode = addDialog.findViewById<TextInputEditText>(R.id.edtBarcode)
-        val spinnerCondition = addDialog.findViewById<Spinner>(R.id.spinnerCondition)
-        val btnCancel = addDialog.findViewById<Button>(R.id.btnCancelAddCopy)
-        val btnSave = addDialog.findViewById<Button>(R.id.btnSaveCopy)
-
-        // Set Book ID tự động từ cuốn sách cha
-        tvInfo.text = "Sách: ${parentBook.title} (ID: ${parentBook.bookId})"
-
-        // Khởi tạo danh sách tình trạng cho Spinner (Dropdown)
-        val conditions = listOf("NEW", "GOOD", "FAIR", "POOR")
-        val spinnerAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, conditions)
-        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinnerCondition.adapter = spinnerAdapter
-
-        // Hủy bỏ thêm
-        btnCancel.setOnClickListener {
-            addDialog.dismiss()
-        }
-
-        // Nhấn Lưu
-        btnSave.setOnClickListener {
-            val barcode = edtBarcode.text.toString().trim()
-            val condition = spinnerCondition.selectedItem.toString()
-            val status = "AVAILABLE" // Mặc định ở background
-
-            if (barcode.isEmpty()) {
-                Toast.makeText(requireContext(), "Vui lòng nhập Barcode!", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            // Ghi nhận thành công (Sau này bạn ghép lệnh gọi ViewModel/Room Database vào đây)
-            Toast.makeText(requireContext(), "Nhập kho thành công!\nBarcode: $barcode\nTình trạng: $condition", Toast.LENGTH_LONG).show()
-            addDialog.dismiss()
-        }
-
-        addDialog.show()
-    }
-
-    private fun setupCategorySpinner() {
-        val categories = listOf("Tất cả danh mục", "CNTT", "Tâm lý", "Tiểu thuyết", "Lịch sử")
-        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, categories)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinnerCategory.adapter = adapter
-    }
-
-    private fun setupFilterToggle() {
-        btnToggleFilter.setOnClickListener {
-            isFilterExpanded = !isFilterExpanded
-            if (isFilterExpanded) {
-                llFilterContainer.visibility = View.VISIBLE
-                val activeBgColor = ContextCompat.getColorStateList(requireContext(), R.color.btn_primary)
-                btnToggleFilter.backgroundTintList = activeBgColor
-
-                val activeIconColor = ContextCompat.getColorStateList(requireContext(), R.color.white)
-                btnToggleFilter.imageTintList = activeIconColor
-            } else {
-                llFilterContainer.visibility = View.GONE
-                btnToggleFilter.backgroundTintList = null
-
-                val defaultIconColor = ContextCompat.getColorStateList(requireContext(), R.color.btn_primary)
-                btnToggleFilter.imageTintList = defaultIconColor
-            }
-        }
-    }
-
-    private fun createDummyData(): List<Book> {
-        return listOf(
-            Book(bookId = 1, categoryId = 1, isbnCode = "978-0132350884", title = "Clean Code", author = "Robert C. Martin", totalQuantity = 10, availableQuantity = 5, basePrice = 250000.0),
-            Book(bookId = 2, categoryId = 2, isbnCode = "978-6045635094", title = "Đắc Nhân Tâm", author = "Dale Carnegie", totalQuantity = 15, availableQuantity = 12, basePrice = 120000.0),
-            Book(bookId = 3, categoryId = 1, isbnCode = "978-0201633610", title = "Design Patterns", author = "Erich Gamma", totalQuantity = 5, availableQuantity = 2, basePrice = 300000.0),
-            Book(bookId = 4, categoryId = 3, isbnCode = "978-6048554164", title = "Nhà Giả Kim", author = "Paulo Coelho", totalQuantity = 5, availableQuantity = 0, lostQuantity = 1, basePrice = 90000.0),
-            Book(bookId = 5, categoryId = 4, isbnCode = "978-6043026368", title = "Sapiens", author = "Yuval Noah Harari", totalQuantity = 10, availableQuantity = 8, basePrice = 280000.0),
-            Book(bookId = 6, categoryId = 1, isbnCode = "978-0596009205", title = "Head First Java", author = "Kathy Sierra", totalQuantity = 5, availableQuantity = 3, basePrice = 220000.0)
-        )
     }
 }
