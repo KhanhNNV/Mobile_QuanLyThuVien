@@ -166,9 +166,9 @@
         android:id="@+id/recyclerViewBooks"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@id/llTopContent"
+        android:clipToPadding="false"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:clipToPadding="false" />
+        app:layout_constraintTop_toBottomOf="@id/llTopContent" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAddBook"
