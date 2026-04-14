@@ -13,7 +13,7 @@ import retrofit2.http.Path
 
 class FeeConfigRepository (private val apiService: FeeConfigApiService) {
 
-    suspend fun updateFeeConfig(request: FeeConfigRequest, id: Long) = apiService.updateFeeConfig(id,request)
+    suspend fun createOrUpdateFeeConfig(request: FeeConfigRequest) = apiService.createOrUpdateFeeConfig(request)
 
     suspend fun getFeeConfigs()= apiService.getFeeConfigs()
 

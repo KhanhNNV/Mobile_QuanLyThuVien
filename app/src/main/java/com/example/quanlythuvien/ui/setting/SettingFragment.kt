@@ -146,21 +146,7 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
         openLayoutFeeHeaderEvent()
 
         // Save Fees Event
-        btnSaveFees.setOnClickListener {
-            val regNormal = edtRegistrationFee.text.toString().toDoubleOrNull() ?: 0.0
-            val lateFee = edtLateFee.text.toString().toDoubleOrNull() ?: 0.0
-            val lostFee = edtLostFeeExtra.text.toString().toDoubleOrNull() ?: 0.0
-            val damageFee = edtDamageFee.text.toString().toDoubleOrNull() ?: 0.0
-
-            val updates = mapOf(
-                TypeFeeConfig.REG_NORMAL to regNormal,
-                TypeFeeConfig.LATE_PER_DAY to lateFee,
-                TypeFeeConfig.LOST_BOOK to lostFee,
-                TypeFeeConfig.DAMAGE_FEE to damageFee
-            )
-
-            viewModel.updateFeeConfigs(updates)
-        }
+        handleBtnSaveEvent()
 
         // Logout Event
         btnLogout.setOnClickListener {
@@ -203,6 +189,24 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
                     .setDuration(200)
                     .start()
             }
+        }
+    }
+
+    private fun handleBtnSaveEvent(){
+        btnSaveFees.setOnClickListener {
+            val regNormal = edtRegistrationFee.text.toString().toDoubleOrNull() ?: 0.0
+            val lateFee = edtLateFee.text.toString().toDoubleOrNull() ?: 0.0
+            val lostFee = edtLostFeeExtra.text.toString().toDoubleOrNull() ?: 0.0
+            val damageFee = edtDamageFee.text.toString().toDoubleOrNull() ?: 0.0
+
+            val updates = mapOf(
+                TypeFeeConfig.REG_NORMAL to regNormal,
+                TypeFeeConfig.LATE_PER_DAY to lateFee,
+                TypeFeeConfig.LOST_BOOK to lostFee,
+                TypeFeeConfig.DAMAGE_FEE to damageFee
+            )
+
+            viewModel.saveFeeConfigs(updates)
         }
     }
 }
