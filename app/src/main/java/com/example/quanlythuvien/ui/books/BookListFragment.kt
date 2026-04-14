@@ -197,28 +197,35 @@ class BookListFragment : Fragment() {
         tvCategory?.text = "Thể loại: $categoryName"
         tvBasePrice?.text = "Giá gốc: ${book.basePrice.toInt()} VND"
 
-        if (book.availableQuantity > 0) {
-            tvStatus?.text = "Tổng quan: Còn ${book.availableQuantity} cuốn"
-            tvStatus?.setTextColor(resources.getColor(R.color.green, null))
-        } else {
-            tvStatus?.text = "Tổng quan: Đã hết sách trong kho"
-            tvStatus?.setTextColor(resources.getColor(R.color.red, null))
-        }
+        val availableCount = book.availableQuantity.coerceAtLeast(0)
+        val lostCount = book.lostQuantity.coerceAtLeast(0)
+        val borrowedCount = (book.totalQuantity - availableCount - lostCount).coerceAtLeast(0)
+        tvStatus?.text = "Tổng quan: Có sẵn $availableCount • Đang mượn $borrowedCount • Đã mất $lostCount"
+        tvStatus?.setTextColor(
+            resources.getColor(
+                if (availableCount > 0) R.color.green else R.color.red,
+                null
+            )
+        )
 
         rvBookCopies?.layoutManager = LinearLayoutManager(requireContext())
         val copyList = mutableListOf<BookCopyItem>()
+        val maxLost = lostCount.coerceAtMost(book.totalQuantity)
+        val maxAvailable = availableCount.coerceAtMost((book.totalQuantity - maxLost).coerceAtLeast(0))
+        val maxBorrowed = (book.totalQuantity - maxAvailable - maxLost).coerceAtLeast(0)
+
         for (i in 1..book.totalQuantity) {
             val statusText: String
             val statusColor: Int
-            if (i <= book.availableQuantity) {
+            if (i <= maxAvailable) {
                 statusText = "Có sẵn"
                 statusColor = resources.getColor(R.color.green, null)
-            } else if (i == book.totalQuantity && book.totalQuantity > book.availableQuantity) {
-                statusText = "Đã mất"
-                statusColor = resources.getColor(R.color.red, null)
-            } else {
+            } else if (i <= maxAvailable + maxBorrowed) {
                 statusText = "Đang mượn"
                 statusColor = resources.getColor(R.color.yellow, null)
+            } else {
+                statusText = "Đã mất"
+                statusColor = resources.getColor(R.color.red, null)
             }
             copyList.add(BookCopyItem("Mã cuốn: B${book.bookId}-$i", statusText, statusColor))
         }

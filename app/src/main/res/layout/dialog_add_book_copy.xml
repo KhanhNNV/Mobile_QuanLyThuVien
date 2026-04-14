@@ -39,7 +39,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             app:boxStrokeColor="@color/btn_primary"
-            android:hint="Nhập hoặc quét mã vạch (Barcode)">
+            android:hint="Nhập mã vạch Barcode">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edtBarcode"
