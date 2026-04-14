@@ -1,9 +1,7 @@
-package com.example.quanlythuvien.ui.books
+package com.example.quanlythuvien.ui.books.addBook
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.AutoCompleteTextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -11,10 +9,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.quanlythuvien.R
-import com.example.quanlythuvien.core.api.RetrofitClient // Sửa lại cho đúng thư mục của bạn
+import com.example.quanlythuvien.core.api.RetrofitClient
 import com.example.quanlythuvien.data.model.request.BookRequest
 import com.example.quanlythuvien.data.remote.BookApiService
 import com.example.quanlythuvien.data.repository.BookRepository
+import com.example.quanlythuvien.ui.books.addBook.AddBookState
+import com.example.quanlythuvien.ui.books.addBook.AddBookViewModel
 import com.example.quanlythuvien.utils.BookWarehousePermissions
 import com.example.quanlythuvien.utils.GenericViewModelFactory
 import com.example.quanlythuvien.utils.TokenManager

@@ -1,9 +1,10 @@
-package com.example.quanlythuvien.ui.books
+package com.example.quanlythuvien.ui.books.addBook
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.quanlythuvien.data.model.request.BookRequest
 import com.example.quanlythuvien.data.repository.BookRepository
+import com.example.quanlythuvien.ui.books.addBook.AddBookState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -12,7 +13,7 @@ class AddBookViewModel(private val repository: BookRepository) : ViewModel(){
     private val _addBookState = MutableStateFlow<AddBookState>(AddBookState.Idle)
     val addBookState : StateFlow<AddBookState> = _addBookState
     fun addBook(request: BookRequest){
-        viewModelScope.launch{
+        viewModelScope.launch {
             _addBookState.value = AddBookState.Loading
             try {
                 val response = repository.createBook(request)

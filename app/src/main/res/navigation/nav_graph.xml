@@ -91,7 +91,7 @@
 
     <fragment
         android:id="@+id/bookAddFragment"
-        android:name="com.example.quanlythuvien.ui.books.AddBookFragment"
+        android:name="com.example.quanlythuvien.ui.books.addBook.AddBookFragment"
         android:label="Thêm Sách"
         tools:layout="@layout/fragment_add_book" />
 
