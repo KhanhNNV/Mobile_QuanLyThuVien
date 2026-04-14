@@ -5,7 +5,6 @@ import lombok.Data;
 
 @Data
 public class FeeConfigRequest {
-    private Long libraryId;
     private TypeFeeConfig feeType;
     private Double amount;
 }

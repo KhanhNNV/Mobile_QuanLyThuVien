@@ -24,8 +24,6 @@ public class LibraryService {
         Library library = Library.builder()
                 .name(request.getName())
                 .address(request.getAddress())
-                .hasStudentDiscount(request.getHasStudentDiscount())
-                .platformFeeExpiry(request.getPlatformFeeExpiry())
                 .status(request.getStatus() != null ? request.getStatus() : StatusLibrary.ACTIVE)
                 .createdAt(now)
                 .updateAt(now)
@@ -56,12 +54,6 @@ public class LibraryService {
         if (request.getAddress() != null) {
             existingLibrary.setAddress(request.getAddress());
         }
-        if (request.getHasStudentDiscount() != null) {
-            existingLibrary.setHasStudentDiscount(request.getHasStudentDiscount());
-        }
-        if (request.getPlatformFeeExpiry() != null) {
-            existingLibrary.setPlatformFeeExpiry(request.getPlatformFeeExpiry());
-        }
         if (request.getStatus() != null) {
             existingLibrary.setStatus(request.getStatus());
         }
@@ -77,13 +69,6 @@ public class LibraryService {
         libraryRepository.delete(library);
     }
 
-    public Boolean getHasStudentDiscount(Long libraryId) {
-        Library library = libraryRepository.findById(libraryId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy thư viện"));
-
-        return library.getHasStudentDiscount();
-    }
-
     // --- CÁC HÀM HỖ TRỢ DÙNG NỘI BỘ ---
 
     private Library getLibraryEntityById(Long id) {
@@ -96,8 +81,6 @@ public class LibraryService {
                 .libraryId(library.getLibraryId())
                 .name(library.getName())
                 .address(library.getAddress())
-                .hasStudentDiscount(library.getHasStudentDiscount())
-                .platformFeeExpiry(library.getPlatformFeeExpiry())
                 .status(library.getStatus())
                 .createdAt(library.getCreatedAt())
                 .updateAt(library.getUpdateAt())

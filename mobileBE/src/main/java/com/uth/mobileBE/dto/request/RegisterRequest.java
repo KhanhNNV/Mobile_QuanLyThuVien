@@ -14,5 +14,4 @@ public class RegisterRequest {
     private String fullName;
     private String libraryName;
     private String address;
-    private Boolean hasStudentDiscount;
 }

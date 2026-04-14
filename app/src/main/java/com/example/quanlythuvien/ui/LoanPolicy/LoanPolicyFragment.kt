@@ -28,7 +28,6 @@ import com.example.quanlythuvien.data.repository.LibraryRepository
 import com.example.quanlythuvien.data.repository.LoanPolicyRepository
 import com.example.quanlythuvien.ui.LoanPolicy.LoanPolicyAdapter
 import com.example.quanlythuvien.utils.GenericViewModelFactory
-import com.example.quanlythuvien.utils.LibraryConfigManager
 import com.example.quanlythuvien.utils.setupHeaderWithBack
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.flow.collectLatest
@@ -41,16 +40,11 @@ class LoanPolicyFragment : Fragment(R.layout.fragment_loan_policy) {
     private lateinit var policyAdapter: LoanPolicyAdapter
 
     private lateinit var viewModel: LoanPolicyViewModel
-    private lateinit var configManager: LibraryConfigManager
-
-    private var hasStudentDiscount: Boolean = false
     private var categoryList: List<CategoryResponse> = emptyList()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupHeaderWithBack(view, "Quản lý chính sách mượn trả")
-
-        configManager = LibraryConfigManager(requireContext())
 
         initViews(view)
         setupViewModel()
@@ -58,8 +52,6 @@ class LoanPolicyFragment : Fragment(R.layout.fragment_loan_policy) {
         observeViewModel()
         handleEvents()
 
-        // Kiểm tra config trước, nếu chưa prefs của hasStudentDC có sẽ lấy api
-        viewModel.checkAndFetchConfig()
         viewModel.fetchPolicies()
         viewModel.fetchCategories()
     }
@@ -75,16 +67,14 @@ class LoanPolicyFragment : Fragment(R.layout.fragment_loan_policy) {
 
         // Khởi tạo các API Service
         val apiService = retrofit.create(LoanPolicyApiService::class.java)
-        val libraryApi = retrofit.create(LibraryApiService::class.java)
         val categoryApi = retrofit.create(CategoryApiService::class.java)
 
         // Khởi tạo các Repository
         val repository = LoanPolicyRepository(apiService)
-        val libraryRepo = LibraryRepository(libraryApi)
         val categoryRepo = CategoryRepository(categoryApi)
 
         val factory = GenericViewModelFactory {
-            LoanPolicyViewModel(repository, libraryRepo, categoryRepo, configManager)
+            LoanPolicyViewModel(repository, categoryRepo)
         }
         viewModel = ViewModelProvider(this, factory)[LoanPolicyViewModel::class.java]
     }
@@ -107,15 +97,6 @@ class LoanPolicyFragment : Fragment(R.layout.fragment_loan_policy) {
                                 Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
                             }
                             else -> {}
-                        }
-                    }
-                }
-
-                // Thu thập kết quả Config
-                launch {
-                    viewModel.configState.collectLatest { configResult ->
-                        if (configResult != null) {
-                            hasStudentDiscount = configResult
                         }
                     }
                 }
@@ -153,8 +134,6 @@ class LoanPolicyFragment : Fragment(R.layout.fragment_loan_policy) {
 
         val tvDialogTitle = dialog.findViewById<TextView>(R.id.tvDialogTitle)
         val edtMaxDays = dialog.findViewById<EditText>(R.id.edtMaxDays)
-        val llCustomerTypeContainer = dialog.findViewById<LinearLayout>(R.id.llCustomerTypeContainer)
-        val rgCustomerType = dialog.findViewById<RadioGroup>(R.id.rgCustomerType)
         val btnCancel = dialog.findViewById<Button>(R.id.btnCancel)
         val btnSavePolicy = dialog.findViewById<Button>(R.id.btnSavePolicy)
         val spinnerCategory = dialog.findViewById<Spinner>(R.id.spinnerCategory)
@@ -167,24 +146,10 @@ class LoanPolicyFragment : Fragment(R.layout.fragment_loan_policy) {
         spinnerCategory?.adapter = adapter
 
 
-        // kiểm tra nếu ko có giảm giá cho sv thì ẩn khung chọn luôn
-        if (!hasStudentDiscount) {
-            llCustomerTypeContainer?.visibility = View.GONE
-            // Nếu rbStudent đang bị gone, mặc định tích vào rbRegular
-            rgCustomerType?.check(R.id.rbRegular)
-        }else{
-            llCustomerTypeContainer?.visibility = View.VISIBLE
-        }
 
         if (policyToEdit != null) {
             tvDialogTitle?.text = "Sửa Chính Sách"
             edtMaxDays?.setText(policyToEdit.maxBorrowDays.toString())
-
-            if (policyToEdit.applyForStudent && hasStudentDiscount) {
-                rgCustomerType?.check(R.id.rbStudent)
-            } else {
-                rgCustomerType?.check(R.id.rbRegular)
-            }
 
             if (policyToEdit.categoryId != null) {
                 // Tìm vị trí của category trong list (Cộng thêm 1 vì vị trí 0 là "Tất cả thể loại")
@@ -208,7 +173,6 @@ class LoanPolicyFragment : Fragment(R.layout.fragment_loan_policy) {
                 return@setOnClickListener
             }
 
-            val isStudent = rgCustomerType?.checkedRadioButtonId == R.id.rbStudent
 
             // Lấy ID thể loại được chọn từ Spinner
             val selectedPosition = spinnerCategory?.selectedItemPosition ?: 0
@@ -222,7 +186,6 @@ class LoanPolicyFragment : Fragment(R.layout.fragment_loan_policy) {
             viewModel.savePolicy(
                 policyId = policyToEdit?.policyId,
                 categoryId = categoryIdToSave,
-                applyForStudent = isStudent,
                 maxDays = maxDaysStr.toInt()
             )
             dialog.dismiss()

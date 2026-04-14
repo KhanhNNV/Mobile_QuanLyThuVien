@@ -18,7 +18,6 @@ class LoanPolicyAdapter(
 
     class PolicyViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tvItemCategory: TextView = view.findViewById(R.id.tvItemCategory)
-        val tvLoanObject: TextView = view.findViewById(R.id.tvLoanObject)
         val tvLoanExp: TextView = view.findViewById(R.id.tvLoanExp)
         val btnEditPolicy: ImageButton = view.findViewById(R.id.btnEditPolicy)
         val btnDelete: ImageButton = view.findViewById(R.id.btnDelete)
@@ -33,11 +32,6 @@ class LoanPolicyAdapter(
         val policy = policyList[position]
        holder.tvItemCategory.text = policy.categoryName ?: "Mặc định"
 
-        if (policy.applyForStudent) {
-            holder.tvLoanObject.text = "Sinh viên"
-        } else {
-            holder.tvLoanObject.text = "Thông thường"
-        }
 
         holder.tvLoanExp.text = "${policy.maxBorrowDays} ngày"
 
