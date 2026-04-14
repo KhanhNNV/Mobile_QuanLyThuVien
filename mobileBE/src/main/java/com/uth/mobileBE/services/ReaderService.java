@@ -1,5 +1,6 @@
 package com.uth.mobileBE.services;
 
+import com.uth.mobileBE.Utils.SecurityUtils;
 import com.uth.mobileBE.dto.request.ReaderRequest;
 import com.uth.mobileBE.dto.response.ReaderResponse;
 import com.uth.mobileBE.models.Library;
@@ -7,6 +8,9 @@ import com.uth.mobileBE.models.Reader;
 import com.uth.mobileBE.repositories.LibraryRepository;
 import com.uth.mobileBE.repositories.ReaderRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,16 +24,17 @@ public class ReaderService {
     private final LibraryRepository libraryRepository;
 
     //Tạo người độc giả
-    @Transactional
+    @Transactional(readOnly = true)
     public ReaderResponse createReader(ReaderRequest request) {
-        Long currentLibraryId = SecurityUtils.getCurrentUserLibraryId();
+        Long libraryId = SecurityUtils.getLibraryId();
+        Library libraryRef = libraryRepository.getReferenceById(libraryId);
         Reader reader = Reader.builder()
                               .fullName(request.getFullName())
                               .phone(request.getPhone())
                               .barcode(request.getBarcode())
                               .isStudent(request.getIsStudent())
                               .membershipExpiry(request.getMembershipExpiry())
-                              .library(library)
+                              .library(libraryRef)
                               .isBlocked(false)
                               .build();
 
@@ -42,14 +47,20 @@ public class ReaderService {
                                .map(this::mapToReaderResponse)
                                .collect(Collectors.toList());
     }
+
     /**
      * Lấy danh sách độc giả theo trang
-     * @param page Số thứ tự trang (bắt đầu từ 0)
-     * @param size Số lượng phần tử trên 1 trang (ví dụ: 10)
+     * @param `page` Số thứ tự trang (bắt đầu từ 0)
+     * @param `size` Số lượng phần tử trên 1 trang (ví dụ: 10)
      */
-    public List<ReaderResponse> getReadersPaginated(Long libraryId) {
-
+    @Transactional(readOnly = true)
+    public Page<ReaderResponse> getReadersPaginated(int page, int size) {
+        Long libraryId = SecurityUtils.getLibraryId();
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Reader> readerPage = readerRepository.findByLibrary_LibraryIdPaged(libraryId, pageable);
+        return readerPage.map(this::mapToReaderResponse);
     }
+
     //Tìm lọc độc giả
     public ReaderResponse getReaderById(Long id) {
         Reader reader = readerRepository.findById(id)

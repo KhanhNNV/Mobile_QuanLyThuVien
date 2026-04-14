@@ -5,6 +5,7 @@ import com.uth.mobileBE.dto.request.ReaderRequest;
 import com.uth.mobileBE.dto.response.ReaderResponse;
 import com.uth.mobileBE.services.ReaderService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -88,4 +89,17 @@ public class ReaderController {
     public ResponseEntity<List<ReaderResponse>> searchReaders(@RequestParam String query) {
         return ResponseEntity.ok(readerService.searchListReader(query));
     }
+
+
+    /**
+     * Lấy danh sách độc giả+ Phân trang
+     * @parem `page`, 'size`
+     */
+    public ResponseEntity<?> getReadersPaginated(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size)
+    {
+        return ResponseEntity.ok(readerService.getReadersPaginated(page,size));
+    }
+
 }
