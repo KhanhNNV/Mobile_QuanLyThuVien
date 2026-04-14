@@ -38,11 +38,6 @@ public class LoanPolicyService {
         Library library = libraryRepository.findById(libraryId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy thư viện"));
 
-        // Nếu không hỗ trợ student, không được phép tạo policy cho student
-        if (Boolean.TRUE.equals(request.getApplyForStudent()) && !Boolean.TRUE.equals(library.getHasStudentDiscount())) {
-            throw new IllegalArgumentException("Thư viện không hỗ trợ chính sách cho học sinh.");
-        }
-
         Category category = null;
         if (request.getCategoryId() != null) {
             category = categoryRepository.findById(request.getCategoryId())
@@ -52,7 +47,6 @@ public class LoanPolicyService {
         LoanPolicy policy = LoanPolicy.builder()
                 .library(library)
                 .category(category)
-                .applyForStudent(request.getApplyForStudent())
                 .maxBorrowDays(request.getMaxBorrowDays())
                 .build();
 
@@ -68,10 +62,6 @@ public class LoanPolicyService {
             throw new RuntimeException("Không có quyền chỉnh sửa chính sách này");
         }
 
-        if (Boolean.TRUE.equals(request.getApplyForStudent()) && !Boolean.TRUE.equals(policy.getLibrary().getHasStudentDiscount())) {
-            throw new IllegalArgumentException("Thư viện không hỗ trợ chính sách cho học sinh.");
-        }
-
         Category category = null;
         if (request.getCategoryId() != null) {
             category = categoryRepository.findById(request.getCategoryId())
@@ -79,7 +69,6 @@ public class LoanPolicyService {
         }
 
         policy.setCategory(category);
-        policy.setApplyForStudent(request.getApplyForStudent());
         policy.setMaxBorrowDays(request.getMaxBorrowDays());
 
         return mapToResponse(loanPolicyRepository.save(policy));
@@ -100,7 +89,6 @@ public class LoanPolicyService {
                 .policyId(policy.getPolicyId())
                 .categoryId(policy.getCategory() != null ? policy.getCategory().getCategoryId() : null)
                 .categoryName(policy.getCategory() != null ? policy.getCategory().getName() : "Tất cả thể loại")
-                .applyForStudent(policy.getApplyForStudent())
                 .maxBorrowDays(policy.getMaxBorrowDays())
                 .build();
     }

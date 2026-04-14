@@ -58,11 +58,8 @@ public class AuthenticationService {
         Library newLibrary = Library.builder()
                 .name(request.getLibraryName())
                 .address(request.getAddress())
-                .hasStudentDiscount(request.getHasStudentDiscount() != null && request.getHasStudentDiscount())
                 .status(StatusLibrary.ACTIVE)
                 .createdAt(LocalDateTime.now())
-                // Tặng 30 ngày (tính bằng milliseconds) dùng thử phí nền tảng
-                .platformFeeExpiry(System.currentTimeMillis() + (30L * 24 * 60 * 60 * 1000))
                 .build();
 
         Library savedLibrary = libraryRepository.save(newLibrary);

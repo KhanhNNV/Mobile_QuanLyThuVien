@@ -51,16 +51,9 @@ public class FeeConfigService {
     }
 
     // 3. CẬP NHẬT MỨC PHÍ
-    @Transactional
     public FeeConfigResponse updateFeeConfig(Long configId, FeeConfigRequest request) {
         FeeConfig feeConfig = feeConfigRepository.findById(configId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy cấu hình phí với ID: " + configId));
-
-        if(!feeConfig.getLibrary().getHasStudentDiscount()){
-           if(request.getFeeType().equals(TypeFeeConfig.REG_STUDENT)){
-               throw new RuntimeException("Thư viện không áp dụng giảm giá cho sinh viên");
-            }
-        }
 
         // Cập nhật lại số tiền (thường chỉ update giá tiền chứ không đổi loại phí)
         feeConfig.setAmount(request.getAmount());

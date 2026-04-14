@@ -13,7 +13,6 @@ import lombok.NoArgsConstructor;
 public class LibraryRequest {
     private String name;
     private String address;
-    private Boolean hasStudentDiscount;
     private Long platformFeeExpiry;
     private StatusLibrary status;
 }
