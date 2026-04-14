@@ -16,8 +16,6 @@ class SettingViewModel(
     private val _state = MutableStateFlow<SettingState>(SettingState.Idle)
     val state: StateFlow<SettingState> = _state
 
-    // Map để lưu trữ configId của từng loại phí dùng cho lúc Update
-    private val feeConfigIds = mutableMapOf<TypeFeeConfig, Long>()
 
     fun fetchFeeConfigs() {
         viewModelScope.launch {
@@ -26,10 +24,6 @@ class SettingViewModel(
                 val response = repository.getFeeConfigs()
                 if (response.isSuccessful) {
                     val configs = response.body() ?: emptyList()
-
-                    // Lưu lại ID vào Map để sử dụng khi update
-                    configs.forEach { feeConfigIds[it.feeType] = it.configId }
-
                     _state.value = SettingState.SuccessGetFees(configs)
                 } else {
                     _state.value = SettingState.Error("Lỗi tải cấu hình phí: ${response.code()}")
@@ -40,17 +34,13 @@ class SettingViewModel(
         }
     }
 
-    fun updateFeeConfigs(updates: Map<TypeFeeConfig, Double>) {
+    fun saveFeeConfigs(updates: Map<TypeFeeConfig, Double>) {
         viewModelScope.launch {
             _state.value = SettingState.Loading
             try {
-                // Lặp qua map dữ liệu truyền từ UI, gọi api update cho từng loại phí
                 for ((feeType, amount) in updates) {
-                    val configId = feeConfigIds[feeType]
-                    if (configId != null) {
-                        val request = FeeConfigRequest(feeType, amount)
-                        repository.updateFeeConfig(request, configId)
-                    }
+                    val request = FeeConfigRequest(feeType, amount)
+                    repository.createOrUpdateFeeConfig(request)
                 }
 
                 _state.value = SettingState.SuccessUpdate("Cập nhật thành công!")

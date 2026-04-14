@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,6 +22,33 @@ public class FeeConfigService {
 
     private final FeeConfigRepository feeConfigRepository;
     private final LibraryRepository libraryRepository;
+
+    public FeeConfigResponse createOrUpdateFeeConfig(FeeConfigRequest request, Long libraryId) {
+        Library library = libraryRepository.findById(libraryId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy thư viện với ID: " + libraryId));
+
+        // Tìm kiếm xem loại phí này đã được cấu hình cho thư viện chưa
+        Optional<FeeConfig> existingConfigOpt = feeConfigRepository
+                .findByLibrary_LibraryIdAndFeeType(libraryId, request.getFeeType());
+
+        FeeConfig feeConfig;
+
+        if (existingConfigOpt.isPresent()) {
+            // Đã tồn tại -> Cập nhật số tiền
+            feeConfig = existingConfigOpt.get();
+            feeConfig.setAmount(request.getAmount());
+        } else {
+            // Chưa tồn tại -> Tạo mới
+            feeConfig = FeeConfig.builder()
+                    .library(library)
+                    .feeType(request.getFeeType())
+                    .amount(request.getAmount())
+                    .build();
+        }
+
+        FeeConfig savedConfig = feeConfigRepository.save(feeConfig);
+        return mapToResponse(savedConfig);
+    }
 
     // 1. TẠO CẤU HÌNH PHÍ MỚI
     public FeeConfigResponse createFeeConfig(FeeConfigRequest request,Long libraryId) {

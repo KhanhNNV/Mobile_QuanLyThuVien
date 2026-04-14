@@ -18,12 +18,12 @@ public class FeeConfigController {
 
     private final FeeConfigService feeConfigService;
 
-    // TẠO CẤU HÌNH PHÍ: POST /api/fee-configs
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public ResponseEntity<FeeConfigResponse> createFeeConfig(@RequestBody FeeConfigRequest request) {
-        Long libraryId= SecurityUtils.getLibraryId();
-        FeeConfigResponse response = feeConfigService.createFeeConfig(request,libraryId);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    public ResponseEntity<FeeConfigResponse> createOrUpdateFeeConfig(@RequestBody FeeConfigRequest request) {
+        Long libraryId = SecurityUtils.getLibraryId();
+        FeeConfigResponse response = feeConfigService.createOrUpdateFeeConfig(request, libraryId);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     // LẤY DS PHÍ THEO THƯ VIỆN: GET /api/fee-configs
@@ -32,16 +32,6 @@ public class FeeConfigController {
         Long libraryId= SecurityUtils.getLibraryId();
         List<FeeConfigResponse> responses = feeConfigService.getFeeConfigsByLibrary(libraryId);
         return ResponseEntity.ok(responses);
-    }
-
-    // CẬP NHẬT PHÍ: PUT /api/fee-configs/{configId}
-    @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/{configId}")
-    public ResponseEntity<FeeConfigResponse> updateFeeConfig(
-            @PathVariable Long configId,
-            @RequestBody FeeConfigRequest request) {
-        FeeConfigResponse response = feeConfigService.updateFeeConfig(configId, request);
-        return ResponseEntity.ok(response);
     }
 
     // XÓA PHÍ: DELETE /api/fee-configs/{configId}
