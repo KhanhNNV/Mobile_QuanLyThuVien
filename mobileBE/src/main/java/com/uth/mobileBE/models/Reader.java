@@ -27,8 +27,6 @@ public class Reader {
     @Column(unique = true, nullable = false)
     private String barcode;
 
-    private Boolean isStudent;
-
     @Column(updatable = false)
     private LocalDateTime createdAt;
 

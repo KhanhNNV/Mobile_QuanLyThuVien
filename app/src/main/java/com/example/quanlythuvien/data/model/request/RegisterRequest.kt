@@ -5,6 +5,5 @@ data class RegisterRequest(
     val password: String,
     val fullName: String,
     val libraryName: String,
-    val address: String,
-    val hasStudentDiscount: Boolean
+    val address: String
 )

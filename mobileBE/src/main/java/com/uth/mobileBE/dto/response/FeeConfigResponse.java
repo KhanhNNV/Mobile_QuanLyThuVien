@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class FeeConfigResponse {
     private Long configId;
-    private Long libraryId;
     private TypeFeeConfig feeType;
     private Double amount;
 }

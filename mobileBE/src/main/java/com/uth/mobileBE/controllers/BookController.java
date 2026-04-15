@@ -10,8 +10,6 @@ import com.uth.mobileBE.services.BookService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,8 +29,15 @@ public class BookController {
 
     @PostMapping
     public ResponseEntity<BookResponse> createBook(@RequestBody BookRequest request) {
-        BookResponse response = bookCrudService.createBook(request);
+        Long currentLibraryId = SecurityUtils.getLibraryId();
+        BookResponse response = bookCrudService.createBook(currentLibraryId, request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<BookResponse>> getBooksByCurrentLibrary() {
+        Long currentLibraryId = SecurityUtils.getLibraryId();
+        return ResponseEntity.ok(bookCrudService.getBooksByLibrary(currentLibraryId));
     }
 
     @GetMapping("/library/{libraryId}")
@@ -40,16 +45,30 @@ public class BookController {
         return ResponseEntity.ok(bookCrudService.getBooksByLibrary(libraryId));
     }
 
+    @GetMapping("/id/{bookId}")
+    public ResponseEntity<BookResponse> getBookByIdWithIdPrefix(@PathVariable Long bookId) {
+        return ResponseEntity.ok(bookCrudService.getBookById(bookId));
+    }
+
     @GetMapping("/{bookId}")
     public ResponseEntity<BookResponse> getBookById(@PathVariable Long bookId) {
         return ResponseEntity.ok(bookCrudService.getBookById(bookId));
+    }
+
+    @PutMapping("/id/{bookId}")
+    public ResponseEntity<BookResponse> updateBookWithIdPrefix(
+            @PathVariable Long bookId,
+            @RequestBody BookRequest request) {
+        Long currentLibraryId = SecurityUtils.getLibraryId();
+        return ResponseEntity.ok(bookCrudService.updateBook(currentLibraryId, bookId, request));
     }
 
     @PutMapping("/{bookId}")
     public ResponseEntity<BookResponse> updateBook(
             @PathVariable Long bookId,
             @RequestBody BookRequest request) {
-        return ResponseEntity.ok(bookCrudService.updateBook(bookId, request));
+        Long currentLibraryId = SecurityUtils.getLibraryId();
+        return ResponseEntity.ok(bookCrudService.updateBook(currentLibraryId, bookId, request));
     }
 
     @DeleteMapping("/{bookId}")
@@ -58,6 +77,11 @@ public class BookController {
         return ResponseEntity.ok("Xóa sách thành công!");
     }
 
+
+    @GetMapping("/current-library-id")
+    public ResponseEntity<Long> getCurrentLibraryId() {
+        return ResponseEntity.ok(SecurityUtils.getLibraryId());
+    }
 
     @GetMapping("/count")
     public ResponseEntity<Long> countBooksByLibrary() {

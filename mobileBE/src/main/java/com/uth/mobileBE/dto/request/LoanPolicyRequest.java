@@ -11,6 +11,5 @@ import lombok.NoArgsConstructor;
 @Builder
 public class LoanPolicyRequest {
     private Long categoryId;
-    private Boolean applyForStudent;
     private Integer maxBorrowDays;
 }

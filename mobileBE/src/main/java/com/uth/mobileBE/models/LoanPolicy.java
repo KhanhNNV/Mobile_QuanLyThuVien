@@ -26,7 +26,6 @@ public class LoanPolicy {
     @JoinColumn(name = "category_id") // Nullable vì có thể áp dụng chung
     private Category category;
 
-    private Boolean applyForStudent;
 
     private Integer maxBorrowDays;
 

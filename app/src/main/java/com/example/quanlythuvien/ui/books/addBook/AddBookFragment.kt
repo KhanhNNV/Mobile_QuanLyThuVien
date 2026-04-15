@@ -2,6 +2,7 @@ package com.example.quanlythuvien.ui.books.addBook
 
 import android.os.Bundle
 import android.view.View
+import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -11,13 +12,15 @@ import androidx.navigation.fragment.findNavController
 import com.example.quanlythuvien.R
 import com.example.quanlythuvien.core.api.RetrofitClient
 import com.example.quanlythuvien.data.model.request.BookRequest
+import com.example.quanlythuvien.data.model.response.CategoryResponse
 import com.example.quanlythuvien.data.remote.BookApiService
+import com.example.quanlythuvien.data.remote.CategoryApiService
 import com.example.quanlythuvien.data.repository.BookRepository
+import com.example.quanlythuvien.data.repository.CategoryRepository
 import com.example.quanlythuvien.ui.books.addBook.AddBookState
 import com.example.quanlythuvien.ui.books.addBook.AddBookViewModel
 import com.example.quanlythuvien.utils.BookWarehousePermissions
 import com.example.quanlythuvien.utils.GenericViewModelFactory
-import com.example.quanlythuvien.utils.TokenManager
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.flow.collectLatest
@@ -36,6 +39,8 @@ class AddBookFragment : Fragment(R.layout.fragment_add_book) {
 
     private lateinit var viewModel: AddBookViewModel
 
+    private var categoryList: List<CategoryResponse> = emptyList()
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -50,6 +55,8 @@ class AddBookFragment : Fragment(R.layout.fragment_add_book) {
         setupViewModel()
         observeViewModel()
         setupListeners()
+
+        viewModel.fetchCategories()
     }
 
     private fun initViews(view: View) {
@@ -63,50 +70,76 @@ class AddBookFragment : Fragment(R.layout.fragment_add_book) {
     }
 
     private fun setupViewModel() {
-        val apiService = RetrofitClient.getInstance(requireContext()).create(BookApiService::class.java)
-        val repository = BookRepository(apiService)
-        val factory = GenericViewModelFactory { AddBookViewModel(repository) }
+        val retrofit = RetrofitClient.getInstance(requireContext())
+
+        // Khởi tạo cả 2 Service
+        val bookApiService = retrofit.create(BookApiService::class.java)
+        val categoryApiService = retrofit.create(CategoryApiService::class.java)
+
+        // Khởi tạo cả 2 Repository
+        val bookRepository = BookRepository(bookApiService)
+        val categoryRepository = CategoryRepository(categoryApiService)
+
+        // Truyền cả 2 vào ViewModel
+        val factory = GenericViewModelFactory { AddBookViewModel(bookRepository, categoryRepository) }
         viewModel = ViewModelProvider(this, factory)[AddBookViewModel::class.java]
     }
 
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.addBookState.collectLatest { state ->
-                when (state) {
-                    is AddBookState.Idle -> {
-                        btnSave.isEnabled = true
-                        btnSave.text = "LƯU SÁCH"
+            // Lắng nghe trạng thái Lưu sách
+            launch {
+                viewModel.addBookState.collectLatest { state ->
+                    when (state) {
+                        is AddBookState.Idle -> {
+                            btnSave.isEnabled = true
+                            btnSave.text = "LƯU SÁCH"
+                        }
+                        is AddBookState.Loading -> {
+                            btnSave.isEnabled = false
+                            btnSave.text = "Đang xử lý..."
+                        }
+                        is AddBookState.Success -> {
+                            Toast.makeText(requireContext(), "Thêm sách thành công: ${state.data.title}", Toast.LENGTH_SHORT).show()
+                            findNavController().popBackStack()
+                        }
+                        is AddBookState.Error -> {
+                            btnSave.isEnabled = true
+                            btnSave.text = "LƯU SÁCH"
+                            Toast.makeText(requireContext(), state.message, Toast.LENGTH_LONG).show()
+                        }
                     }
-                    is AddBookState.Loading -> {
-                        btnSave.isEnabled = false
-                        btnSave.text = "Đang xử lý..."
-                    }
-                    is AddBookState.Success -> {
-                        Toast.makeText(requireContext(), "Thêm sách thành công: ${state.data.title}", Toast.LENGTH_SHORT).show()
-                        findNavController().popBackStack() // Trở về danh sách sách
-                    }
-                    is AddBookState.Error -> {
-                        btnSave.isEnabled = true
-                        btnSave.text = "LƯU SÁCH"
-                        Toast.makeText(requireContext(), state.message, Toast.LENGTH_LONG).show()
-                    }
+                }
+            }
+
+            // Lắng nghe danh sách Thể loại để bơm vào Spinner
+            launch {
+                viewModel.categories.collectLatest { list ->
+                    categoryList = list
+                    // Chỉ lấy danh sách TÊN thể loại để hiển thị lên UI
+                    val categoryNames = list.map { it.name }
+                    val adapter = ArrayAdapter(
+                        requireContext(),
+                        android.R.layout.simple_spinner_dropdown_item,
+                        categoryNames
+                    )
+                    spinnerCategory.setAdapter(adapter)
                 }
             }
         }
     }
 
     private fun setupListeners() {
-        // Nút Hủy
         btnCancel.setOnClickListener {
             findNavController().popBackStack()
         }
 
-        // Nút Lưu
         btnSave.setOnClickListener {
             val bookName = edtBookName.text.toString().trim()
             val author = edtAuthor.text.toString().trim()
             val isbn = edtIsbn.text.toString().trim()
             val costStr = edtCost.text.toString().trim()
+            val selectedCategoryName = spinnerCategory.text.toString().trim()
 
             // Validate báo lỗi từng ô
             if (bookName.isEmpty()) {
@@ -124,21 +157,28 @@ class AddBookFragment : Fragment(R.layout.fragment_add_book) {
                 edtIsbn.requestFocus()
                 return@setOnClickListener
             }
+            if (selectedCategoryName.isEmpty()) {
+                spinnerCategory.error = "Vui lòng chọn thể loại!"
+                spinnerCategory.requestFocus()
+                return@setOnClickListener
+            }
             if (costStr.isEmpty() || costStr == "VND") {
                 edtCost.error = "Vui lòng nhập giá gốc của sách!"
                 edtCost.requestFocus()
                 return@setOnClickListener
             }
 
-            val libraryId = TokenManager(requireContext()).getLibraryId()
-            if (libraryId == null) {
-                Toast.makeText(requireContext(), "Lỗi: Không tìm thấy thông tin thư viện!", Toast.LENGTH_SHORT).show()
+            // Dò tìm ID của thể loại dựa vào tên user đã chọn
+            val selectedCategory = categoryList.find { it.name == selectedCategoryName }
+            val categoryIdToSave = selectedCategory?.categoryId
+
+            if (categoryIdToSave == null) {
+                Toast.makeText(requireContext(), "Lỗi: Thể loại không hợp lệ!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
             val request = BookRequest(
-                libraryId = libraryId,
-                categoryId = 1L, // Tạm fix cứng categoryId, phần Spinner chọn danh mục mình xử lý sau
+                categoryId = categoryIdToSave,
                 isbn = isbn,
                 title = bookName,
                 author = author,
