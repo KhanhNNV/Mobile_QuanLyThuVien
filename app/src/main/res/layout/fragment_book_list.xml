@@ -74,52 +74,6 @@
             android:paddingBottom="16dp"
             android:visibility="gone">
 
-            <RadioGroup
-                android:id="@+id/rgStatusFilter"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:weightSum="4"
-                android:gravity="center_vertical">
-
-                <RadioButton
-                    android:id="@+id/rbAll"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Tất cả"
-                    android:checked="true"
-                    android:textColor="@color/text_primary"
-                    android:textSize="12sp" />
-
-                <RadioButton
-                    android:id="@+id/rbAvailable"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Có sẵn"
-                    android:textColor="@color/text_primary"
-                    android:textSize="12sp" />
-
-                <RadioButton
-                    android:id="@+id/rbBorrowed"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Đang mượn"
-                    android:textColor="@color/text_primary"
-                    android:textSize="12sp" />
-
-                <RadioButton
-                    android:id="@+id/rbLost"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Đã mất"
-                    android:textColor="@color/text_primary"
-                    android:textSize="12sp" />
-            </RadioGroup>
-
             <Spinner
                 android:id="@+id/spinnerCategory"
                 android:layout_width="match_parent"

@@ -35,7 +35,7 @@ class BookAdapter : ListAdapter<BookResponse, BookAdapter.BookViewHolder>(BookDi
         holder.tvAuthor.text = book.author
         holder.tvIsbn.text = "ISBN: ${book.isbn}"
         holder.tvQuantity.text = "Còn ${book.availableCopies ?: "--"} bản"
-        holder.tvCategory.text = "Danh muc: ${book.categoryName ?: "Chua cap nhat"}"
+        holder.tvCategory.text = "Danh mục: ${book.categoryName ?: "Chưa cập nhật"}"
 
         holder.itemView.setOnClickListener {
             onItemClick?.invoke(book)

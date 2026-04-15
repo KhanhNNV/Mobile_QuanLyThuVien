@@ -31,6 +31,19 @@ class BookCopyRepository(private val apiService: BookCopyApiService) {
         }
     }
 
+    suspend fun updateBookCopy(copyId: Long, request: BookCopyRequest): Result<BookCopyResponse> {
+        return try {
+            val response = apiService.updateBookCopy(copyId, request)
+            if (response.isSuccessful && response.body() != null) {
+                Result.success(response.body()!!)
+            } else {
+                Result.failure(Exception(response.errorBody()?.string().orEmpty().ifBlank { "Không thể cập nhật bản sao sách." }))
+            }
+        } catch (exception: Exception) {
+            Result.failure(exception)
+        }
+    }
+
     suspend fun deleteBookCopy(copyId: Long): Result<Unit> {
         return try {
             val response = apiService.deleteBookCopy(copyId)

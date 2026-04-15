@@ -77,6 +77,7 @@ class BookListViewModel(
                     _allBooks.value = books
                     applyFilters()
                     _bookListState.value = BookListUiState.Success(_allBooks.value)
+                    refreshAllAvailableCopies(books)
                 }
                 .onFailure { error ->
                     _bookListState.value = BookListUiState.Error(error.message ?: "Tai danh sach sach that bai.")
@@ -210,6 +211,114 @@ class BookListViewModel(
                 }
                 .onFailure { error ->
                     _bookCopyState.value = BookCopyUiState.Error(error.message ?: "Không thể thêm bản sao sách.")
+                }
+        }
+    }
+
+    fun buildNextBarcode(bookId: Long, categoryName: String?): String {
+        val prefix = normalizeCategoryCode(categoryName)
+        val sameBookCopies = _bookCopyState.value.let { state ->
+            if (state is BookCopyUiState.Success && state.bookId == bookId) state.copies else emptyList()
+        }
+        val nextSequence = sameBookCopies.size + 1
+        return "$prefix-$bookId-$nextSequence"
+    }
+
+    private fun updateBookAvailableCopies(bookId: Long, copies: List<BookCopyResponse>) {
+        val availableCount = copies.count { it.status.equals("AVAILABLE", ignoreCase = true) }
+        _allBooks.value = _allBooks.value.map { book ->
+            if (book.bookId == bookId) book.copy(availableCopies = availableCount) else book
+        }
+        applyFilters()
+    }
+
+    fun refreshAvailableCopiesFromBookDetail(bookId: Long) {
+        viewModelScope.launch {
+            bookCopyRepository.getBookCopiesByBook(bookId)
+                .onSuccess { copies -> updateBookAvailableCopies(bookId, copies) }
+        }
+    }
+
+    private fun refreshAllAvailableCopies(books: List<BookResponse>) {
+        viewModelScope.launch {
+            val results = books.map { book ->
+                async {
+                    bookCopyRepository.getBookCopiesByBook(book.bookId)
+                        .onSuccess { copies -> updateBookAvailableCopies(book.bookId, copies) }
+                }
+            }
+            results.forEach { it.await() }
+        }
+    }
+
+    private fun normalizeCategoryCode(categoryName: String?): String {
+        val ascii = removeDiacritics(categoryName.orEmpty())
+            .uppercase()
+            .replace(Regex("[^A-Z0-9 ]"), " ")
+            .trim()
+
+        return when {
+            ascii.contains("VAN HOC") || ascii.contains("VANHOC") -> "VH"
+            ascii.contains("KY NANG SONG") || ascii.contains("KYNANG SONG") -> "KNS"
+            ascii.contains("KINH DOANH") || ascii.contains("KINHDOANH") -> "KD"
+            ascii.contains("CONG NGHE THONG TIN") || ascii.contains("CONGNGHETHONGTIN") -> "CNTT"
+            ascii.contains("LAP TRINH") || ascii.contains("LAPTRINH") -> "LT"
+            ascii.contains("NGOAI NGU") || ascii.contains("NGOAINGU") -> "NN"
+            ascii.contains("THIEU NHI") || ascii.contains("THIEUNHI") -> "TN"
+            ascii.contains("TRINH THAM") || ascii.contains("TRINHTHAM") -> "TT"
+            else -> ascii.split(" ").filter { it.isNotBlank() }.joinToString("") { it.take(1) }.ifBlank { "BK" }
+        }
+    }
+
+    private fun removeDiacritics(input: String): String {
+        return input
+            .replace('á', 'a').replace('à', 'a').replace('ả', 'a').replace('ã', 'a').replace('ạ', 'a')
+            .replace('ă', 'a').replace('ắ', 'a').replace('ằ', 'a').replace('ẳ', 'a').replace('ẵ', 'a').replace('ặ', 'a')
+            .replace('â', 'a').replace('ấ', 'a').replace('ầ', 'a').replace('ẩ', 'a').replace('ẫ', 'a').replace('ậ', 'a')
+            .replace('é', 'e').replace('è', 'e').replace('ẻ', 'e').replace('ẽ', 'e').replace('ẹ', 'e')
+            .replace('ê', 'e').replace('ế', 'e').replace('ề', 'e').replace('ể', 'e').replace('ễ', 'e').replace('ệ', 'e')
+            .replace('í', 'i').replace('ì', 'i').replace('ỉ', 'i').replace('ĩ', 'i').replace('ị', 'i')
+            .replace('ó', 'o').replace('ò', 'o').replace('ỏ', 'o').replace('õ', 'o').replace('ọ', 'o')
+            .replace('ô', 'o').replace('ố', 'o').replace('ồ', 'o').replace('ổ', 'o').replace('ỗ', 'o').replace('ộ', 'o')
+            .replace('ơ', 'o').replace('ớ', 'o').replace('ờ', 'o').replace('ở', 'o').replace('ỡ', 'o').replace('ợ', 'o')
+            .replace('ú', 'u').replace('ù', 'u').replace('ủ', 'u').replace('ũ', 'u').replace('ụ', 'u')
+            .replace('ư', 'u').replace('ứ', 'u').replace('ừ', 'u').replace('ử', 'u').replace('ữ', 'u').replace('ự', 'u')
+            .replace('ý', 'y').replace('ỳ', 'y').replace('ỷ', 'y').replace('ỹ', 'y').replace('ỵ', 'y')
+            .replace('đ', 'd')
+            .replace('Á', 'A').replace('À', 'A').replace('Ả', 'A').replace('Ã', 'A').replace('Ạ', 'A')
+            .replace('Ă', 'A').replace('Ắ', 'A').replace('Ằ', 'A').replace('Ẳ', 'A').replace('Ẵ', 'A').replace('Ặ', 'A')
+            .replace('Â', 'A').replace('Ấ', 'A').replace('Ầ', 'A').replace('Ẩ', 'A').replace('Ẫ', 'A').replace('Ậ', 'A')
+            .replace('É', 'E').replace('È', 'E').replace('Ẻ', 'E').replace('Ẽ', 'E').replace('Ẹ', 'E')
+            .replace('Ê', 'E').replace('Ế', 'E').replace('Ề', 'E').replace('Ể', 'E').replace('Ễ', 'E').replace('Ệ', 'E')
+            .replace('Í', 'I').replace('Ì', 'I').replace('Ỉ', 'I').replace('Ĩ', 'I').replace('Ị', 'I')
+            .replace('Ó', 'O').replace('Ò', 'O').replace('Ỏ', 'O').replace('Õ', 'O').replace('Ọ', 'O')
+            .replace('Ô', 'O').replace('Ố', 'O').replace('Ồ', 'O').replace('Ổ', 'O').replace('Ỗ', 'O').replace('Ộ', 'O')
+            .replace('Ơ', 'O').replace('Ớ', 'O').replace('Ờ', 'O').replace('Ở', 'O').replace('Ỡ', 'O').replace('Ợ', 'O')
+            .replace('Ú', 'U').replace('Ù', 'U').replace('Ủ', 'U').replace('Ũ', 'U').replace('Ụ', 'U')
+            .replace('Ư', 'U').replace('Ứ', 'U').replace('Ừ', 'U').replace('Ử', 'U').replace('Ữ', 'U').replace('Ự', 'U')
+            .replace('Ý', 'Y').replace('Ỳ', 'Y').replace('Ỷ', 'Y').replace('Ỹ', 'Y').replace('Ỵ', 'Y')
+            .replace('Đ', 'D')
+    }
+
+    fun updateBookCopy(copyId: Long, bookId: Long, condition: String, barcode: String? = null) {
+        viewModelScope.launch {
+            _bookCopyState.value = BookCopyUiState.Loading
+            val currentCopy = (_bookCopyState.value as? BookCopyUiState.Success)
+                ?.copies
+                ?.firstOrNull { it.copyId == copyId }
+            val request = BookCopyRequest(
+                bookId = currentCopy?.bookId ?: bookId,
+                barcode = barcode ?: currentCopy?.barcode.orEmpty(),
+                condition = condition,
+                status = currentCopy?.status ?: "AVAILABLE"
+            )
+            bookCopyRepository.updateBookCopy(copyId, request)
+                .onSuccess {
+                    loadBookCopies(bookId)
+                    loadBooks()
+                }
+                .onFailure { error ->
+                    _bookCopyState.value = BookCopyUiState.Error(error.message ?: "Không thể cập nhật bản sao sách.")
                 }
         }
     }
