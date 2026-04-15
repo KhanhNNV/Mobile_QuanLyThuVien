@@ -15,11 +15,11 @@ public interface ReaderRepository extends JpaRepository<Reader, Long> {
     long countByLibrary_LibraryId(Long libraryId);
 
     // Tìm kiếm tương đối theo Tên, Số điện thoại hoặc Mã thẻ (Barcode)
-    @Query("SELECT r FROM Reader r WHERE " +
+    @Query("SELECT r FROM Reader r WHERE r.library.libraryId = :libraryId AND (" +
             "LOWER(r.fullName) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
             "r.phone LIKE CONCAT('%', :query, '%') OR " +
-            "LOWER(r.barcode) LIKE LOWER(CONCAT('%', :query, '%'))")
-    List<Reader> searchReaders(@Param("query") String query);
+            "LOWER(r.barcode) LIKE LOWER(CONCAT('%', :query, '%')))")
+    List<Reader> searchReadersByLibraryId(@Param("libraryId") Long libraryId, @Param("query") String query);
 
 
     /**

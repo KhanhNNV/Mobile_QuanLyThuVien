@@ -1,7 +1,10 @@
 package com.example.quanlythuvien.ui.reader
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
+import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -15,6 +18,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class ReaderListFragment : Fragment(R.layout.fragment_reader_list) {
     private lateinit var readerAdapter: ReaderAdapter
+    private lateinit var etSearch: EditText
 
     // Này để khi xoay màn hình thì , android sẽ phải xây lại fragment nhưng dữ liệu không mất
     private val viewModel: ReaderListViewModel by viewModels()
@@ -33,12 +37,10 @@ class ReaderListFragment : Fragment(R.layout.fragment_reader_list) {
             // Chuyển sang màn hình form nhập độc giả
             findNavController().navigate(R.id.readerAddFragment)
         }
+        etSearch = view.findViewById(R.id.etSearch)
         setupRecyclerView(view)
         observeViewModel()
-
-        // Load trang đầu tiên khi mở màn hình
-        setupRecyclerView(view)
-        observeViewModel()
+        setupSearchListener()
     }
 
     private fun setupRecyclerView(view: View) {
@@ -91,6 +93,18 @@ class ReaderListFragment : Fragment(R.layout.fragment_reader_list) {
         viewModel.error.observe(viewLifecycleOwner) { msg ->
             Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun setupSearchListener() {
+        etSearch.addTextChangedListener(object : TextWatcher { //TextWatcher interface theo dõi sự thay đổi của văn bản trong EditText.
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
+
+            override fun afterTextChanged(s: Editable?) {
+                viewModel.updateSearchQuery(s?.toString().orEmpty())  // Chỉ cập nhật Flow, không gọi API trực tiếp
+            }
+        })
     }
 
 }

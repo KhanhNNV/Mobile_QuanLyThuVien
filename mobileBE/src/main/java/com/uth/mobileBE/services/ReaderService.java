@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,7 +25,7 @@ public class ReaderService {
     private final LibraryRepository libraryRepository;
 
     //Tạo người độc giả
-    @Transactional(readOnly = true)
+    @Transactional
     public ReaderResponse createReader(ReaderRequest request) {
         Long libraryId = SecurityUtils.getLibraryId();
         Library libraryRef = libraryRepository.getReferenceById(libraryId);
@@ -46,20 +47,18 @@ public class ReaderService {
                                .map(this::mapToReaderResponse)
                                .collect(Collectors.toList());
     }
-
     /**
      * Lấy danh sách độc giả theo trang
      * @param `page` Số thứ tự trang (bắt đầu từ 0)
      * @param `size` Số lượng phần tử trên 1 trang (ví dụ: 10)
      */
-    @Transactional(readOnly = true)
     public Page<ReaderResponse> getReadersPaginated(int page, int size) {
         Long libraryId = SecurityUtils.getLibraryId();
         Pageable pageable = PageRequest.of(page, size);
-        Page<Reader> readerPage = readerRepository.findByLibrary_LibraryId(libraryId, pageable);
-        return readerPage.map(this::mapToReaderResponse);
-    }
+        return readerRepository.findByLibrary_LibraryId(libraryId, pageable)
+                               .map(this::mapToReaderResponse);
 
+    }
     //Tìm lọc độc giả
     public ReaderResponse getReaderById(Long id) {
         Reader reader = readerRepository.findById(id)
@@ -72,8 +71,11 @@ public class ReaderService {
      * @return listReader
      */
     public List<ReaderResponse> searchListReader(String request) {
-        if (request == null || request.isEmpty()) { return null; }
-        List<Reader> listReader = readerRepository.searchReaders(request.trim());
+        if (request == null || request.trim().isEmpty()) {
+            return Collections.emptyList();
+        }
+        Long libraryId = SecurityUtils.getLibraryId();
+        List<Reader> listReader = readerRepository.searchReadersByLibraryId(libraryId, request.trim());
         return listReader.stream().map(reader -> mapToReaderResponse(reader))
                                        .collect(Collectors.toList());
     }

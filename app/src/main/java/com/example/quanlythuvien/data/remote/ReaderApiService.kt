@@ -17,4 +17,11 @@ interface ReaderApiService {
         @Query("page") page: Int,
         @Query("size") size: Int
     ): Response<PageResponse<ReaderResponse>>
+
+    //API gọi search reader
+    @GET("api/readers/search")
+    suspend fun searchReaders(
+        @Query("query") query: String
+    ): Response<List<ReaderResponse>>
+
 }
