@@ -8,15 +8,13 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quanlythuvien.R
+import com.example.quanlythuvien.data.model.response.ReaderResponse
+import com.example.quanlythuvien.data.repository.ReaderRepository
 import com.example.quanlythuvien.data2.entity.Reader
 
-open class ReaderDiffCallback {
-
-}
-
-class ReaderAdapter (
-    private val onItemClick: (Reader) -> Unit
-): ListAdapter<Reader, ReaderAdapter.ReaderViewHolder>(ReaderDiffCallback()) {
+class ReaderAdapter(
+    private val onItemClick: (ReaderResponse) -> Unit
+) : ListAdapter<ReaderResponse, ReaderAdapter.ReaderViewHolder>(ReaderDiffCallback()) {
 
     override fun onCreateViewHolder(
         p0: ViewGroup, p1: Int
@@ -42,23 +40,28 @@ class ReaderAdapter (
         private val tvReaderStatus: TextView = itemView.findViewById(R.id.tvReaderStatus)
         private val tvAvatar: TextView = itemView.findViewById(R.id.tvAvatar)
 
-        fun bind(reader: Reader) {
-            tvReaderName.text = reader.name
-            tvReaderInfo.text = reader.phoneNumber
-            tvReaderStatus.text = reader.readerType.name
-            tvAvatar.text = reader.name.firstOrNull()?.uppercase()
+        fun bind(reader: ReaderResponse) {
+            // Dùng đúng các biến trả về từ API
+            tvReaderName.text = reader.fullName
+            tvReaderInfo.text = reader.phone
+
+            // Vì dự án bỏ "type" nên ta ẩn luôn phần text trạng thái/loại đi cho giao diện sạch
+            tvReaderStatus.visibility = View.GONE
+
+            tvAvatar.text = reader.fullName.firstOrNull()?.uppercase()
         }
+
     }
 
-    class ReaderDiffCallback : DiffUtil.ItemCallback<Reader>() {
+    class ReaderDiffCallback : DiffUtil.ItemCallback<ReaderResponse>() {
         override fun areItemsTheSame(
-            p0: Reader, p1: Reader
+            p0: ReaderResponse, p1: ReaderResponse
         ): Boolean {
             return p0.readerId == p1.readerId
         }
 
         override fun areContentsTheSame(
-            p0: Reader, p1: Reader
+            p0: ReaderResponse, p1: ReaderResponse
         ): Boolean {
             return p0 == p1
         }

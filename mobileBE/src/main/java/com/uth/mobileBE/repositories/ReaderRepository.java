@@ -29,6 +29,6 @@ public interface ReaderRepository extends JpaRepository<Reader, Long> {
      * @param pageable  đối tượng chứa thông tin phân trang (số trang, kích thước, sắp xếp)
      * @return một trang (Page) chứa danh sách các Reader tương ứng với thư viện
      */
-    Page<Reader> findByLibrary_LibraryIdPaged(Long libraryId, Pageable pageable);
+    Page<Reader> findByLibrary_LibraryId(Long libraryId, Pageable pageable);
 }
 

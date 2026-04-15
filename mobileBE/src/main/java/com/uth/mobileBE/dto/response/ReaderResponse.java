@@ -16,7 +16,6 @@ public class ReaderResponse {
     private String fullName;
     private String phone;
     private String barcode;
-    private Boolean isStudent;
     private Boolean isBlocked;
     private LocalDateTime membershipExpiry;
     private LocalDateTime createdAt;

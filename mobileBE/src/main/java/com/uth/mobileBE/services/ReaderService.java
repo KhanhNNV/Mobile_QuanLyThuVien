@@ -57,7 +57,7 @@ public class ReaderService {
     public Page<ReaderResponse> getReadersPaginated(int page, int size) {
         Long libraryId = SecurityUtils.getLibraryId();
         Pageable pageable = PageRequest.of(page, size);
-        Page<Reader> readerPage = readerRepository.findByLibrary_LibraryIdPaged(libraryId, pageable);
+        Page<Reader> readerPage = readerRepository.findByLibrary_LibraryId(libraryId, pageable);
         return readerPage.map(this::mapToReaderResponse);
     }
 

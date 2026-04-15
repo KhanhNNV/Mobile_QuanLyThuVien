@@ -31,7 +31,7 @@ public class ReaderController {
      * Lấy danh sách tất cả độc giả
      * @return danh sách độc giả
      */
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<List<ReaderResponse>> getAll() {
         return ResponseEntity.ok(readerService.getAllReaders());
     }
@@ -95,6 +95,7 @@ public class ReaderController {
      * Lấy danh sách độc giả+ Phân trang
      * @parem `page`, 'size`
      */
+    @GetMapping
     public ResponseEntity<?> getReadersPaginated(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size)

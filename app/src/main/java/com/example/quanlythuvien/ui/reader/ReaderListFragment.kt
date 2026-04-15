@@ -34,35 +34,34 @@ class ReaderListFragment : Fragment(R.layout.fragment_reader_list) {
         }
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.rvReaders)
+        val layoutManager = LinearLayoutManager(requireContext())
+        readerAdapter = ReaderAdapter { readerResponse ->
+            val bundle = Bundle().apply {
+                // Ép kiểu Long sang Int nếu màn hình Detail của bạn đang dùng Int để hứng Id
+                putInt("readerId", readerResponse.readerId.toInt())
 
-        readerAdapter = ReaderAdapter{
-            reader ->
-            var bundle = Bundle().apply{
-                putInt("readerId", reader.readerId)
-                putString("readerName", reader.name)
-                putString("readerPhone", reader.phoneNumber)
-                putString("readerType", reader.readerType.name)
+                // Dùng fullName và phone thay vì name và phoneNumber
+                putString("readerName", readerResponse.fullName)
+                putString("readerPhone", readerResponse.phone)
             }
 
             findNavController().navigate(R.id.readerDetailFragment, bundle)
         }
+
         recyclerView.adapter = readerAdapter
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        recyclerView.layoutManager = layoutManager
 
-        viewModel.allReaders.observe(viewLifecycleOwner) { readers ->
-//            readers?.let {
-//                readerAdapter.submitList(it)
-//            }
-
-            if (readers != null && readers.isEmpty()) {
-                // Nếu DB đang rỗng -> Tự động chèn dữ liệu mẫu
-                viewModel.insertMockData()
-            } else {
-                // Nếu đã có dữ liệu -> Đưa vào RecyclerView hiển thị
-                readerAdapter.submitList(readers)
-            }
+        viewModel.allReader.observe(viewLifecycleOwner) { readers ->
+            readerAdapter.submitList(readers)
         }
+
+        // Bắt sự kiện cuộn để xử lý phân trang
+        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(rv: RecyclerView, dx: Int, dy: Int) {
+                if (dy > 0 && !rv.canScrollVertically(1)) {
+                    viewModel.fetchReaders()
+                }
+            }
+        })
     }
-
-
 }
