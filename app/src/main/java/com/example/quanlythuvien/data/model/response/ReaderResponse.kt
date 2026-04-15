@@ -8,5 +8,4 @@ data class ReaderResponse(
     val isBlocked: Boolean,
     val membershipExpiry: String?,
     val createdAt: String?,
-    val updatedAt: String?
 )
