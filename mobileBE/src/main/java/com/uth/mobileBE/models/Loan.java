@@ -1,5 +1,6 @@
 package com.uth.mobileBE.models;
 
+import com.uth.mobileBE.models.enums.BookCondition;
 import com.uth.mobileBE.models.enums.StatusLoan;
 import jakarta.persistence.*;
 import lombok.*;
@@ -7,7 +8,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -16,6 +16,7 @@ import java.util.List;
 @Entity
 @Table(name = "loan")
 public class Loan {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long loanId;
@@ -32,16 +33,22 @@ public class Loan {
     @JoinColumn(name = "processed_by", nullable = false)
     private User processedBy;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "copy_id", nullable = false)
+    private BookCopy bookCopy;
+
     private LocalDateTime borrowDate;
+    private LocalDateTime dueDate;     // Hạn trả
+    private LocalDateTime returnDate;  // Ngày trả thực tế
 
     @Enumerated(EnumType.STRING)
-    private StatusLoan status;
+    private StatusLoan status;         // BORROWING, RETURNED, CLOSED, OVERDUE
 
-    @OneToMany(mappedBy = "loan", cascade = CascadeType.ALL)
-    private List<LoanDetail> loanDetails;
+    @Enumerated(EnumType.STRING)
+    private BookCondition condition;   // NORMAL, LOST, DAMAGED
 
     @CreationTimestamp
-    @Column(updatable = false) // Không cho phép sửa ngày tạo sau khi đã tạo
+    @Column(updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp

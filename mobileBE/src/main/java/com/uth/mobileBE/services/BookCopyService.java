@@ -22,6 +22,32 @@ public class BookCopyService {
     private final BookCopyRepository bookCopyRepository;
     private final BookRepository bookRepository;
 
+    @Transactional(readOnly = true)
+    public List<BookCopyResponse> getAvailableCopies(Long libraryId) {
+
+        List<BookCopy> availableCopies = bookCopyRepository.findByBook_Library_LibraryIdAndStatus(
+                libraryId,
+                StatusBookCopy.AVAILABLE
+        );
+
+        // Map toàn bộ dữ liệu sang DTO
+        return availableCopies.stream().map(copy -> BookCopyResponse.builder()
+                .copyId(copy.getCopyId())
+                .bookId(copy.getBook().getBookId()) // Lấy ID của đầu sách gốc
+
+                // THÊM MỚI: Lấy Tên sách và Tác giả từ đối tượng Book gốc
+                .title(copy.getBook().getTitle())
+                .author(copy.getBook().getAuthor())
+
+                .barcode(copy.getBarcode())
+                .condition(copy.getCondition())
+                .status(copy.getStatus())
+                .createdAt(copy.getCreatedAt())
+                .updatedAt(copy.getUpdatedAt())
+                .build()
+        ).collect(Collectors.toList());
+    }
+
     @Transactional
     public BookCopyResponse createBookCopy(BookCopyRequest request) {
         if (request.getBookId() == null) {
@@ -73,27 +99,44 @@ public class BookCopyService {
 
     @Transactional
     public BookCopyResponse updateBookCopy(Long copyId, BookCopyRequest request) {
-        if (request.getBarcode() == null || request.getBarcode().isBlank()) {
-            throw new RuntimeException("Barcode không được để trống");
-        }
-        if (request.getCondition() == null || request.getStatus() == null) {
-            throw new RuntimeException("condition và status không được để trống");
-        }
-
         BookCopy copy = bookCopyRepository.findById(copyId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy bản sao với ID: " + copyId));
 
-        if (!copy.getBarcode().equals(request.getBarcode())
-                && bookCopyRepository.existsByBarcode(request.getBarcode())) {
-            throw new RuntimeException("Mã barcode đã tồn tại!");
+        validateBookId(copy, request);
+        updateBarcode(copy, request.getBarcode());
+        updateConditionAndStatus(copy, request.getCondition(), request.getStatus());
+
+        return mapToResponse(bookCopyRepository.save(copy));
+    }
+
+    private void validateBookId(BookCopy copy, BookCopyRequest request) {
+        if (request.getBookId() != null && !request.getBookId().equals(copy.getBook().getBookId())) {
+            throw new RuntimeException("Không được thay đổi bookId của bản sao");
+        }
+    }
+
+    private void updateBarcode(BookCopy copy, String barcode) {
+        if (barcode == null) {
+            return;
         }
 
-        copy.setBarcode(request.getBarcode());
-        copy.setCondition(request.getCondition());
-        copy.setStatus(request.getStatus());
+        String normalizedBarcode = barcode.trim();
+        if (normalizedBarcode.isBlank()) {
+            throw new RuntimeException("Barcode không được để trống");
+        }
+        if (!normalizedBarcode.equals(copy.getBarcode()) && bookCopyRepository.existsByBarcode(normalizedBarcode)) {
+            throw new RuntimeException("Mã barcode đã tồn tại!");
+        }
+        copy.setBarcode(normalizedBarcode);
+    }
 
-        BookCopy updated = bookCopyRepository.save(copy);
-        return mapToResponse(updated);
+    private void updateConditionAndStatus(BookCopy copy, ConditionBookCopy condition, StatusBookCopy status) {
+        if (condition != null) {
+            copy.setCondition(condition);
+        }
+        if (status != null) {
+            copy.setStatus(status);
+        }
     }
 
     @Transactional

@@ -23,7 +23,8 @@ public class BookController {
 
     @PostMapping("/welcome")
     public ResponseEntity<InitialBookResponse> createInitialBook(@RequestBody InitialBookRequest request) {
-        InitialBookResponse response = bookService.createInitialBook(request);
+        Long libraryId = SecurityUtils.getLibraryId();
+        InitialBookResponse response = bookService.createInitialBook(request,libraryId);
         return ResponseEntity.ok(response);
     }
 

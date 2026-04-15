@@ -1,5 +1,6 @@
 package com.uth.mobileBE.controllers;
 
+import com.uth.mobileBE.Utils.SecurityUtils;
 import com.uth.mobileBE.dto.request.BookCopyRequest;
 import com.uth.mobileBE.dto.response.BookCopyResponse;
 import com.uth.mobileBE.services.BookCopyService;
@@ -16,6 +17,23 @@ import java.util.List;
 public class BookCopyController {
 
     private final BookCopyService bookCopyService;
+
+
+    //Hàm lấy bookcopy cho spinner sửa thông tin sách
+    @GetMapping("/available")
+    public ResponseEntity<List<BookCopyResponse>> getAvailableCopies() {
+
+        // 1. Lấy libraryId của người đang thao tác (từ Token)
+        Long currentLibraryId = SecurityUtils.getLibraryId();
+
+        // 2. Gọi Service để lấy dữ liệu
+        List<BookCopyResponse> response = bookCopyService.getAvailableCopies(currentLibraryId);
+
+        // 3. Trả về kết quả với HTTP Status 200 (OK)
+        return ResponseEntity.ok(response);
+    }
+
+
 
     @PostMapping
     public ResponseEntity<BookCopyResponse> createBookCopy(@RequestBody BookCopyRequest request) {

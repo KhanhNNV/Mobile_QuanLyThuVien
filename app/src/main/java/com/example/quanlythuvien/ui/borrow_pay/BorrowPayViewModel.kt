@@ -29,19 +29,19 @@ class BorrowPayViewModel(private val repository: LoanRepository) : ViewModel() {
                 if (response.isSuccessful && response.body() != null) {
                     val loanResponseList = response.body()!!
 
-                    // MAP DỮ LIỆU: Từ DTO của Backend sang LoanItemData của bạn
+                    // MAP DỮ LIỆU: Từ DTO của Backend sang LoanItemData
                     val uiModelList = loanResponseList.map { dto ->
 
-                        // --- Xử lý danh sách sách mượn (Khớp 100% với file Data của bạn) ---
-                        val detailList = dto.bookTitles?.map { titleName ->
+                        // --- Xử lý danh sách sách mượn (Bây giờ dùng bookDetails thay vì bookTitles) ---
+                        val detailList = dto.bookDetails?.map { detail ->
                             LoanDetailItemData(
-                                bookId = 0L,              // Gán mặc định vì API List không có
-                                title = titleName,        // Lấy tên sách từ danh sách trả về
-                                author = "N/A",           // Gán mặc định
-                                categoryName = "N/A",     // Gán mặc định
-                                returnDate = null,        // Gán mặc định
-                                dueDate = "N/A",          // Gán mặc định
-                                status = dto.status       // Dùng trạng thái chung của phiếu mượn
+                                bookId = detail.copyId ?: 0L,           // Lấy ID thật từ backend
+                                title = detail.title ?: "Không rõ",     // Tên sách
+                                author = detail.author ?: "Không rõ",   // Tác giả
+                                categoryName = detail.category ?: "Không rõ", // Thể loại
+                                returnDate = detail.returnDate,         // Ngày trả
+                                dueDate = detail.dueDate ?: "Chưa có",  // Hạn trả
+                                status = detail.status ?: dto.status    // Lấy trạng thái của từng cuốn sách
                             )
                         }?.toMutableList() ?: mutableListOf()
 

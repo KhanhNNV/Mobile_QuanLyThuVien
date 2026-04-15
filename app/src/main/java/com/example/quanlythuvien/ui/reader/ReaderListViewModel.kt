@@ -1,120 +1,169 @@
 package com.example.quanlythuvien.ui.reader
 
 import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.viewModelScope
-import com.example.quanlythuvien.data2.AppDatabase
-import com.example.quanlythuvien.data2.entity.Reader
-import com.example.quanlythuvien.data2.entity.enums.ReaderType
-import com.example.quanlythuvien.data2.repository.ReaderRepository
+import androidx.lifecycle.*
+import com.example.quanlythuvien.core.api.RetrofitClient
+import com.example.quanlythuvien.data.model.response.ReaderResponse
+import com.example.quanlythuvien.data.remote.ReaderApiService
+import com.example.quanlythuvien.data.repository.ReaderRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.time.debounce
 
-class ReaderListViewModel(application: Application): AndroidViewModel(application) {
-    private val repository: ReaderRepository
-    val allReaders: LiveData<List<Reader>>
+class ReaderListViewModel(application: Application) : AndroidViewModel(application) {
+    // Khởi tạo API Service và Repository để giao tiếp với Backend
+    private val apiService = RetrofitClient.getInstance(application).create(ReaderApiService::class.java)
+    private val readerRepository = ReaderRepository(apiService)
+
+
+    private val _readers = MutableLiveData<List<ReaderResponse>>(emptyList())
+    val allReader: LiveData<List<ReaderResponse>> get() = _readers
+
+    private val _error = MutableLiveData<String>()
+    val error: LiveData<String> get() = _error
+
+
+    //Giữ các từ khóa tìm kiếm
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery = _searchQuery.asStateFlow()
+
+    // CÁC BIẾN QUẢN LÝ TRẠNG THÁI PHÂN TRANG
+    private var currentPage = 0
+    private var isLastPage = false
+    private var isLoading = false
+    private var isSearchMode = false
 
     init {
-        val dao = AppDatabase.getDatabase(application).readerDao()
-        repository = ReaderRepository(dao)
-        allReaders = repository.allReaders
+        loadInitialReaders() // Tự động tải trang đầu tiên khi ViewModel khởi tạo
+
+        setupSearchListener()
     }
-    fun insertMockData() {
+
+    /**
+     * Hàm tải lại từ đầu (dùng cho lần đầu mở máy hoặc khi người dùng Refresh)
+     */
+    fun loadInitialReaders() {
+        isSearchMode = false
+        currentPage = 0
+        isLastPage = false
+        _readers.value = emptyList()
+        fetchReaders()
+    }
+
+    /**
+     * Hàm yêu cầu tải thêm trang tiếp theo khi người dùng cuộn xuống cuối
+     */
+    fun loadMoreReaders() {
+        if (isLoading || isLastPage || isSearchMode) return
+        currentPage++
+        fetchReaders()
+    }
+
+    fun searchReaders(query: String) {
+        val keyword = query.trim()
+        if (keyword.isEmpty()) {
+            loadInitialReaders()
+            return
+        }
+
+        isSearchMode = true
+        isLoading = true
         viewModelScope.launch {
-            val reader1 = Reader(
-                name = "Nguyễn Văn A",
-                phoneNumber = "0901234567",
-                readerType = ReaderType.STUDENT,
-                expirationDate = System.currentTimeMillis() + (86400000L * 30) // 30 ngày
-            )
-            val reader2 = Reader(
-                name = "Trần Thị B",
-                phoneNumber = "0987654321",
-                readerType = ReaderType.GUEST,
-                expirationDate = System.currentTimeMillis() + (86400000L * 7) // 7 ngày
-            )
-            val reader3 = Reader(
-                name = "Lê Văn C",
-                phoneNumber = "0911222333",
-                readerType = ReaderType.STUDENT,
-                expirationDate = null
-            )
-            val reader4 = Reader(
-                name = "Phạm Thị D",
-                phoneNumber = "0922333444",
-                readerType = ReaderType.STUDENT,
-                expirationDate = System.currentTimeMillis() + (86400000L * 60) // 60 ngày
-            )
-            val reader5 = Reader(
-                name = "Hoàng Văn E",
-                phoneNumber = "0933444555",
-                readerType = ReaderType.GUEST,
-                expirationDate = System.currentTimeMillis() + (86400000L * 14) // 14 ngày
-            )
-            val reader6 = Reader(
-                name = "Đặng Thị F",
-                phoneNumber = "0944555666",
-                readerType = ReaderType.STUDENT,
-                expirationDate = null // Không có thời hạn
-            )
-            val reader7 = Reader(
-                name = "Bùi Văn G",
-                phoneNumber = "0955666777",
-                readerType = ReaderType.GUEST,
-                expirationDate = System.currentTimeMillis() + (86400000L * 3) // 3 ngày
-            )
-            val reader8 = Reader(
-                name = "Vũ Thị H",
-                phoneNumber = "0966777888",
-                readerType = ReaderType.STUDENT,
-                expirationDate = System.currentTimeMillis() + (86400000L * 120) // 120 ngày
-            )
-            val reader9 = Reader(
-                name = "Ngô Văn I",
-                phoneNumber = "0977888999",
-                readerType = ReaderType.STUDENT,
-                expirationDate = System.currentTimeMillis() + (86400000L * 90) // 90 ngày
-            )
-            val reader10 = Reader(
-                name = "Đỗ Thị K",
-                phoneNumber = "0988999000",
-                readerType = ReaderType.GUEST,
-                expirationDate = null
-            )
-            val reader11 = Reader(
-                name = "Lý Văn L",
-                phoneNumber = "0999000111",
-                readerType = ReaderType.STUDENT,
-                expirationDate = System.currentTimeMillis() + (86400000L * 15) // 15 ngày
-            )
-            val reader12 = Reader(
-                name = "Hồ Thị M",
-                phoneNumber = "0811222333",
-                readerType = ReaderType.GUEST,
-                expirationDate = System.currentTimeMillis() + (86400000L * 1) // 1 ngày
-            )
-            val reader13 = Reader(
-                name = "Đinh Văn N",
-                phoneNumber = "0822333444",
-                readerType = ReaderType.STUDENT,
-                expirationDate = System.currentTimeMillis() + (86400000L * 30) // 30 ngày
-            )
-
-
-            repository.insert(reader4)
-            repository.insert(reader5)
-            repository.insert(reader6)
-            repository.insert(reader7)
-            repository.insert(reader8)
-            repository.insert(reader9)
-            repository.insert(reader10)
-            repository.insert(reader11)
-            repository.insert(reader12)
-            repository.insert(reader13)
-
-            repository.insert(reader1)
-            repository.insert(reader2)
-            repository.insert(reader3)
+            try {
+                val response = readerRepository.searchReaders(keyword)
+                if (response.isSuccessful) {
+                    _readers.value = response.body().orEmpty()
+                    isLastPage = true
+                } else {
+                    _error.value = "Không thể tìm kiếm: ${response.code()}"
+                }
+            } catch (e: Exception) {
+                _error.value = "Lỗi tìm kiếm: ${e.message}"
+            } finally {
+                isLoading = false
+            }
         }
     }
+
+    /**
+     * Hàm lấy dữ liệu từ API và cập nhật vào LiveData
+     */
+    private fun fetchReaders() {
+        isLoading = true //Bật cờ tránh gọi nhiều lần API
+        viewModelScope.launch {
+            try {
+                // Gọi Repository lấy dữ liệu theo Page và Size (10)
+                val response = readerRepository.getReadersPaginated(currentPage, 10)
+                if (response.isSuccessful) {
+                    response.body()?.let { pageData ->
+                        // Cộng dồn danh sách cũ với danh sách mới
+                        val currentList = _readers.value.orEmpty().toMutableList()
+                        currentList.addAll(pageData.content)
+                        _readers.value = currentList
+                        //Cập nhật lại biến cờ trang cuối
+                        isLastPage = pageData.last
+                    }
+                } else {
+                    _error.value = "Không thể lấy dữ liệu: ${response.code()}"
+                }
+            } catch (e: Exception) {
+                _error.value = "Lỗi kết nối: ${e.message}"
+            } finally {
+                isLoading = false // Hoàn tất quá trình tải, hạ cờ xuống để cho phép gọi lần sau
+            }
+        }
+    }
+
+    private fun setupSearchListener() {
+        viewModelScope.launch {
+            _searchQuery
+                .debounce(500)                     // Đợi 0.5s sau lần gõ cuối
+                .distinctUntilChanged()            // Không gọi lại nếu từ khóa không đổi
+                .collect { query ->
+                    performSearch(query.trim())
+                }
+        }
+    }
+
+    /**
+     * Hàm này được Fragment gọi mỗi khi người dùng gõ (để cập nhật Flow)
+     */
+    fun updateSearchQuery(query: String) {
+        _searchQuery.value = query
+    }
+
+
+    /**
+     * Thực sự gọi API tìm kiếm
+     */
+    private suspend fun performSearch(query: String) {
+        if (query.isEmpty()) {
+            // Xóa trắng -> quay lại danh sách phân trang
+            loadInitialReaders()
+            return
+        }
+
+        isSearchMode = true
+        isLoading = true
+        try {
+            val response = readerRepository.searchReaders(query)
+            if (response.isSuccessful) {
+                _readers.value = response.body().orEmpty()
+                isLastPage = true   // Tìm kiếm trả về toàn bộ, không phân trang
+            } else {
+                _error.value = "Không thể tìm kiếm: ${response.code()}"
+            }
+        } catch (e: Exception) {
+            _error.value = "Lỗi tìm kiếm: ${e.message}"
+        } finally {
+            isLoading = false
+        }
+    }
+
+    // Các hàm helper để Fragment kiểm tra trạng thái mà không can thiệp trực tiếp vào biến private
+    fun isLoading() = isLoading
+    fun isLastPage() = isLastPage
 }

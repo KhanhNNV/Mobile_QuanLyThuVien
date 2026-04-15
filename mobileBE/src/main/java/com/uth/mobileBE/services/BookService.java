@@ -1,5 +1,6 @@
 package com.uth.mobileBE.services;
 
+import com.uth.mobileBE.Utils.GenerateBarcode;
 import com.uth.mobileBE.dto.request.BookRequest;
 import com.uth.mobileBE.dto.request.InitialBookRequest;
 import com.uth.mobileBE.dto.response.BookResponse;
@@ -30,8 +31,8 @@ public class BookService {
     private final CategoryRepository categoryRepository;
 
     @Transactional
-    public InitialBookResponse createInitialBook(InitialBookRequest request) {
-        Library library = libraryRepository.findById(request.getLibraryId())
+    public InitialBookResponse createInitialBook(InitialBookRequest request,Long libraryId) {
+        Library library = libraryRepository.findById(libraryId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy thư viện"));
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy thể loại"));
@@ -47,9 +48,12 @@ public class BookService {
                 .build();
         Book savedBook = bookRepository.save(book);
 
+        int count=bookCopyRepository.countByBook_BookId(savedBook.getBookId());
+        String barcode = GenerateBarcode.generateBarcode(category.getName(),savedBook.getBookId(),count);
+
         BookCopy copy = BookCopy.builder()
                 .book(savedBook)
-                .barcode(request.getBarcode())
+                .barcode(barcode)
                 .condition(ConditionBookCopy.NEW)
                 .status(StatusBookCopy.AVAILABLE)
                 .build();

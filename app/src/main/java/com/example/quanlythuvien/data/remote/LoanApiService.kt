@@ -2,6 +2,7 @@ package com.example.quanlythuvien.data.remote
 
 import com.example.quanlythuvien.data.model.response.LoanResponse
 import retrofit2.Response
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -20,4 +21,13 @@ interface LoanApiService {
         @Query("toDate") toDate: String? = null,
         @Query("search") search: String? = null
     ): Response<List<LoanResponse>>
+
+    // Lấy chi tiết phiếu mượn theo ID
+    @GET("api/loans/{id}")
+    suspend fun getLoanById(@Path("id") id: Long): Response<LoanResponse>
+
+    // Xóa phiếu mượn theo ID
+    // Backend trả về ResponseEntity<Void> nên bên Kotlin mình dùng Response<Unit>
+    @DELETE("api/loans/{id}")
+    suspend fun deleteLoan(@Path("id") id: Long): Response<Unit>
 }
