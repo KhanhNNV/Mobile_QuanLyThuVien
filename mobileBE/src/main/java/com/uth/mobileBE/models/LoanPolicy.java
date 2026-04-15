@@ -2,6 +2,8 @@ package com.uth.mobileBE.models;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -24,10 +26,12 @@ public class LoanPolicy {
     @JoinColumn(name = "category_id") // Nullable vì có thể áp dụng chung
     private Category category;
 
-    private Boolean applyForStudent;
 
     private Integer maxBorrowDays;
 
+    @CreationTimestamp
     private LocalDateTime createdAt;
+
+    @UpdateTimestamp
     private LocalDateTime updateAt;
 }

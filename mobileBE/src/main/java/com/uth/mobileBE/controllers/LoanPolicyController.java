@@ -1,11 +1,13 @@
 package com.uth.mobileBE.controllers;
 
+import com.uth.mobileBE.Utils.SecurityUtils;
 import com.uth.mobileBE.dto.request.LoanPolicyRequest;
 import com.uth.mobileBE.dto.response.LoanPolicyResponse;
 import com.uth.mobileBE.services.LoanPolicyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,32 +19,35 @@ public class LoanPolicyController {
     @Autowired
     private LoanPolicyService loanPolicyService;
 
-    @PostMapping
-    public ResponseEntity<LoanPolicyResponse> createLoanPolicy(@RequestBody LoanPolicyRequest request) {
-        LoanPolicyResponse response = loanPolicyService.createLoanPolicy(request);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
-    }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
-    public ResponseEntity<List<LoanPolicyResponse>> getAllLoanPolicies() {
-        return ResponseEntity.ok(loanPolicyService.getAllLoanPolicies());
+    public ResponseEntity<List<LoanPolicyResponse>> getAllPolicies() {
+        Long libraryId = SecurityUtils.getLibraryId();
+        return ResponseEntity.ok(loanPolicyService.getPoliciesByLibrary(libraryId));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<LoanPolicyResponse> getLoanPolicyById(@PathVariable Long id) {
-        return ResponseEntity.ok(loanPolicyService.getLoanPolicyById(id));
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping
+    public ResponseEntity<LoanPolicyResponse> createPolicy(@RequestBody LoanPolicyRequest request) {
+        Long libraryId = SecurityUtils.getLibraryId();
+        return ResponseEntity.ok(loanPolicyService.createPolicy(libraryId, request));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
-    public ResponseEntity<LoanPolicyResponse> updateLoanPolicy(
+    public ResponseEntity<LoanPolicyResponse> updatePolicy(
             @PathVariable Long id,
             @RequestBody LoanPolicyRequest request) {
-        return ResponseEntity.ok(loanPolicyService.updateLoanPolicy(id, request));
+        Long libraryId = SecurityUtils.getLibraryId();
+        return ResponseEntity.ok(loanPolicyService.updatePolicy(id, libraryId, request));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteLoanPolicy(@PathVariable Long id) {
-        loanPolicyService.deleteLoanPolicy(id);
+    public ResponseEntity<Void> deletePolicy(@PathVariable Long id) {
+        Long libraryId = SecurityUtils.getLibraryId();
+        loanPolicyService.deletePolicy(id, libraryId);
         return ResponseEntity.noContent().build();
     }
+
 }

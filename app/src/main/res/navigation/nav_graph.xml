@@ -90,10 +90,10 @@
         tools:layout="@layout/fragment_book_list" />
 
     <fragment
-        android:id="@+id/bookImportFragment"
-        android:name="com.example.quanlythuvien.ui.books.BookImportFragment"
-        android:label="Kho Sách"
-        tools:layout="@layout/fragment_book_import" />
+        android:id="@+id/bookAddFragment"
+        android:name="com.example.quanlythuvien.ui.books.addBook.AddBookFragment"
+        android:label="Thêm Sách"
+        tools:layout="@layout/fragment_add_book" />
 
     <fragment
         android:id="@+id/readerAddFragment"
@@ -172,7 +172,7 @@
 
     <fragment
         android:id="@+id/loanPolicyFragment"
-        android:name="com.example.quanlythuvien.ui.borrow_pay.LoanPolicyFragment"
+        android:name="com.example.quanlythuvien.ui.LoanPolicy.LoanPolicyFragment"
         android:label="Chính sách mượn trả">
     </fragment>
 

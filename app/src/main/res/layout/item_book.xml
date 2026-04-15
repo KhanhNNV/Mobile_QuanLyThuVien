@@ -102,7 +102,7 @@
                     android:textSize="11sp"
                     android:textStyle="bold"
                     android:textColor="@color/chip_primary"
-                    android:text="Còn 8 bản"
+                    android:text="Có sẵn 8 • Mượn 1"
                     android:background="@drawable/bg_chip_primary"
                     android:layout_marginEnd="6dp" />
 

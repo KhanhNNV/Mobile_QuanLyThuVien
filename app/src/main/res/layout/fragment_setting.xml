@@ -150,16 +150,38 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <TextView
+        <LinearLayout
+            android:id="@+id/layoutFeeHeader"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:minHeight="48dp"
             android:layout_marginTop="24dp"
-            android:text="QUẢN LÝ CÁC LOẠI PHÍ"
-            android:textColor="@color/text_primary"
-            android:textSize="14sp"
-            android:textStyle="bold" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="8dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="QUẢN LÝ CÁC LOẠI PHÍ"
+                android:textColor="@color/text_primary"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:id="@+id/imgToggleFee"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/baseline_arrow_forward_ios_24"
+                app:tint="@color/theme_primary"/>
+        </LinearLayout>
+
 
         <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardFeeContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
@@ -167,7 +189,8 @@
             app:cardElevation="0dp"
             app:strokeColor="#E0E0E0"
             app:strokeWidth="1dp"
-            android:backgroundTint="@color/bg_card">
+            android:backgroundTint="@color/bg_card"
+            android:visibility="gone">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -188,47 +211,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="number"
-                        android:text="50000" />
+                        android:text="0" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <com.google.android.material.materialswitch.MaterialSwitch
-                    android:id="@+id/switchStudentDiscount"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Áp dụng giảm giá cho Sinh viên"
-                    android:textColor="@color/text_primary"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="8dp" />
-
-                <LinearLayout
-                    android:id="@+id/layoutStudentDiscountContainer"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:visibility="gone">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="* Chỉ áp dụng cho phí làm thẻ"
-                        android:textColor="#757575"
-                        android:textSize="12sp"
-                        android:layout_marginBottom="4dp"/>
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="16dp"
-                        android:hint="Mức giảm giá"
-                        app:suffixText="%">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/edtStudentDiscount"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:inputType="number" />
-                    </com.google.android.material.textfield.TextInputLayout>
-                </LinearLayout>
 
                 <View
                     android:layout_width="match_parent"
@@ -258,7 +243,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="number"
-                        android:text="5000" />
+                        android:text="0" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <TextView
@@ -282,7 +267,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="number"
-                        android:text="20000" />
+                        android:text="0" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -298,7 +283,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="number"
-                        android:text="10000" />
+                        android:text="0" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <Button

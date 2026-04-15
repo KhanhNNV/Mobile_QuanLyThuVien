@@ -17,10 +17,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.quanlythuvien.R
 import com.example.quanlythuvien.core.api.RetrofitClient
 import com.example.quanlythuvien.data.remote.BookApiService
+import com.example.quanlythuvien.data.remote.LibraryApiService
 import com.example.quanlythuvien.data.remote.LoanApiService
 import com.example.quanlythuvien.data.remote.LoanDetailApiService
 import com.example.quanlythuvien.data.remote.ReaderApiService
 import com.example.quanlythuvien.data.repository.BookRepository
+import com.example.quanlythuvien.data.repository.LibraryRepository
 import com.example.quanlythuvien.data.repository.LoanDetailRepository
 import com.example.quanlythuvien.data.repository.LoanRepository
 import com.example.quanlythuvien.data.repository.ReaderRepository
@@ -91,12 +93,14 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
         val loanApi = retrofit.create(LoanApiService::class.java)
         val readerApi = retrofit.create(ReaderApiService::class.java)
         val loanDetailApi= retrofit.create(LoanDetailApiService::class.java)
+        val libraryApi = retrofit.create(LibraryApiService::class.java)
 
         // Khởi tạo 3 Repository
         val bookRepo = BookRepository(bookApi)
         val loanRepo = LoanRepository(loanApi)
         val readerRepo = ReaderRepository(readerApi)
         val loanDetailRepo= LoanDetailRepository(loanDetailApi)
+        val libraryRepo = LibraryRepository(libraryApi)
 
         val factory = GenericViewModelFactory {
             DashboardViewModel(bookRepo, loanRepo, readerRepo,loanDetailRepo)

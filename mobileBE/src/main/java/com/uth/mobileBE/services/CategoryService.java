@@ -40,7 +40,6 @@ public class CategoryService {
         return CategoryResponse.builder()
                 .categoryId(savedCategory.getCategoryId())
                 .name(savedCategory.getName())
-                .libraryId(library.getLibraryId())
                 .build();
     }
     // 1. TẠO THỂ LOẠI MỚI
@@ -95,8 +94,6 @@ public class CategoryService {
         return CategoryResponse.builder()
                 .categoryId(category.getCategoryId())
                 .name(category.getName())
-                // Dùng toán tử 3 ngôi: Nếu Library khác null thì lấy ID, ngược lại thì để null
-                .libraryId(category.getLibrary() != null ? category.getLibrary().getLibraryId() : null)
                 .build();
     }
 }

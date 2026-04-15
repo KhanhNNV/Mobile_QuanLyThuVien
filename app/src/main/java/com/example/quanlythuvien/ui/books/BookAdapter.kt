@@ -4,13 +4,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quanlythuvien.R
-import com.example.quanlythuvien.data2.entity.Book // Nhớ import đúng đường dẫn Entity của bạn
+import com.example.quanlythuvien.data.model.response.BookResponse
 
-class BookAdapter(private val bookList: MutableList<Book>) : RecyclerView.Adapter<BookAdapter.BookViewHolder>() {
+class BookAdapter : ListAdapter<BookResponse, BookAdapter.BookViewHolder>(BookDiffCallback()) {
 
-    var onItemClick: ((Book) -> Unit)? = null
+    var onItemClick: ((BookResponse) -> Unit)? = null
 
     class BookViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tvTitle: TextView = view.findViewById(R.id.tvBookTitle)
@@ -27,37 +29,40 @@ class BookAdapter(private val bookList: MutableList<Book>) : RecyclerView.Adapte
     }
 
     override fun onBindViewHolder(holder: BookViewHolder, position: Int) {
-        val book = bookList[position]
+        val book = getItem(position)
 
-        // Gán dữ liệu
         holder.tvTitle.text = book.title
         holder.tvAuthor.text = book.author
-        holder.tvIsbn.text = "ISBN: ${book.isbnCode}"
-        holder.tvQuantity.text = "Còn ${book.availableQuantity} bản"
-        holder.tvCategory.text = book.categoryId.toString()
+        holder.tvIsbn.text = "ISBN: ${book.isbn}"
+        holder.tvQuantity.text = "Còn ${book.availableCopies ?: "--"} bản"
+        holder.tvCategory.text = "Danh muc: ${book.categoryName ?: "Chua cap nhat"}"
 
-        // Bắt sự kiện khi người dùng bấm vào 1 dòng (itemView)
         holder.itemView.setOnClickListener {
-            onItemClick?.invoke(book) // Truyền cuốn sách đang được bấm ra ngoài
+            onItemClick?.invoke(book)
         }
     }
 
-    override fun getItemCount(): Int {
-        return bookList.size
-    }
-
     fun removeById(bookId: Long): Int {
-        val index = bookList.indexOfFirst { it.bookId == bookId }
+        val mutable = currentList.toMutableList()
+        val index = mutable.indexOfFirst { it.bookId == bookId }
         if (index >= 0) {
-            bookList.removeAt(index)
-            notifyItemRemoved(index)
+            mutable.removeAt(index)
+            submitList(mutable)
         }
         return index
     }
 
-    fun setItems(items: List<Book>) {
-        bookList.clear()
-        bookList.addAll(items)
-        notifyDataSetChanged()
+    fun setItems(items: List<BookResponse>) {
+        submitList(items)
+    }
+}
+
+private class BookDiffCallback : DiffUtil.ItemCallback<BookResponse>() {
+    override fun areItemsTheSame(oldItem: BookResponse, newItem: BookResponse): Boolean {
+        return oldItem.bookId == newItem.bookId
+    }
+
+    override fun areContentsTheSame(oldItem: BookResponse, newItem: BookResponse): Boolean {
+        return oldItem == newItem
     }
 }

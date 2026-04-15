@@ -6,6 +6,8 @@ import com.uth.mobileBE.models.Book;
 import com.uth.mobileBE.models.BookCopy;
 import com.uth.mobileBE.models.Category;
 import com.uth.mobileBE.models.Library;
+import com.uth.mobileBE.models.enums.ConditionBookCopy;
+import com.uth.mobileBE.models.enums.StatusBookCopy;
 import com.uth.mobileBE.repositories.BookCopyRepository;
 import com.uth.mobileBE.repositories.BookRepository;
 import com.uth.mobileBE.repositories.CategoryRepository;
@@ -27,9 +29,9 @@ public class BookCrudService {
     private final CategoryRepository categoryRepository;
 
     @Transactional
-    public BookResponse createBook(BookRequest request) {
-        Library library = libraryRepository.findById(request.getLibraryId())
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy thư viện với ID: " + request.getLibraryId()));
+    public BookResponse createBook(Long currentLibraryId, BookRequest request) {
+        Library library = libraryRepository.findById(currentLibraryId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy thư viện với ID: " + currentLibraryId));
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy thể loại với ID: " + request.getCategoryId()));
 
@@ -50,7 +52,35 @@ public class BookCrudService {
                 .build();
 
         Book saved = bookRepository.save(book);
+
+        // --- ĐOẠN LOGIC TẠO BOOK COPY ĐÃ ĐƯỢC CHUYỂN QUA ĐÂY ---
+        String categoryAcronym = generateAcronym(category.getName());
+        String barcode = categoryAcronym + "-" + saved.getBookId() + "-1";
+
+        BookCopy bookCopy = BookCopy.builder()
+                .book(saved)
+                .barcode(barcode)
+                .condition(ConditionBookCopy.NEW)
+                .status(StatusBookCopy.AVAILABLE)
+                .build();
+        bookCopyRepository.save(bookCopy);
+        // -------------------------------------------------------
+
         return mapToResponse(saved);
+    }
+    // --- HÀM HỖ TRỢ TẠO BARCODE (Mang từ bên kia qua) ---
+    private String generateAcronym(String categoryName) {
+        if (categoryName == null || categoryName.trim().isEmpty()) {
+            return "BK";
+        }
+        StringBuilder acronym = new StringBuilder();
+        String[] words = categoryName.trim().split("\\s+");
+        for (String word : words) {
+            if (!word.isEmpty()) {
+                acronym.append(word.charAt(0));
+            }
+        }
+        return acronym.toString().toUpperCase();
     }
 
     public List<BookResponse> getBooksByLibrary(Long libraryId) {
@@ -71,9 +101,10 @@ public class BookCrudService {
     }
 
     @Transactional
-    public BookResponse updateBook(Long bookId, BookRequest request) {
+    public BookResponse updateBook(Long currentLibraryId, Long bookId, BookRequest request) {
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy sách với ID: " + bookId));
+        assertBookBelongsToLibrary(book, currentLibraryId);
 
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy thể loại với ID: " + request.getCategoryId()));
@@ -111,6 +142,13 @@ public class BookCrudService {
         if (category.getLibrary() == null
                 || !category.getLibrary().getLibraryId().equals(library.getLibraryId())) {
             throw new RuntimeException("Thể loại không thuộc thư viện này");
+        }
+    }
+
+    private void assertBookBelongsToLibrary(Book book, Long currentLibraryId) {
+        if (book.getLibrary() == null
+                || !book.getLibrary().getLibraryId().equals(currentLibraryId)) {
+            throw new RuntimeException("Sách không thuộc thư viện hiện tại");
         }
     }
 

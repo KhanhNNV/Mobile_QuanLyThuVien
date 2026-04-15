@@ -9,14 +9,14 @@ import android.content.Context
  */
 object BookWarehousePermissions {
 
-    private const val PREFS_NAME = "LibraryAppPrefs"
-    private const val KEY_LOGGED_IN = "isLoggedIn"
-    private const val KEY_USER_ROLE = "userRole"
-
     private fun currentRole(context: Context): String {
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        if (!prefs.getBoolean(KEY_LOGGED_IN, false)) return ""
-        return prefs.getString(KEY_USER_ROLE, "").orEmpty()
+        val role = TokenManager(context).getRole().orEmpty()
+
+        // Chuẩn hóa role (backend có thể trả "ROLE_ADMIN", "ADMIN", ...)
+        if (role.contains("ADMIN", ignoreCase = true)) return "ADMIN"
+        if (role.contains("STAFF", ignoreCase = true)) return "STAFF"
+
+        return ""
     }
 
     /** Admin — quyền đầy đủ trên kho, gồm xóa BookCopy. */

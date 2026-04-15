@@ -1,5 +1,6 @@
 package com.uth.mobileBE.controllers;
 
+import com.uth.mobileBE.Utils.SecurityUtils;
 import com.uth.mobileBE.dto.request.CategoryRequest;
 import com.uth.mobileBE.dto.response.CategoryResponse;
 import com.uth.mobileBE.services.CategoryService;
@@ -29,9 +30,10 @@ public class CategoryController {
         return new ResponseEntity<>(createdCategory, HttpStatus.CREATED);
     }
 
-    // API: GET /api/categories/library/{libraryId}
-    @GetMapping("/library/{libraryId}")
-    public ResponseEntity<List<CategoryResponse>> getCategoriesByLibrary(@PathVariable Long libraryId) {
+    // API: GET /api/categories
+    @GetMapping()
+    public ResponseEntity<List<CategoryResponse>> getCategoriesByLibrary() {
+        Long libraryId = SecurityUtils.getLibraryId();
         List<CategoryResponse> categories = categoryService.getAllCategoriesByLibrary(libraryId);
         return ResponseEntity.ok(categories);
     }

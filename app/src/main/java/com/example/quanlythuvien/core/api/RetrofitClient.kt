@@ -23,6 +23,7 @@ object RetrofitClient {
     private fun buildRetrofit(context: Context): Retrofit {
         val tokenManager = TokenManager(context)
         val authInterceptor = AuthInterceptor(tokenManager)
+        val tokenAuthenticator = TokenAuthenticator(context, tokenManager)
 
         // Log API ra Logcat
         val loggingInterceptor = HttpLoggingInterceptor().apply {
@@ -31,6 +32,7 @@ object RetrofitClient {
 
         val okHttpClient = OkHttpClient.Builder()
             .addInterceptor(authInterceptor)
+            .authenticator(tokenAuthenticator)
             .addInterceptor(loggingInterceptor) // Ghi log request/response
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
