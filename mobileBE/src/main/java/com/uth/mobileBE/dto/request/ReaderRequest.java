@@ -14,7 +14,6 @@ public class ReaderRequest {
     private String fullName;
     private String phone;
     private String barcode;
-    private Boolean isStudent;
     private Long libraryId;
     private LocalDateTime membershipExpiry;
 }

@@ -24,6 +24,11 @@ class ReaderDetailFragment : Fragment(R.layout.fragment_reader_detail) {
 
     var onItemClick: ((MockReaderBook) -> Unit)? = null
 
+    // Biến tạm để nhớ thông tin chờ lưu PDF
+    private var pendingPdfCode = ""
+    private var pendingPdfName = ""
+    private var pendingPdfPhone = ""
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -143,6 +148,17 @@ class ReaderDetailFragment : Fragment(R.layout.fragment_reader_detail) {
                     findNavController().navigate(R.id.actionReaderDetailToReaderAdd, bundle)
                     true
                 }
+                //  BẮT SỰ KIỆN IN PDF
+                R.id.menuPrintPdf -> {
+
+                    pendingPdfCode = readerPhone
+                    pendingPdfName = readerName
+                    pendingPdfPhone = readerPhone
+
+                    // Mở hộp thoại chọn thư mục lưu file với tên mặc định
+                    createPdfLauncher.launch("TheDocGia_${pendingPdfCode}.pdf")
+                    true
+                }
                 //Xữ lý khi nhấn vào nút xóa reader
                 R.id.menuDeleteReader -> {
                     //Gọi hàm hiển thị dialog xác nhận xóa
@@ -231,6 +247,48 @@ class ReaderDetailFragment : Fragment(R.layout.fragment_reader_detail) {
             else -> allDataMockReaderBook
         }
         bookAdapter.submitList(filteredList)
+    }
+
+    //HÀM TẠO VÀ LƯU PDF
+    private fun writePdfToUri(uri: android.net.Uri, code: String, name: String, phone: String) {
+        val pdfDocument = android.graphics.pdf.PdfDocument()
+        val pageInfo = android.graphics.pdf.PdfDocument.PageInfo.Builder(400, 300, 1).create()
+        val page = pdfDocument.startPage(pageInfo)
+        val canvas = page.canvas
+
+        val paint = android.graphics.Paint()
+        paint.color = android.graphics.Color.BLACK
+        paint.textSize = 16f
+
+        paint.isFakeBoldText = true
+        canvas.drawText("THẺ ĐỘC GIẢ THƯ VIỆN", 100f, 50f, paint)
+        paint.isFakeBoldText = false
+
+        canvas.drawText("Họ và tên: $name", 50f, 140f, paint)
+        canvas.drawText("Số điện thoại: $phone", 50f, 180f, paint)
+
+        pdfDocument.finishPage(page)
+        try {
+            requireContext().contentResolver.openOutputStream(uri)?.use { outputStream ->
+                pdfDocument.writeTo(outputStream)
+            }
+            Toast.makeText(requireContext(), "Lưu PDF thành công! Mở mục Tệp (Files) để xem.", Toast.LENGTH_LONG).show()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(requireContext(), "Lỗi khi lưu PDF: ${e.message}", Toast.LENGTH_SHORT).show()
+        } finally {
+            pdfDocument.close()
+        }
+    }
+    private val createPdfLauncher = registerForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.CreateDocument("application/pdf")
+    ) { uri ->
+        if (uri != null) {
+            // Nếu người dùng chọn chỗ lưu thành công, tiến hành vẽ và ghi PDF vào chỗ đó
+            writePdfToUri(uri, pendingPdfCode, pendingPdfName, pendingPdfPhone)
+        } else {
+            Toast.makeText(requireContext(), "Đã hủy lưu file PDF", Toast.LENGTH_SHORT).show()
+        }
     }
 
 }

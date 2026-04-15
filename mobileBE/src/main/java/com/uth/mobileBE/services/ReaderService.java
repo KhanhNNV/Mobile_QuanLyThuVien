@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,17 +23,25 @@ public class ReaderService {
     @Transactional
     public ReaderResponse createReader(ReaderRequest request) {
         Library library = libraryRepository.findById(request.getLibraryId())
-                                           .orElseThrow(() -> new RuntimeException("Không tìm thấy thư viện"));
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy thư viện"));
+
+
+        // Lấy số ID to nhất trong hệ thống hiện tại
+        Long maxId = readerRepository.findMaxReaderId();
+
+        // Tạo mã mới bằng cách lấy ID to nhất + 1 (Ví dụ đang có người DG-5 thì tạo DG-6)
+        String generatedBarcode = "READER-" + (maxId + 1);
+        // ----------------------------------------------
 
         Reader reader = Reader.builder()
-                              .fullName(request.getFullName())
-                              .phone(request.getPhone())
-                              .barcode(request.getBarcode())
-                              .isStudent(request.getIsStudent())
-                              .membershipExpiry(request.getMembershipExpiry())
-                              .library(library)
-                              .isBlocked(false)
-                              .build();
+                .fullName(request.getFullName())
+                .phone(request.getPhone())
+                .barcode(generatedBarcode)
+                .membershipExpiry(request.getMembershipExpiry())
+                .library(library)
+                .isBlocked(false) // Mặc định không bị khóa
+                .createdAt(LocalDateTime.now())
+                .build();
 
         Reader saved = readerRepository.save(reader);
         return mapToReaderResponse(saved);
@@ -61,7 +70,6 @@ public class ReaderService {
         reader.setFullName(request.getFullName());
         reader.setPhone(request.getPhone());
         reader.setBarcode(request.getBarcode());
-        reader.setIsStudent(request.getIsStudent());
         reader.setMembershipExpiry(request.getMembershipExpiry());
 
         // Nếu muốn cho phép chuyển thư viện, bạn có thể xử lý libraryId ở đây
@@ -93,7 +101,6 @@ public class ReaderService {
                              .fullName(reader.getFullName())
                              .phone(reader.getPhone())
                              .barcode(reader.getBarcode())
-                             .isStudent(reader.getIsStudent())
                              .isBlocked(reader.getIsBlocked())
                              .createdAt(reader.getCreatedAt())
                              .membershipExpiry(reader.getMembershipExpiry())

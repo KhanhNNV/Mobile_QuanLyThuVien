@@ -17,4 +17,9 @@
         android:icon="@drawable/ic_autorenew"
         android:iconTint="@color/red"
         android:title="Gia hạn" />
+    <item
+        android:id="@+id/menuPrintPdf"
+        android:icon="@android:drawable/ic_menu_agenda"
+        android:iconTint="@color/text_primary"
+        android:title="In thẻ PDF" />
 </menu>
