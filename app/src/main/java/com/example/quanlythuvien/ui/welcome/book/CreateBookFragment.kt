@@ -90,22 +90,16 @@ class CreateBookFragment : Fragment(R.layout.fragment_create_book) {
         btnFinishSetup.setOnClickListener {
             val title = etBookName.text.toString().trim()
             val author = etBookAuthor.text.toString().trim()
-            val barcode = etBookCode.text.toString().trim() // Dùng mã sách làm barcode
+            val isbn = etBookCode.text.toString().trim()
             val priceStr = etBookBasePrice.text.toString().trim()
 
-            if (title.isEmpty() || author.isEmpty() || barcode.isEmpty()) {
+            if (title.isEmpty() || author.isEmpty() || isbn.isEmpty()) {
                 Toast.makeText(requireContext(), "Vui lòng nhập đủ thông tin bắt buộc!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
             val basePrice = priceStr.toDoubleOrNull() ?: 0.0
 
-            // Lấy libraryId
-            val libraryId = TokenManager(requireContext()).getLibraryId()
-            if (libraryId == null) {
-                Toast.makeText(requireContext(), "Lỗi: Không tìm thấy thông tin thư viện!", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
 
             val categoryId = arguments?.getLong("categoryId", -1L) ?: -1L
 
@@ -117,11 +111,9 @@ class CreateBookFragment : Fragment(R.layout.fragment_create_book) {
             val request = InitialBookRequest(
                 title = title,
                 author = author,
-                isbn = "Temp",
+                isbn = isbn,
                 basePrice = basePrice,
-                categoryId = categoryId,
-                libraryId = libraryId,
-                barcode = barcode
+                categoryId = categoryId
             )
 
             viewModel.createInitialBook(request)

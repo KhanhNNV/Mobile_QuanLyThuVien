@@ -5,7 +5,5 @@ data class InitialBookRequest(
     val author: String,
     val isbn: String,
     val basePrice: Double,
-    val categoryId: Long,
-    val libraryId: Long,
-    val barcode: String
+    val categoryId: Long
 )

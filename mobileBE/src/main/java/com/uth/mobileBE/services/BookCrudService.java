@@ -1,5 +1,6 @@
 package com.uth.mobileBE.services;
 
+import com.uth.mobileBE.Utils.GenerateBarcode;
 import com.uth.mobileBE.dto.request.BookRequest;
 import com.uth.mobileBE.dto.response.BookResponse;
 import com.uth.mobileBE.models.Book;
@@ -54,8 +55,8 @@ public class BookCrudService {
         Book saved = bookRepository.save(book);
 
         // --- ĐOẠN LOGIC TẠO BOOK COPY ĐÃ ĐƯỢC CHUYỂN QUA ĐÂY ---
-        String categoryAcronym = generateAcronym(category.getName());
-        String barcode = categoryAcronym + "-" + saved.getBookId() + "-1";
+        int currentCopiesCount = bookCopyRepository.countByBook_BookId(saved.getBookId());
+        String barcode = GenerateBarcode.generateBarcode(category.getName(),saved.getBookId(),currentCopiesCount);
 
         BookCopy bookCopy = BookCopy.builder()
                 .book(saved)
@@ -68,20 +69,7 @@ public class BookCrudService {
 
         return mapToResponse(saved);
     }
-    // --- HÀM HỖ TRỢ TẠO BARCODE (Mang từ bên kia qua) ---
-    private String generateAcronym(String categoryName) {
-        if (categoryName == null || categoryName.trim().isEmpty()) {
-            return "BK";
-        }
-        StringBuilder acronym = new StringBuilder();
-        String[] words = categoryName.trim().split("\\s+");
-        for (String word : words) {
-            if (!word.isEmpty()) {
-                acronym.append(word.charAt(0));
-            }
-        }
-        return acronym.toString().toUpperCase();
-    }
+
 
     public List<BookResponse> getBooksByLibrary(Long libraryId) {
         List<Book> books = bookRepository.findByLibrary_LibraryId(libraryId);

@@ -16,4 +16,6 @@ public interface BookCopyRepository extends JpaRepository<BookCopy, Long> {
 
     // Tìm sách theo thư viện và trạng thái
     List<BookCopy> findByBook_Library_LibraryIdAndStatus(Long libraryId, StatusBookCopy status);
+
+    int countByBook_BookId(Long bookId);
 }
