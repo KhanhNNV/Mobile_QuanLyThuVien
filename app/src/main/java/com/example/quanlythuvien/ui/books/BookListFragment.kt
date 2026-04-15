@@ -454,7 +454,10 @@ class BookListFragment : Fragment() {
         tvInfo.text = "Sửa tình trạng cho ${item.copyId}"
         tvSuggestedBarcode.text = "Mã cuốn hiện tại"
         edtBarcode.setText(item.copyIdValue.toString())
-        edtBarcode.isEnabled = false
+        edtBarcode.apply {
+            isEnabled = false
+            alpha = 0.6f
+        }
 
         val conditions = listOf(
             "NEW" to "Mới",

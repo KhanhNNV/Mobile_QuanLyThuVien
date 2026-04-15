@@ -302,16 +302,18 @@ class BookListViewModel(
 
     fun updateBookCopy(copyId: Long, bookId: Long, condition: String, barcode: String? = null) {
         viewModelScope.launch {
-            _bookCopyState.value = BookCopyUiState.Loading
             val currentCopy = (_bookCopyState.value as? BookCopyUiState.Success)
                 ?.copies
                 ?.firstOrNull { it.copyId == copyId }
+
+            _bookCopyState.value = BookCopyUiState.Loading
             val request = BookCopyRequest(
                 bookId = currentCopy?.bookId ?: bookId,
-                barcode = barcode ?: currentCopy?.barcode.orEmpty(),
+                barcode = barcode?.takeIf { it.isNotBlank() } ?: currentCopy?.barcode,
                 condition = condition,
                 status = currentCopy?.status ?: "AVAILABLE"
             )
+
             bookCopyRepository.updateBookCopy(copyId, request)
                 .onSuccess {
                     loadBookCopies(bookId)
