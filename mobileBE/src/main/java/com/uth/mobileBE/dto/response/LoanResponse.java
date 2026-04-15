@@ -19,9 +19,10 @@ public class LoanResponse {
     private LocalDateTime borrowDate;
 
     private StatusLoan status;
-    private List<String> bookTitles;
 
-    // THÊM 2 TRƯỜNG NÀY VÀO:
+    private List<BookDetailInfoDto> bookDetails;
+
+
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
 

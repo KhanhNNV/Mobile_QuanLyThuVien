@@ -22,6 +22,32 @@ public class BookCopyService {
     private final BookCopyRepository bookCopyRepository;
     private final BookRepository bookRepository;
 
+    @Transactional(readOnly = true)
+    public List<BookCopyResponse> getAvailableCopies(Long libraryId) {
+
+        List<BookCopy> availableCopies = bookCopyRepository.findByBook_Library_LibraryIdAndStatus(
+                libraryId,
+                StatusBookCopy.AVAILABLE
+        );
+
+        // Map toàn bộ dữ liệu sang DTO
+        return availableCopies.stream().map(copy -> BookCopyResponse.builder()
+                .copyId(copy.getCopyId())
+                .bookId(copy.getBook().getBookId()) // Lấy ID của đầu sách gốc
+
+                // THÊM MỚI: Lấy Tên sách và Tác giả từ đối tượng Book gốc
+                .title(copy.getBook().getTitle())
+                .author(copy.getBook().getAuthor())
+
+                .barcode(copy.getBarcode())
+                .condition(copy.getCondition())
+                .status(copy.getStatus())
+                .createdAt(copy.getCreatedAt())
+                .updatedAt(copy.getUpdatedAt())
+                .build()
+        ).collect(Collectors.toList());
+    }
+
     @Transactional
     public BookCopyResponse createBookCopy(BookCopyRequest request) {
         if (request.getBookId() == null) {

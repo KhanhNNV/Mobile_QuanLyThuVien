@@ -24,4 +24,6 @@ public interface LoanDetailRepository extends JpaRepository<LoanDetail, LoanDeta
     List<LoanDetail> findDueToday(@Param("libraryId") Long libraryId,
                                   @Param("startOfDay") LocalDateTime startOfDay,
                                   @Param("endOfDay") LocalDateTime endOfDay);
+
+    List<LoanDetail> findByLoan_LoanId(Long loanId);
 }

@@ -12,6 +12,8 @@ import java.time.LocalDateTime;
 public class BookCopyResponse {
     private Long copyId;
     private Long bookId;
+    private String title;
+    private String author;
     private String barcode;
     private ConditionBookCopy condition;
     private StatusBookCopy status;

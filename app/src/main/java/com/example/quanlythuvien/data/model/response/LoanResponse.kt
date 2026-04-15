@@ -21,8 +21,8 @@ data class LoanResponse(
     @SerializedName("status")
     val status: String, // Nhận Enum StatusLoan dưới dạng String (VD: "BORROWING", "RETURNED")
 
-    @SerializedName("bookTitles")
-    val bookTitles: List<String>?, // Danh sách tên sách
+    @SerializedName("bookDetails")
+    val bookDetails: List<BookDetailInfoDto>?,
 
     @SerializedName("createdAt")
     val createdAt: String,
