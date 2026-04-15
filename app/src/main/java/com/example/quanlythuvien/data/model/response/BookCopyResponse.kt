@@ -7,9 +7,9 @@ data class BookCopyResponse(
     @SerializedName("bookId") val bookId: Long,
     @SerializedName("title") val title: String?,
     @SerializedName("author") val author: String?,
-    @SerializedName("barcode") val barcode: String?,
-    @SerializedName("condition") val condition: String?,
-    @SerializedName("status") val status: String?,
+    @SerializedName("barcode") val barcode: String,
+    @SerializedName("condition") val condition: String,
+    @SerializedName("status") val status: String,
     @SerializedName("createdAt") val createdAt: String?,
     @SerializedName("updatedAt") val updatedAt: String?
 )
