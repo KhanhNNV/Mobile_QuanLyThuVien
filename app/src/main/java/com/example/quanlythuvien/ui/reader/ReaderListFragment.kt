@@ -2,6 +2,7 @@ package com.example.quanlythuvien.ui.reader
 
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -32,36 +33,64 @@ class ReaderListFragment : Fragment(R.layout.fragment_reader_list) {
             // Chuyển sang màn hình form nhập độc giả
             findNavController().navigate(R.id.readerAddFragment)
         }
+        setupRecyclerView(view)
+        observeViewModel()
 
+        // Load trang đầu tiên khi mở màn hình
+        setupRecyclerView(view)
+        observeViewModel()
+    }
+
+    private fun setupRecyclerView(view: View) {
         val recyclerView = view.findViewById<RecyclerView>(R.id.rvReaders)
         val layoutManager = LinearLayoutManager(requireContext())
-        readerAdapter = ReaderAdapter { readerResponse ->
+
+        readerAdapter = ReaderAdapter { reader ->
             val bundle = Bundle().apply {
-                // Ép kiểu Long sang Int nếu màn hình Detail của bạn đang dùng Int để hứng Id
-                putInt("readerId", readerResponse.readerId.toInt())
-
-                // Dùng fullName và phone thay vì name và phoneNumber
-                putString("readerName", readerResponse.fullName)
-                putString("readerPhone", readerResponse.phone)
+                putInt("readerId", reader.readerId.toInt())
+                putString("readerName", reader.fullName)
+                putString("readerPhone", reader.phone)
             }
-
             findNavController().navigate(R.id.readerDetailFragment, bundle)
         }
 
         recyclerView.adapter = readerAdapter
         recyclerView.layoutManager = layoutManager
 
-        viewModel.allReader.observe(viewLifecycleOwner) { readers ->
-            readerAdapter.submitList(readers)
-        }
-
-        // Bắt sự kiện cuộn để xử lý phân trang
+        // Xử lý cuộn
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(rv: RecyclerView, dx: Int, dy: Int) {
-                if (dy > 0 && !rv.canScrollVertically(1)) {
-                    viewModel.fetchReaders()
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+
+                // Lấy thông tin về các vị trí item đang hiển thị
+                val visibleItemCount = layoutManager.childCount // Số item đang hiện trên màn hình
+                val totalItemCount = layoutManager.itemCount  // Tổng số item có trong Adapter
+                val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition() // Vị trí item đầu tiên đang hiện
+
+                //Kiểm tra hiện tại có đang tải không hoặc có đang trang cuối không
+                if (!viewModel.isLoading() && !viewModel.isLastPage()) {
+                    //(số item hiển thị + vị trí item đầu tiên) >= tổng số item
+                    //  → nghĩa là người dùng đã cuộn đến gần hoặc chạm cuối danh sách.
+                    if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount
+                        && firstVisibleItemPosition >= 0) {
+                        viewModel.loadMoreReaders()
+                    }
                 }
             }
         })
     }
+
+    private fun observeViewModel() {
+        //Lắng nghe danh sách độc giả
+        viewModel.allReader.observe(viewLifecycleOwner) { readers ->
+
+            //Khi có danh sách mới gọi setData  sẽ cập nhật dữu liệu cho recycleView
+            readerAdapter.setData(readers)
+        }
+
+        viewModel.error.observe(viewLifecycleOwner) { msg ->
+            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+        }
+    }
+
 }

@@ -32,7 +32,6 @@ public class ReaderService {
                               .fullName(request.getFullName())
                               .phone(request.getPhone())
                               .barcode(request.getBarcode())
-                              .isStudent(request.getIsStudent())
                               .membershipExpiry(request.getMembershipExpiry())
                               .library(libraryRef)
                               .isBlocked(false)
@@ -88,7 +87,6 @@ public class ReaderService {
         reader.setFullName(request.getFullName());
         reader.setPhone(request.getPhone());
         reader.setBarcode(request.getBarcode());
-        reader.setIsStudent(request.getIsStudent());
         reader.setMembershipExpiry(request.getMembershipExpiry());
 
         // Nếu muốn cho phép chuyển thư viện, bạn có thể xử lý libraryId ở đây
@@ -121,7 +119,6 @@ public class ReaderService {
                              .fullName(reader.getFullName())
                              .phone(reader.getPhone())
                              .barcode(reader.getBarcode())
-                             .isStudent(reader.getIsStudent())
                              .isBlocked(reader.getIsBlocked())
                              .createdAt(reader.getCreatedAt())
                              .membershipExpiry(reader.getMembershipExpiry())

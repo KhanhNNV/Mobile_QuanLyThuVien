@@ -12,7 +12,7 @@ data class ReaderResponse (
 
     val isBlocked: Boolean,
 
-    val createdAt: Long?,
+    val createdAt: String?,
 
-    val membershipExpiry: Long?
+    val membershipExpiry: String?
 )
