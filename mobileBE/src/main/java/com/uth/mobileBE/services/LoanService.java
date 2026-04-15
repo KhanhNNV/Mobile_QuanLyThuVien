@@ -2,8 +2,10 @@ package com.uth.mobileBE.services;
 
 import com.uth.mobileBE.Utils.LoanSpecification;
 import com.uth.mobileBE.dto.request.LoanRequest;
+import com.uth.mobileBE.dto.response.BookDetailInfoDto;
 import com.uth.mobileBE.dto.response.LoanResponse;
 import com.uth.mobileBE.models.Loan;
+import com.uth.mobileBE.models.LoanDetail;
 import com.uth.mobileBE.models.enums.StatusLoan;
 import com.uth.mobileBE.models.enums.StatusLoanDetail;
 import com.uth.mobileBE.repositories.*;
@@ -23,6 +25,7 @@ public class LoanService {
     @Autowired private LibraryRepository libraryRepository;
     @Autowired private ReaderRepository readerRepository;
     @Autowired private UserRepository userRepository;
+    @Autowired private LoanDetailRepository loanDetailRepository;
 
 
     @Transactional(readOnly = true) // Thêm dòng này
@@ -47,10 +50,21 @@ public class LoanService {
 
 
 
-
+    @Transactional(readOnly = true)
     public LoanResponse getLoanById(Long id) {
+        // 1. Tìm phiếu mượn gốc trước
         Loan loan = loanRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy phiếu mượn ID: " + id));
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy phiếu mượn gốc với ID: " + id));
+
+        // 2. Lấy danh sách chi tiết
+        List<LoanDetail> details = loanDetailRepository.findByLoan_LoanId(id);
+
+        // Nếu danh sách rỗng, đừng throw Exception vội, hãy log ra để xem
+        if (details.isEmpty()) {
+            System.out.println("LOG: Phiếu mượn " + id + " tồn tại nhưng bảng loan_detail lại trống!");
+            // Bạn nên trả về một List rỗng trong DTO thay vì sập app
+        }
+
         return mapToResponse(loan);
     }
 
@@ -114,43 +128,51 @@ public class LoanService {
     }
 
     private LoanResponse mapToResponse(Loan loan) {
-        // 1. Lấy trạng thái gốc từ Database
         StatusLoan finalStatus = loan.getStatus();
 
-        // 2. LOGIC TÍNH TOÁN OVERDUE (Trễ hạn)
-        // Nếu phiếu đang mượn, ta phải kiểm tra xem có cuốn sách nào bị lố ngày không
+        // 1. Logic tính toán trạng thái Overdue (Giữ nguyên của bạn)
         if (finalStatus == StatusLoan.BORROWING && loan.getLoanDetails() != null) {
             LocalDateTime now = LocalDateTime.now();
-
-            // Quét qua danh sách chi tiết mượn
             boolean isOverdue = loan.getLoanDetails().stream()
                     .anyMatch(detail ->
-                            // Sách chưa trả VÀ ngày hết hạn nhỏ hơn thời gian hiện tại
                             detail.getStatus() == StatusLoanDetail.BORROWING &&
                                     detail.getDueDate() != null &&
                                     detail.getDueDate().isBefore(now)
                     );
-
-            // Nếu phát hiện có sách trễ hạn, ghi đè trạng thái thành OVERDUE để gửi cho Mobile
             if (isOverdue) {
                 finalStatus = StatusLoan.OVERDUE;
             }
         }
 
-        // 3. Build Response gửi về Mobile
+        // 2. Chuyển đổi LoanDetail thành BookDetailInfoDto
+        List<BookDetailInfoDto> detailDtos = loan.getLoanDetails() != null ?
+                loan.getLoanDetails().stream().map(detail -> {
+                    // Lấy đối tượng Book ra để code ngắn gọn hơn
+                    var book = detail.getBookCopy().getBook();
+
+                    return BookDetailInfoDto.builder()
+                            .copyId(detail.getBookCopy().getCopyId()) // Cần thiết cho Android
+                            .title(book.getTitle())
+                            .author(book.getAuthor())
+                            // Giả sử Book có quan hệ với Category, nếu không có bạn có thể bỏ qua
+                            .category(book.getCategory() != null ? book.getCategory().getName() : "N/A")
+                            .dueDate(detail.getDueDate())
+                            .returnDate(detail.getReturnDate())
+                            .status(detail.getStatus())
+                            .build();
+                }).collect(Collectors.toList()) : List.of();
+
+        // 3. Build LoanResponse
         return LoanResponse.builder()
                 .loanId(loan.getLoanId())
                 .libraryName(loan.getLibrary().getName())
                 .readerName(loan.getReader().getFullName())
                 .processorName(loan.getProcessedBy().getFullname())
                 .borrowDate(loan.getBorrowDate())
-                .status(finalStatus) // Gửi trạng thái ĐÃ ĐƯỢC TÍNH TOÁN LẠI
-                .bookTitles(loan.getLoanDetails() != null ?
-                        loan.getLoanDetails().stream()
-                                .map(d -> d.getBookCopy().getBook().getTitle())
-                                .collect(Collectors.toList()) : List.of())
+                .status(finalStatus)
                 .createdAt(loan.getCreatedAt())
                 .updateAt(loan.getUpdateAt())
+                .bookDetails(detailDtos) // Truyền danh sách DTO mới vào đây
                 .build();
     }
 }
