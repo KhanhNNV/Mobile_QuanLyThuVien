@@ -60,6 +60,7 @@ class BookListFragment : Fragment() {
     private var selectedCategoryId: Long? = null
     private var hasLoadError = false
     private var isUpdatingBook = false
+    private var pendingBookDetailId: Long? = null
     private var currentDialog: android.app.Dialog? = null
     private var currentDialogBookId: Long? = null
     private var currentStatusText: TextView? = null
@@ -115,6 +116,7 @@ class BookListFragment : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         bookAdapter = BookAdapter()
         bookAdapter.onItemClick = { selectedBook ->
+            pendingBookDetailId = selectedBook.bookId
             viewModel.loadBookDetail(selectedBook.bookId)
         }
         recyclerView.adapter = bookAdapter
@@ -171,7 +173,10 @@ class BookListFragment : Fragment() {
                                     isUpdatingBook = false
                                     Toast.makeText(requireContext(), "Cập nhật sách thành công.", Toast.LENGTH_SHORT).show()
                                 } else {
-                                    showBookDetailDialog(state.book)
+                                    if (pendingBookDetailId == state.book.bookId) {
+                                        showBookDetailDialog(state.book)
+                                    }
+                                    pendingBookDetailId = null
                                 }
                             }
                             is BookDetailUiState.Error -> {
@@ -423,6 +428,7 @@ class BookListFragment : Fragment() {
                 currentCopyAdapter = null
             }
         }
+        pendingBookDetailId = null
         dialog.show()
         viewModel.loadBookCopies(book.bookId)
     }
