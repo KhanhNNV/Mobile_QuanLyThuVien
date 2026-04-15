@@ -10,6 +10,7 @@ import com.example.quanlythuvien.data.model.response.CategoryResponse
 import com.example.quanlythuvien.data.repository.BookCopyRepository
 import com.example.quanlythuvien.data.repository.BookRepository
 import com.example.quanlythuvien.data.repository.CategoryRepository
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -76,6 +77,7 @@ class BookListViewModel(
                     _allBooks.value = books
                     applyFilters()
                     _bookListState.value = BookListUiState.Success(_allBooks.value)
+                    refreshAllAvailableCopies(books)
                 }
                 .onFailure { error ->
                     _bookListState.value = BookListUiState.Error(error.message ?: "Tai danh sach sach that bai.")
@@ -220,6 +222,33 @@ class BookListViewModel(
         }
         val nextSequence = sameBookCopies.size + 1
         return "$prefix-$bookId-$nextSequence"
+    }
+
+    private fun updateBookAvailableCopies(bookId: Long, copies: List<BookCopyResponse>) {
+        val availableCount = copies.count { it.status.equals("AVAILABLE", ignoreCase = true) }
+        _allBooks.value = _allBooks.value.map { book ->
+            if (book.bookId == bookId) book.copy(availableCopies = availableCount) else book
+        }
+        applyFilters()
+    }
+
+    fun refreshAvailableCopiesFromBookDetail(bookId: Long) {
+        viewModelScope.launch {
+            bookCopyRepository.getBookCopiesByBook(bookId)
+                .onSuccess { copies -> updateBookAvailableCopies(bookId, copies) }
+        }
+    }
+
+    private fun refreshAllAvailableCopies(books: List<BookResponse>) {
+        viewModelScope.launch {
+            val results = books.map { book ->
+                async {
+                    bookCopyRepository.getBookCopiesByBook(book.bookId)
+                        .onSuccess { copies -> updateBookAvailableCopies(book.bookId, copies) }
+                }
+            }
+            results.forEach { it.await() }
+        }
     }
 
     private fun normalizeCategoryCode(categoryName: String?): String {

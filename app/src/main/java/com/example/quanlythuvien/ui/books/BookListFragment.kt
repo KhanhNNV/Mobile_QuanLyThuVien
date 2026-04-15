@@ -192,6 +192,7 @@ class BookListFragment : Fragment() {
                                 val copies = state.copies
                                 val availableCount = copies.count { it.status.equals("AVAILABLE", ignoreCase = true) }
                                 currentStatusText?.text = "Tổng quan: Còn $availableCount cuốn"
+                                viewModel.refreshAvailableCopiesFromBookDetail(state.bookId)
                                 val items = copies.map {
                                     BookCopyItem(
                                         copyIdValue = it.copyId,
@@ -201,13 +202,16 @@ class BookListFragment : Fragment() {
                                         statusColor = resources.getColor(R.color.text_secondary, null)
                                     )
                                 }.toMutableList()
+                                val allowEditCopy = BookWarehousePermissions
+                                    .canCreateOrUpdateCatalog(requireContext())
                                 val allowDeleteCopy = BookWarehousePermissions
                                     .canDeleteBookCopiesInWarehouseUi(requireContext())
                                 currentCopyAdapter = BookCopyAdapter(
                                     copyList = items,
+                                    allowEdit = allowEditCopy,
                                     allowDelete = allowDeleteCopy,
                                     onEditClick = { item, _ ->
-                                        if (!allowDeleteCopy) return@BookCopyAdapter
+                                        if (!allowEditCopy) return@BookCopyAdapter
                                         showEditCopyConditionDialog(item, state.bookId)
                                     },
                                     onDeleteClick = { item, position ->
@@ -400,6 +404,7 @@ class BookListFragment : Fragment() {
         val placeholderCopies = mutableListOf<BookCopyItem>()
         rvBookCopies.adapter = BookCopyAdapter(
             copyList = placeholderCopies,
+            allowEdit = false,
             allowDelete = false,
             onEditClick = { _, _ -> },
             onDeleteClick = { _, _ -> }

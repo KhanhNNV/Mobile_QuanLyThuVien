@@ -16,6 +16,7 @@ import com.example.quanlythuvien.R
 
 class BookCopyAdapter(
     private val copyList: MutableList<BookCopyItem>,
+    private val allowEdit: Boolean,
     private val allowDelete: Boolean,
     private val onEditClick: (BookCopyItem, Int) -> Unit,
     private val onDeleteClick: (BookCopyItem, Int) -> Unit
@@ -81,13 +82,19 @@ class BookCopyAdapter(
         }
         holder.tvCopyStatus.setTextColor(ContextCompat.getColor(holder.itemView.context, R.color.text_secondary))
 
-        if (allowDelete) {
+        if (allowEdit) {
             holder.ivEditCopy.visibility = View.VISIBLE
             holder.ivEditCopy.setOnClickListener {
                 val adapterPos = holder.bindingAdapterPosition
                 if (adapterPos == RecyclerView.NO_POSITION) return@setOnClickListener
                 onEditClick(item, adapterPos)
             }
+        } else {
+            holder.ivEditCopy.visibility = View.GONE
+            holder.ivEditCopy.setOnClickListener(null)
+        }
+
+        if (allowDelete) {
             holder.ivDeleteCopy.visibility = View.VISIBLE
             holder.ivDeleteCopy.setOnClickListener {
                 val adapterPos = holder.bindingAdapterPosition
@@ -95,8 +102,6 @@ class BookCopyAdapter(
                 onDeleteClick(item, adapterPos)
             }
         } else {
-            holder.ivEditCopy.visibility = View.GONE
-            holder.ivEditCopy.setOnClickListener(null)
             holder.ivDeleteCopy.visibility = View.GONE
             holder.ivDeleteCopy.setOnClickListener(null)
         }
