@@ -37,7 +37,7 @@
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="8dp"
             app:boxStrokeColor="@color/btn_primary"
             android:hint="Nhập mã vạch Barcode">
 
@@ -45,9 +45,20 @@
                 android:id="@+id/edtBarcode"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:imeOptions="actionDone"
                 android:inputType="text"
                 android:maxLines="1" />
         </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:id="@+id/tvSuggestedBarcode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="Đề xuất mã: ..."
+            android:textColor="@color/btn_primary"
+            android:textSize="13sp"
+            android:textStyle="bold" />
 
         <TextView
             android:layout_width="match_parent"

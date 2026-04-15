@@ -8,6 +8,7 @@ import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 
 interface BookCopyApiService {
@@ -16,6 +17,12 @@ interface BookCopyApiService {
 
     @GET("api/book-copies/book/{bookId}")
     suspend fun getBookCopiesByBook(@Path("bookId") bookId: Long): Response<List<BookCopyResponse>>
+
+    @PUT("api/book-copies/{copyId}")
+    suspend fun updateBookCopy(
+        @Path("copyId") copyId: Long,
+        @Body request: BookCopyRequest
+    ): Response<BookCopyResponse>
 
     @DELETE("api/book-copies/{copyId}")
     suspend fun deleteBookCopy(@Path("copyId") copyId: Long): Response<ResponseBody>

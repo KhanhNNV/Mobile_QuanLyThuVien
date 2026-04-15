@@ -10,9 +10,9 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.RadioGroup
 import android.widget.Spinner
 import android.widget.TextView
+import android.view.KeyEvent
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -46,7 +46,6 @@ class BookListFragment : Fragment() {
     private lateinit var bookAdapter: BookAdapter
     private lateinit var spinnerCategory: Spinner
     private lateinit var etSearch: EditText
-    private lateinit var rgStatusFilter: RadioGroup
     private lateinit var btnResetFilter: Button
     private lateinit var btnApplyFilter: Button
     private lateinit var btnToggleFilter: ImageView
@@ -57,14 +56,18 @@ class BookListFragment : Fragment() {
     private lateinit var fabAddBook: FloatingActionButton
     private lateinit var viewModel: BookListViewModel
     private var isFilterExpanded = false
-    private var categoryOptions: List<Pair<Long?, String>> = listOf(null to "Tat ca danh muc")
+    private var categoryOptions: List<Pair<Long?, String>> = listOf(null to "Tất cả danh mục")
     private var selectedCategoryId: Long? = null
     private var hasLoadError = false
     private var isUpdatingBook = false
     private var currentDialog: android.app.Dialog? = null
     private var currentDialogBookId: Long? = null
     private var currentStatusText: TextView? = null
+    private var currentSuggestedBarcodeText: TextView? = null
+    private var currentBarcodeInput: TextInputEditText? = null
     private var currentCopyAdapter: BookCopyAdapter? = null
+    private var currentDialogCategoryName: String? = null
+    private var currentDialogBookTitle: String? = null
     private val deletingCopyIds = mutableSetOf<Long>()
 
     override fun onCreateView(
@@ -97,7 +100,6 @@ class BookListFragment : Fragment() {
         llFilterContainer = view.findViewById(R.id.llFilterContainer)
         spinnerCategory = view.findViewById(R.id.spinnerCategory)
         etSearch = view.findViewById(R.id.etSearch)
-        rgStatusFilter = view.findViewById(R.id.rgStatusFilter)
         btnResetFilter = view.findViewById(R.id.btnResetFilter)
         btnApplyFilter = view.findViewById(R.id.btnApplyFilter)
         layoutEmptyState = view.findViewById(R.id.layoutEmptyState)
@@ -194,6 +196,7 @@ class BookListFragment : Fragment() {
                                     BookCopyItem(
                                         copyIdValue = it.copyId,
                                         copyId = "Mã cuốn: ${it.barcode}",
+                                        conditionText = it.condition,
                                         statusText = it.status,
                                         statusColor = resources.getColor(R.color.text_secondary, null)
                                     )
@@ -202,21 +205,26 @@ class BookListFragment : Fragment() {
                                     .canDeleteBookCopiesInWarehouseUi(requireContext())
                                 currentCopyAdapter = BookCopyAdapter(
                                     copyList = items,
-                                    allowDelete = allowDeleteCopy
-                                ) { item, position ->
-                                    if (!allowDeleteCopy) return@BookCopyAdapter
-                                    if (deletingCopyIds.contains(item.copyIdValue)) return@BookCopyAdapter
-                                    MaterialAlertDialogBuilder(requireContext())
-                                        .setTitle("Xóa bản sao")
-                                        .setMessage("Bạn chắc chắn muốn xóa ${item.copyId}?")
-                                        .setNegativeButton("Hủy", null)
-                                        .setPositiveButton("Xóa") { _, _ ->
-                                            deletingCopyIds.add(item.copyIdValue)
-                                            currentCopyAdapter?.removeAt(position)
-                                            viewModel.deleteBookCopy(item.copyIdValue, state.bookId)
-                                        }
-                                        .show()
-                                }
+                                    allowDelete = allowDeleteCopy,
+                                    onEditClick = { item, _ ->
+                                        if (!allowDeleteCopy) return@BookCopyAdapter
+                                        showEditCopyConditionDialog(item, state.bookId)
+                                    },
+                                    onDeleteClick = { item, position ->
+                                        if (!allowDeleteCopy) return@BookCopyAdapter
+                                        if (deletingCopyIds.contains(item.copyIdValue)) return@BookCopyAdapter
+                                        MaterialAlertDialogBuilder(requireContext())
+                                            .setTitle("Xóa bản sao")
+                                            .setMessage("Bạn chắc chắn muốn xóa ${item.copyId}?")
+                                            .setNegativeButton("Hủy", null)
+                                            .setPositiveButton("Xóa") { _, _ ->
+                                                deletingCopyIds.add(item.copyIdValue)
+                                                currentCopyAdapter?.removeAt(position)
+                                                viewModel.deleteBookCopy(item.copyIdValue, state.bookId)
+                                            }
+                                            .show()
+                                    }
+                                )
                                 val recycler = currentDialog?.findViewById<RecyclerView>(R.id.rvBookCopies)
                                 recycler?.adapter = currentCopyAdapter
                             }
@@ -276,7 +284,6 @@ class BookListFragment : Fragment() {
 
         btnResetFilter.setOnClickListener {
             etSearch.text?.clear()
-            rgStatusFilter.check(R.id.rbAll)
             spinnerCategory.setSelection(0)
             selectedCategoryId = null
             viewModel.resetFilters()
@@ -387,14 +394,16 @@ class BookListFragment : Fragment() {
         btnAddCopy.visibility = if (canCrudWarehouse) View.VISIBLE else View.GONE
         btnAddCopy.setOnClickListener {
             if (!canCrudWarehouse) return@setOnClickListener
-            showAddCopyDialog(book.bookId, book.title)
+            showAddCopyDialog(book.bookId, book.title, categoryText)
         }
         rvBookCopies.layoutManager = LinearLayoutManager(requireContext())
         val placeholderCopies = mutableListOf<BookCopyItem>()
         rvBookCopies.adapter = BookCopyAdapter(
             copyList = placeholderCopies,
-            allowDelete = false
-        ) { _, _ -> }
+            allowDelete = false,
+            onEditClick = { _, _ -> },
+            onDeleteClick = { _, _ -> }
+        )
 
         btnClose.setOnClickListener { dialog.dismiss() }
         btnEdit.setOnClickListener {
@@ -413,7 +422,55 @@ class BookListFragment : Fragment() {
         viewModel.loadBookCopies(book.bookId)
     }
 
-    private fun showAddCopyDialog(bookId: Long, bookTitle: String) {
+    private fun showEditCopyConditionDialog(item: BookCopyItem, bookId: Long) {
+        val dialog = android.app.Dialog(requireContext())
+        dialog.setContentView(R.layout.dialog_add_book_copy)
+        dialog.window?.setBackgroundDrawable(
+            android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT)
+        )
+        dialog.window?.setLayout(
+            android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+            android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+
+        val tvInfo = dialog.findViewById<TextView>(R.id.tvAddCopyBookInfo)
+        val tvSuggestedBarcode = dialog.findViewById<TextView>(R.id.tvSuggestedBarcode)
+        val edtBarcode = dialog.findViewById<TextInputEditText>(R.id.edtBarcode)
+        val spinnerCondition = dialog.findViewById<Spinner>(R.id.spinnerCondition)
+        val btnCancel = dialog.findViewById<Button>(R.id.btnCancelAddCopy)
+        val btnSave = dialog.findViewById<Button>(R.id.btnSaveCopy)
+
+        tvInfo.text = "Sửa tình trạng cho ${item.copyId}"
+        tvSuggestedBarcode.text = "Mã cuốn hiện tại"
+        edtBarcode.setText(item.copyIdValue.toString())
+        edtBarcode.isEnabled = false
+
+        val conditions = listOf(
+            "NEW" to "Mới",
+            "GOOD" to "Tốt",
+            "FAIR" to "Khá",
+            "POOR" to "Kém"
+        )
+        val spinnerAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, conditions.map { it.second })
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinnerCondition.adapter = spinnerAdapter
+
+        val initialIndex = conditions.indexOfFirst { it.first.equals(item.conditionText, ignoreCase = true) }
+            .takeIf { it >= 0 } ?: 0
+        spinnerCondition.setSelection(initialIndex)
+
+        btnCancel.setOnClickListener { dialog.dismiss() }
+        btnSave.setOnClickListener {
+            val selectedLabel = spinnerCondition.selectedItem?.toString().orEmpty()
+            val selectedCondition = conditions.firstOrNull { it.second == selectedLabel }?.first ?: item.conditionText
+            viewModel.updateBookCopy(item.copyIdValue, bookId, selectedCondition)
+            dialog.dismiss()
+        }
+
+        dialog.show()
+    }
+
+    private fun showAddCopyDialog(bookId: Long, bookTitle: String, categoryName: String?) {
         val addDialog = android.app.Dialog(requireContext())
         addDialog.setContentView(R.layout.dialog_add_book_copy)
         addDialog.window?.setBackgroundDrawable(
@@ -425,28 +482,51 @@ class BookListFragment : Fragment() {
         )
 
         val tvInfo = addDialog.findViewById<TextView>(R.id.tvAddCopyBookInfo)
+        val tvSuggestedBarcode = addDialog.findViewById<TextView>(R.id.tvSuggestedBarcode)
         val edtBarcode = addDialog.findViewById<TextInputEditText>(R.id.edtBarcode)
         val spinnerCondition = addDialog.findViewById<Spinner>(R.id.spinnerCondition)
         val btnCancel = addDialog.findViewById<Button>(R.id.btnCancelAddCopy)
         val btnSave = addDialog.findViewById<Button>(R.id.btnSaveCopy)
         tvInfo.text = "Sách: $bookTitle (ID: $bookId)"
 
-        val conditions = listOf("NEW", "GOOD", "FAIR", "POOR")
-        val spinnerAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, conditions)
+        val conditions = listOf("NEW" to "Mới", "GOOD" to "Tốt", "FAIR" to "Khá", "POOR" to "Kém")
+        val spinnerAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, conditions.map { it.second })
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerCondition.adapter = spinnerAdapter
 
-        btnCancel.setOnClickListener { addDialog.dismiss() }
-        btnSave.setOnClickListener {
+        val suggestedBarcode = viewModel.buildNextBarcode(bookId, categoryName)
+        edtBarcode.setText(suggestedBarcode)
+        edtBarcode.setSelection(suggestedBarcode.length)
+        tvSuggestedBarcode.text = "Đề xuất mã: $suggestedBarcode"
+
+        fun submitCopy() {
             val barcode = edtBarcode.text?.toString()?.trim().orEmpty()
-            val condition = spinnerCondition.selectedItem?.toString().orEmpty()
+            val selectedConditionLabel = spinnerCondition.selectedItem?.toString().orEmpty()
+            val condition = conditions.firstOrNull { it.second == selectedConditionLabel }?.first
+                ?: selectedConditionLabel
             if (barcode.isEmpty()) {
                 Toast.makeText(requireContext(), "Vui lòng nhập Barcode!", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
+                return
             }
             viewModel.createBookCopy(bookId = bookId, barcode = barcode, condition = condition)
             addDialog.dismiss()
         }
+
+        edtBarcode.setOnEditorActionListener { _, _, _ ->
+            submitCopy()
+            true
+        }
+        edtBarcode.setOnKeyListener { _, keyCode, event ->
+            if (keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_UP) {
+                submitCopy()
+                true
+            } else {
+                false
+            }
+        }
+
+        btnCancel.setOnClickListener { addDialog.dismiss() }
+        btnSave.setOnClickListener { submitCopy() }
         addDialog.show()
     }
 
