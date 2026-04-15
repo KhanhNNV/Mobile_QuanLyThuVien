@@ -444,20 +444,18 @@ class BookListFragment : Fragment() {
             android.view.ViewGroup.LayoutParams.WRAP_CONTENT
         )
 
+        val tvDialogTitle = dialog.findViewById<TextView>(R.id.tvDialogTitle)
         val tvInfo = dialog.findViewById<TextView>(R.id.tvAddCopyBookInfo)
-        val tvSuggestedBarcode = dialog.findViewById<TextView>(R.id.tvSuggestedBarcode)
+        val layoutBarcodeGroup = dialog.findViewById<LinearLayout>(R.id.layoutBarcodeGroup)
         val edtBarcode = dialog.findViewById<TextInputEditText>(R.id.edtBarcode)
         val spinnerCondition = dialog.findViewById<Spinner>(R.id.spinnerCondition)
         val btnCancel = dialog.findViewById<Button>(R.id.btnCancelAddCopy)
         val btnSave = dialog.findViewById<Button>(R.id.btnSaveCopy)
 
-        tvInfo.text = "Sửa tình trạng cho ${item.copyId}"
-        tvSuggestedBarcode.text = "Mã cuốn hiện tại"
-        edtBarcode.setText(item.copyIdValue.toString())
-        edtBarcode.apply {
-            isEnabled = false
-            alpha = 0.6f
-        }
+        tvDialogTitle.text = "Sửa tình trạng bản sao"
+        tvInfo.text = "${item.copyId}"
+        layoutBarcodeGroup.visibility = View.GONE
+        edtBarcode.setText("")
 
         val conditions = listOf(
             "NEW" to "Mới",
