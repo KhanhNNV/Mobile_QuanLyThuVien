@@ -38,6 +38,16 @@ class BookCopyAdapter(
         else -> rawStatus
     }
 
+    private fun statusColor(holder: CopyViewHolder, rawStatus: String, fallbackColor: Int): Int {
+        return when (rawStatus.uppercase()) {
+            "AVAILABLE", "CÓ SẴN" -> ContextCompat.getColor(holder.itemView.context, R.color.green)
+            "BORROWED", "ĐANG MƯỢN" -> ContextCompat.getColor(holder.itemView.context, R.color.btn_primary)
+            "LOST", "ĐÃ MẤT" -> ContextCompat.getColor(holder.itemView.context, R.color.red)
+            "DAMAGED", "HƯ HỎNG" -> ContextCompat.getColor(holder.itemView.context, R.color.yellow)
+            else -> fallbackColor
+        }
+    }
+
     private fun conditionColor(holder: CopyViewHolder, rawCondition: String, fallbackColor: Int): Int {
         return when (rawCondition.uppercase()) {
             "NEW", "MỚI" -> ContextCompat.getColor(holder.itemView.context, R.color.green)
@@ -51,6 +61,15 @@ class BookCopyAdapter(
     private fun conditionLabelSpan(holder: CopyViewHolder, rawCondition: String): CharSequence {
         val label = displayCondition(rawCondition)
         val color = conditionColor(holder, rawCondition, holder.tvCopyStatus.currentTextColor)
+        return SpannableStringBuilder(label).apply {
+            setSpan(ForegroundColorSpan(color), 0, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            setSpan(StyleSpan(Typeface.BOLD), 0, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+    }
+
+    private fun statusLabelSpan(holder: CopyViewHolder, rawStatus: String): CharSequence {
+        val label = displayStatus(rawStatus)
+        val color = statusColor(holder, rawStatus, holder.tvCopyStatus.currentTextColor)
         return SpannableStringBuilder(label).apply {
             setSpan(ForegroundColorSpan(color), 0, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
             setSpan(StyleSpan(Typeface.BOLD), 0, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
@@ -72,7 +91,7 @@ class BookCopyAdapter(
     override fun onBindViewHolder(holder: CopyViewHolder, position: Int) {
         val item = copyList[position]
         holder.tvCopyId.text = item.copyId
-        val statusText = displayStatus(item.statusText)
+        val statusText = statusLabelSpan(holder, item.statusText)
         val conditionText = conditionLabelSpan(holder, item.conditionText)
         holder.tvCopyStatus.text = SpannableStringBuilder().apply {
             append(statusText)
