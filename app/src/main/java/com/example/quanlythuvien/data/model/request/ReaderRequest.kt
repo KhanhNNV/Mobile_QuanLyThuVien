@@ -5,5 +5,5 @@ data class ReaderRequest(
     val phone: String,
     val barcode: String,
     val libraryId: Long,
-    val membershipExpiry: String? = null
+    val monthRegis: Long
 )

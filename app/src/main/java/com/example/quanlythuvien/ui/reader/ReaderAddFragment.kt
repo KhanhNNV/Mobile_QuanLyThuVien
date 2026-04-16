@@ -156,25 +156,12 @@ class ReaderAddFragment : Fragment(R.layout.fragment_reader_add) {
             }
 
 
-            //Tạo một cái Lịch (Calendar) ngay thời điểm hiện tại
-            val calendar = Calendar.getInstance()
-
-            //  Cộng thêm số tháng user vừa nhập vào cái Lịch đó
-            calendar.add(Calendar.MONTH, months.toInt())
-
-            // Chuẩn bị một cái Khuôn (Format) : "Năm-Tháng-NgàyTHiờ:Phút:Giây"
-            // Locale.getDefault() để đảm bảo định dạng không bị lỗi múi giờ
-            val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
-
-            //  In cái Lịch ra thành chuỗi dựa theo cái Khuôn đó
-            val expiryDate = formatter.format(calendar.time)
-
             val request = ReaderRequest(
                 fullName = name,
                 phone = phone,
                 barcode = "",
                 libraryId = libraryId,
-                membershipExpiry = expiryDate
+                monthRegis = months
             )
 
             viewModel.addReader(request)

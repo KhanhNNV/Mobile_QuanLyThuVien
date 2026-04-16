@@ -15,5 +15,5 @@ public class ReaderRequest {
     private String phone;
     private String barcode;
     private Long libraryId;
-    private LocalDateTime membershipExpiry;
+    private Long monthRegis;
 }

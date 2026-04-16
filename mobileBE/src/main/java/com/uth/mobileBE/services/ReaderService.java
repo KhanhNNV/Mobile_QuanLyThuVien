@@ -3,8 +3,15 @@ package com.uth.mobileBE.services;
 import com.uth.mobileBE.Utils.SecurityUtils;
 import com.uth.mobileBE.dto.request.ReaderRequest;
 import com.uth.mobileBE.dto.response.ReaderResponse;
+import com.uth.mobileBE.models.FeeConfig;
+import com.uth.mobileBE.models.FeeInvoice;
 import com.uth.mobileBE.models.Library;
 import com.uth.mobileBE.models.Reader;
+import com.uth.mobileBE.models.enums.StatusFeeInvoice;
+import com.uth.mobileBE.models.enums.TypeFeeConfig;
+import com.uth.mobileBE.models.enums.TypeFeeInvoice;
+import com.uth.mobileBE.repositories.FeeConfigRepository;
+import com.uth.mobileBE.repositories.FeeInvoiceRepository;
 import com.uth.mobileBE.repositories.LibraryRepository;
 import com.uth.mobileBE.repositories.ReaderRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +31,8 @@ import java.util.stream.Collectors;
 public class ReaderService {
     private final ReaderRepository readerRepository;
     private final LibraryRepository libraryRepository;
+    private final FeeInvoiceRepository feeInvoiceRepository;
+    private final FeeConfigRepository feeConfigRepository;
 
     //Tạo người độc giả
     @Transactional
@@ -40,17 +49,35 @@ public class ReaderService {
         String generatedBarcode = "READER-" + (maxId + 1);
         // ----------------------------------------------
 
+        LocalDateTime membershipExpiry = calculateExpiryDate(request.getMonthRegis());
+
         Reader reader = Reader.builder()
                 .fullName(request.getFullName())
                 .phone(request.getPhone())
                 .barcode(generatedBarcode)
-                .membershipExpiry(request.getMembershipExpiry())
+                .membershipExpiry(membershipExpiry)
                 .library(library)
-                .isBlocked(false) // Mặc định không bị khóa
+                .isBlocked(true)
                 .createdAt(LocalDateTime.now())
                 .build();
 
         Reader saved = readerRepository.save(reader);
+
+        FeeConfig feeRegistration= feeConfigRepository.findByLibrary_LibraryIdAndFeeType(library.getLibraryId(), TypeFeeConfig.REG_NORMAL)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy phí đăng ký thẻ cho thư viện này"));
+
+        Double totalAmount = feeRegistration.getAmount() * request.getMonthRegis();
+
+
+        FeeInvoice feeInvoice = FeeInvoice.builder()
+                .reader(reader)
+                .library(library)
+                .type(TypeFeeInvoice.REGISTRATION)
+                .totalAmount(totalAmount)
+                .status(StatusFeeInvoice.UNPAID)
+                .build();
+
+        feeInvoiceRepository.save(feeInvoice);
         return mapToReaderResponse(saved);
     }
 
@@ -101,7 +128,7 @@ public class ReaderService {
         reader.setFullName(request.getFullName());
         reader.setPhone(request.getPhone());
         reader.setBarcode(request.getBarcode());
-        reader.setMembershipExpiry(request.getMembershipExpiry());
+        reader.setMembershipExpiry(calculateExpiryDate(request.getMonthRegis()));
 
         // Nếu muốn cho phép chuyển thư viện, bạn có thể xử lý libraryId ở đây
         if (request.getLibraryId() != null && !request.getLibraryId().equals(reader.getLibrary().getLibraryId())) {
@@ -126,6 +153,10 @@ public class ReaderService {
         return readerRepository.countByLibrary_LibraryId(libraryId);
     }
 
+    private LocalDateTime calculateExpiryDate(Long days){
+        return LocalDateTime.now().plusDays(days);
+    }
+
 
     private ReaderResponse mapToReaderResponse(Reader reader) {
         return ReaderResponse.builder()
@@ -136,7 +167,7 @@ public class ReaderService {
                              .isBlocked(reader.getIsBlocked())
                              .createdAt(reader.getCreatedAt())
                              .membershipExpiry(reader.getMembershipExpiry())
-                             // .updatedAt(reader.getUpdatedAt()) // (Bổ sung nếu entity có trường này)
+                             .updatedAt(LocalDateTime.now())
                              .build();
     }
 
