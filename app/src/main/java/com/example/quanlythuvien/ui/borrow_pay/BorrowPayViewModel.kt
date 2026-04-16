@@ -32,20 +32,20 @@ class BorrowPayViewModel(private val repository: LoanRepository) : ViewModel() {
                     // MAP DỮ LIỆU: Từ DTO của Backend sang LoanItemData
                     val uiModelList = loanResponseList.map { dto ->
 
-                        // --- Xử lý danh sách sách mượn (Bây giờ dùng bookDetails thay vì bookTitles) ---
-                        val detailList = dto.bookDetails?.map { detail ->
+                        // Lặp qua loanDetails thay vì bookDetails
+                        val detailList = dto.loanDetails?.map { detail ->
                             LoanDetailItemData(
-                                bookId = detail.copyId ?: 0L,           // Lấy ID thật từ backend
-                                title = detail.title ?: "Không rõ",     // Tên sách
-                                author = detail.author ?: "Không rõ",   // Tác giả
-                                categoryName = detail.category ?: "Không rõ", // Thể loại
-                                returnDate = detail.returnDate,         // Ngày trả
-                                dueDate = detail.dueDate ?: "Chưa có",  // Hạn trả
-                                status = detail.status ?: dto.status    // Lấy trạng thái của từng cuốn sách
+                                loanDetailId = detail.loanDetailId, // Gán ID mới
+                                bookId = detail.bookId ?: 0L,
+                                title = detail.bookTitle ?: "Không rõ",
+                                author = "Không rõ", // Backend chưa trả về, tạm gán
+                                categoryName = "Không rõ", // Backend chưa trả về, tạm gán
+                                returnDate = detail.returnDate,
+                                dueDate = detail.dueDate ?: "Chưa có",
+                                status = detail.status
                             )
                         }?.toMutableList() ?: mutableListOf()
 
-                        // --- Tạo Object cha ---
                         LoanItemData(
                             loanId = dto.loanId,
                             borrowDate = dto.borrowDate,
