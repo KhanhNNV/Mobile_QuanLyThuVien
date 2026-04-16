@@ -13,6 +13,9 @@ import java.util.List;
 @Repository
 public interface ReaderRepository extends JpaRepository<Reader, Long> {
     long countByLibrary_LibraryId(Long libraryId);
+    // Tìm ID lớn nhất hiện tại. Dùng COALESCE để lỡ bảng chưa có ai thì trả về 0.
+    @Query("SELECT COALESCE(MAX(r.readerId), 0) FROM Reader r")
+    Long findMaxReaderId();
 
     // Tìm kiếm tương đối theo Tên, Số điện thoại hoặc Mã thẻ (Barcode)
     @Query("SELECT r FROM Reader r WHERE r.library.libraryId = :libraryId AND (" +

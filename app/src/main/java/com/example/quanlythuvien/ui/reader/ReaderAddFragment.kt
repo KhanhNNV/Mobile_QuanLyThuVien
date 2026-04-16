@@ -6,151 +6,178 @@ import android.graphics.Paint
 import android.graphics.pdf.PdfDocument
 import android.os.Bundle
 import android.os.Environment
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.widget.AutoCompleteTextView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.example.quanlythuvien.R
+import com.example.quanlythuvien.core.api.RetrofitClient
+import com.example.quanlythuvien.data.model.request.ReaderRequest
+import com.example.quanlythuvien.data.remote.ReaderApiService
+import com.example.quanlythuvien.data.repository.ReaderRepository
+import com.example.quanlythuvien.utils.GenericViewModelFactory
+import com.example.quanlythuvien.utils.TokenManager
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
-import androidx.navigation.fragment.findNavController
-import com.example.quanlythuvien.data2.entity.enums.ReaderType
+import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.util.Calendar
+import java.util.Locale
 
-class ReaderAddFragment : Fragment() {
+class ReaderAddFragment : Fragment(R.layout.fragment_reader_add) {
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Nạp giao diện fragment_reader_add.xml
-        return inflater.inflate(R.layout.fragment_reader_add, container, false)
-    }
+    // 1. Khai báo các View
+    private lateinit var tvTitle: TextView
+    private lateinit var edtReaderName: TextInputEditText
+    private lateinit var edtReaderPhone: TextInputEditText
+    private lateinit var btnCancelReader: MaterialButton
+    private lateinit var btnSaveReader: MaterialButton
 
+    private lateinit var viewModel: ReaderAddViewModel
+    private lateinit var edtMembershipMonths: TextInputEditText
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // 1. Ánh xạ nút "Lưu Độc Giả" từ file XML sang biến Kotlin
-        val tvTitle = view.findViewById<TextView>(R.id.tvTitle) //Thông thêm
-        val edtReaderCode = view.findViewById<TextInputEditText>(R.id.edtReaderCode)
-        val edtReaderName = view.findViewById<TextInputEditText>(R.id.edtReaderName)
-        val edtReaderPhone = view.findViewById<TextInputEditText>(R.id.edtReaderPhone)
-        val spinnerReaderType = view.findViewById<AutoCompleteTextView>(R.id.spinnerReaderType)
-        val btnSaveReader = view.findViewById<MaterialButton>(R.id.btnSaveReader)
-        val btnCancelReader = view.findViewById<MaterialButton>(R.id.btnCancelReader)
+        initViews(view)
+        setupViewModel()
+        setupEditMode() // Tách logic chế độ Edit ra một hàm cho sạch sẽ
+        observeViewModel()
+        setupListeners()
+    }
 
-        val displayTypes = ReaderType.entries.map { it.value }.toTypedArray()
+    private fun initViews(view: View) {
+        tvTitle = view.findViewById(R.id.tvTitle)
+        edtReaderName = view.findViewById(R.id.edtReaderName)
+        edtReaderPhone = view.findViewById(R.id.edtReaderPhone)
+        btnCancelReader = view.findViewById(R.id.btnCancelReader)
+        btnSaveReader = view.findViewById(R.id.btnSaveReader)
+        edtMembershipMonths = view.findViewById(R.id.edtMembershipMonths)
+    }
 
-        val adapter = android.widget.ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, displayTypes)
-        spinnerReaderType.setAdapter(adapter)
+    private fun setupViewModel() {
+        val retrofit = RetrofitClient.getInstance(requireContext())
+        val apiService = retrofit.create(ReaderApiService::class.java)
+        val repository = ReaderRepository(apiService)
 
-        // Hứng dữ liệu bundle từ bên detail_reader vào các ô edittext
+        val factory = GenericViewModelFactory { ReaderAddViewModel(repository) }
+        viewModel = ViewModelProvider(this, factory)[ReaderAddViewModel::class.java]
+    }
+
+    private fun setupEditMode() {
         val editName = arguments?.getString("readerName")
         val editPhone = arguments?.getString("readerPhone")
-        val editType = arguments?.getString("readerType")
-
         val isModeEdit = !editName.isNullOrEmpty()
+
         if (isModeEdit) {
-            // Đổi giao diện sang chế độ CẬP NHẬT
             tvTitle.text = "Cập nhật Độc giả"
-            btnSaveReader.text = "Cập nhật"
-            // Đổ dữ liệu cũ vào các ô
+            btnSaveReader.text = "CẬP NHẬT"
             edtReaderName.setText(editName)
             edtReaderPhone.setText(editPhone)
-            // Lệnh set text cho Spinner (AutoCompleteTextView), tham số 'false' để tránh nó tự động bung list ra khi gán
-            spinnerReaderType.setText(editType, false)
-
-            edtReaderCode.setText("123#")
-            //edtReaderCode.isEnabled = false
         }
+    }
 
+    private fun observeViewModel() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.addReaderState.collectLatest { state ->
+                when (state) {
+                    is ReaderAddState.Idle -> {
+                        btnSaveReader.isEnabled = true
+                        // Check xem đang ở chế độ thêm hay sửa để set chữ cho đúng
+                        btnSaveReader.text = if (arguments?.getString("readerName").isNullOrEmpty()) "LƯU ĐỘC GIẢ" else "CẬP NHẬT"
+                    }
+                    is ReaderAddState.Loading -> {
+                        btnSaveReader.isEnabled = false
+                        btnSaveReader.text = "Đang xử lý..."
+                    }
+                    is ReaderAddState.Success -> {
+                        btnSaveReader.isEnabled = true
+                        btnSaveReader.text = "LƯU ĐỘC GIẢ"
 
+                        Toast.makeText(requireContext(), "Thêm độc giả thành công!", Toast.LENGTH_SHORT).show()
+                        findNavController().popBackStack()
+                    }
+                    is ReaderAddState.Error -> {
+                        btnSaveReader.isEnabled = true
+                        btnSaveReader.text = "LƯU ĐỘC GIẢ"
+                        Toast.makeText(requireContext(), state.message, Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun setupListeners() {
         btnCancelReader.setOnClickListener {
             findNavController().popBackStack()
         }
 
-        // 2. Lắng nghe sự kiện người dùng bấm vào nút Lưu
         btnSaveReader.setOnClickListener {
-
-            val code = edtReaderCode.text.toString().trim()
             val name = edtReaderName.text.toString().trim()
             val phone = edtReaderPhone.text.toString().trim()
-            val type = spinnerReaderType.text.toString().trim()
+            val monthsStr = edtMembershipMonths.text.toString().trim()
 
-            if (code.isEmpty()) {
-                edtReaderCode.error = "Vui lòng nhập mã độc giả!"
-                edtReaderCode.requestFocus() // Đẩy con trỏ nhấp nháy về ô này
-
-            } else if (name.isEmpty()) {
+            // Validate báo lỗi từng ô giống AddBookFragment
+            if (name.isEmpty()) {
                 edtReaderName.error = "Vui lòng nhập họ tên!"
                 edtReaderName.requestFocus()
-
-            } else if (phone.isEmpty()) {
+                return@setOnClickListener
+            }
+            if (phone.isEmpty()) {
                 edtReaderPhone.error = "Vui lòng nhập số điện thoại!"
                 edtReaderPhone.requestFocus()
-
-            } else {
-                //Gọi MaterialAlertDialogBuilder để tạo Popup thông báo
-                MaterialAlertDialogBuilder(requireContext())
-                    .setTitle("Lưu thành công!")
-                    .setMessage("Độc giả đã được thêm vào hệ thống. Bạn có muốn xuất thông tin này ra file PDF để in thẻ độc giả không?")
-
-                    .setPositiveButton("In PDF") { dialog, _ ->
-                        createPdf(code,name,phone,type)
-                        dialog.dismiss() // Đóng popup lại
-                        findNavController().popBackStack()
-                    }
-
-                    .setNegativeButton("Để sau") { dialog, _ ->
-                        dialog.dismiss() // Chỉ đóng popup lại thôi
-                        findNavController().popBackStack()
-                    }
-
-                    .show()
+                return@setOnClickListener
+            }
+            if (monthsStr.isEmpty()) {
+                edtMembershipMonths.error = "Vui lòng nhập số tháng!"
+                edtMembershipMonths.requestFocus()
+                return@setOnClickListener
+            }
+            val months = monthsStr.toLongOrNull()
+            if (months == null || months <= 0) {
+                edtMembershipMonths.error = "Số tháng không hợp lệ!"
+                edtMembershipMonths.requestFocus()
+                return@setOnClickListener
             }
 
-        }
+            // Lấy ID thư viện từ Token
+            val libraryId = TokenManager(requireContext()).getLibraryId()
+            if (libraryId == null) {
+                Toast.makeText(requireContext(), "Lỗi: Không tìm thấy thông tin thư viện!", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
 
-    }
-    private fun createPdf(code : String, name: String,phone: String ,type: String){
 
-        val pdfDocument = PdfDocument()
+            //Tạo một cái Lịch (Calendar) ngay thời điểm hiện tại
+            val calendar = Calendar.getInstance()
 
-        val pageInfo = PdfDocument.PageInfo.Builder(400,300,1).create()
-        val page = pdfDocument.startPage(pageInfo)
-        val canvas : Canvas = page.canvas
+            //  Cộng thêm số tháng user vừa nhập vào cái Lịch đó
+            calendar.add(Calendar.MONTH, months.toInt())
 
-        val paint = Paint()
-        paint.color = Color.BLACK
-        paint.textSize = 16f
-        //
-        paint.isFakeBoldText = true // chữ in đạm cho tiêu đề
-        canvas.drawText("THẺ ĐỘC GIẢ THƯ VIỆN", 100f, 50f, paint)
-        paint.isFakeBoldText = false // Chữ thường cho thông tin
-        canvas.drawText("Mã thẻ: $code", 50f, 100f, paint)
-        canvas.drawText("Họ và tên: $name", 50f, 140f, paint)
-        canvas.drawText("Số điện thoại: $phone", 50f, 180f, paint)
-        canvas.drawText("Loại độc giả: $type", 50f, 220f, paint)
-        pdfDocument.finishPage(page)
-        try {
-            // Lưu file vào thư mục Documents riêng của App
-            val directory = requireContext().getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)
-            val file = File(directory, "TheDocGia_$code.pdf")
+            // Chuẩn bị một cái Khuôn (Format) : "Năm-Tháng-NgàyTHiờ:Phút:Giây"
+            // Locale.getDefault() để đảm bảo định dạng không bị lỗi múi giờ
+            val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
 
-            pdfDocument.writeTo(FileOutputStream(file))
+            //  In cái Lịch ra thành chuỗi dựa theo cái Khuôn đó
+            val expiryDate = formatter.format(calendar.time)
 
-            Toast.makeText(requireContext(), "Đã in PDF! Bạn vào thư mục máy để xem.", Toast.LENGTH_LONG).show()
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Toast.makeText(requireContext(), "Lỗi khi tạo PDF: ${e.message}", Toast.LENGTH_SHORT).show()
-        } finally {
-            pdfDocument.close()
+            val request = ReaderRequest(
+                fullName = name,
+                phone = phone,
+                barcode = "",
+                libraryId = libraryId,
+                membershipExpiry = expiryDate
+            )
+
+            viewModel.addReader(request)
         }
     }
 }

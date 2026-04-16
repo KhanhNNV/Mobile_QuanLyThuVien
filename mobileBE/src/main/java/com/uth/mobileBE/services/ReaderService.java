@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,16 +28,27 @@ public class ReaderService {
     //Tạo người độc giả
     @Transactional
     public ReaderResponse createReader(ReaderRequest request) {
-        Long libraryId = SecurityUtils.getLibraryId();
-        Library libraryRef = libraryRepository.getReferenceById(libraryId);
+        Long currentLibraryId = SecurityUtils.getLibraryId();
+        Library library = libraryRepository.findById(currentLibraryId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy thư viện"));
+
+
+        // Lấy số ID to nhất trong hệ thống hiện tại
+        Long maxId = readerRepository.findMaxReaderId();
+
+        // Tạo mã mới bằng cách lấy ID to nhất + 1 (Ví dụ đang có người DG-5 thì tạo DG-6)
+        String generatedBarcode = "READER-" + (maxId + 1);
+        // ----------------------------------------------
+
         Reader reader = Reader.builder()
-                              .fullName(request.getFullName())
-                              .phone(request.getPhone())
-                              .barcode(request.getBarcode())
-                              .membershipExpiry(request.getMembershipExpiry())
-                              .library(libraryRef)
-                              .isBlocked(false)
-                              .build();
+                .fullName(request.getFullName())
+                .phone(request.getPhone())
+                .barcode(generatedBarcode)
+                .membershipExpiry(request.getMembershipExpiry())
+                .library(library)
+                .isBlocked(false) // Mặc định không bị khóa
+                .createdAt(LocalDateTime.now())
+                .build();
 
         Reader saved = readerRepository.save(reader);
         return mapToReaderResponse(saved);
