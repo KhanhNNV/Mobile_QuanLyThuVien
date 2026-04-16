@@ -8,6 +8,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -33,19 +34,14 @@ public class Loan {
     @JoinColumn(name = "processed_by", nullable = false)
     private User processedBy;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "copy_id", nullable = false)
-    private BookCopy bookCopy;
-
     private LocalDateTime borrowDate;
-    private LocalDateTime dueDate;     // Hạn trả
-    private LocalDateTime returnDate;  // Ngày trả thực tế
 
     @Enumerated(EnumType.STRING)
-    private StatusLoan status;         // BORROWING, RETURNED, CLOSED, OVERDUE
+    private StatusLoan status;
+    // ACTIVE, COMPLETED, OVERDUE, VIOLATED
 
-    @Enumerated(EnumType.STRING)
-    private BookCondition condition;   // NORMAL, LOST, DAMAGED
+    @OneToMany(mappedBy = "loan", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<LoanDetail> loanDetails;
 
     @CreationTimestamp
     @Column(updatable = false)

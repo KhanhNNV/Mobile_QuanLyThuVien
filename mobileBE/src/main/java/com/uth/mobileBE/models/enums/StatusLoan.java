@@ -1,5 +1,8 @@
-package com.uth.mobileBE.models.enums;
+    package com.uth.mobileBE.models.enums;
 
-public enum StatusLoan {
-    BORROWING, RETURNED, CLOSED, OVERDUE
-}
+    public enum StatusLoan {
+        ACTIVE,
+        COMPLETED,
+        OVERDUE,
+        VIOLATED
+    }

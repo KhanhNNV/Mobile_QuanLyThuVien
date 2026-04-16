@@ -4,7 +4,6 @@ data class BookData (
     val copyId: Long = 0L,     // THÊM: Dùng để gửi xuống API Update
     val title: String,
     val author: String,
-    val categoryName: String,
     val barcode: String = ""   // THÊM (Tùy chọn): Để hiển thị thêm mã vạch cho rõ ràng
 ) {
     // Override hàm toString() là cách NHANH NHẤT để Spinner hiển thị chữ đẹp mắt

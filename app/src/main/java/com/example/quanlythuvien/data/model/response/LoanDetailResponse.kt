@@ -3,30 +3,17 @@ package com.example.quanlythuvien.data.model.response
 import com.google.gson.annotations.SerializedName
 
 data class LoanDetailResponse(
-    @SerializedName("loanId")
-    val loanId: Long,
-
-    @SerializedName("copyId")
-    val copyId: Long,
-
-    @SerializedName("bookTitle")
-    val bookTitle: String,
-
-    @SerializedName("dueDate")
-    val dueDate: String?, // Ngày hết hạn (có thể null)
-
-    @SerializedName("returnDate")
-    val returnDate: String?, // Ngày trả thực tế (sẽ null nếu chưa trả)
-
-    @SerializedName("status")
-    val status: String, // Enum StatusLoanDetail dạng String (VD: "BORROWING", "LOST")
-
-    @SerializedName("penaltyAmount")
-    val penaltyAmount: Double?, // Tiền phạt (có thể null hoặc 0.0)
-
-    @SerializedName("createdAt")
-    val createdAt: String,
-
-    @SerializedName("updateAt")
-    val updateAt: String
+    @SerializedName("loanDetailId") val loanDetailId: Long, // QUAN TRỌNG: ID mới để gọi API
+    @SerializedName("loanId") val loanId: Long,
+    @SerializedName("copyId") val copyId: Long,
+    @SerializedName("bookId") val bookId: Long?,
+    @SerializedName("bookTitle") val bookTitle: String?,
+    @SerializedName("author") val author: String?,
+    @SerializedName("category") val category: String?,
+    @SerializedName("dueDate") val dueDate: String?,
+    @SerializedName("returnDate") val returnDate: String?,
+    @SerializedName("status") val status: String,
+    @SerializedName("penaltyAmount") val penaltyAmount: Double?,
+    @SerializedName("createdAt") val createdAt: String?,
+    @SerializedName("updateAt") val updateAt: String?
 )

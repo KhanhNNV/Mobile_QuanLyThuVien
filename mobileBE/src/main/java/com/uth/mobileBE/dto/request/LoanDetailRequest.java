@@ -1,15 +1,20 @@
 package com.uth.mobileBE.dto.request;
 
-import com.uth.mobileBE.models.enums.StatusLoanDetail;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-import java.time.LocalDateTime;
 
 @Data
 public class LoanDetailRequest {
+
+    @NotNull(message = "Loan ID không được để trống")
     private Long loanId;
+
+    @NotNull(message = "Mã bản sao sách (Copy ID) không được để trống")
     private Long copyId;
-    private LocalDateTime dueDate;
-    private LocalDateTime returnDate;
-    private StatusLoanDetail status;
-    private Double penaltyAmount;
+
+    @NotNull(message = "Số ngày mượn không được để trống")
+    @Min(value = 1, message = "Số ngày mượn ít nhất phải là 1")
+    private Integer borrowDays;
+
 }

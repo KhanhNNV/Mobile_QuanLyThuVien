@@ -1,6 +1,5 @@
 package com.example.quanlythuvien.ui.borrow_pay.adapter
 
-
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -23,7 +22,7 @@ class BookSpinnerAdapter(context: Context, books: List<BookData>) :
 
     private fun createItemView(position: Int, convertView: View?, parent: ViewGroup): View {
         val view = convertView ?: LayoutInflater.from(context)
-            .inflate(R.layout.item_custom_spinner_book, parent, false) // Thay bằng tên file XML custom của bạn
+            .inflate(R.layout.item_custom_spinner_book, parent, false)
 
         val book = getItem(position)
 
@@ -37,7 +36,8 @@ class BookSpinnerAdapter(context: Context, books: List<BookData>) :
             if (book.copyId == 0L) {
                 tvAuthorCategory.text = "Giữ nguyên bản gốc"
             } else {
-                tvAuthorCategory.text = "TG: ${book.author} | TL: ${book.categoryName}"
+                // ĐÃ SỬA: Thay thế Thể loại (categoryName) bằng Barcode (Mã vạch)
+                tvAuthorCategory.text = "TG: ${book.author} | Mã vạch: ${book.barcode}"
             }
         }
 
