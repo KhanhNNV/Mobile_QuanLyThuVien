@@ -1,6 +1,7 @@
 package com.uth.mobileBE.services;
 
 import com.uth.mobileBE.Utils.SecurityUtils;
+import com.uth.mobileBE.dto.request.ExtendMembershipExpiryRequest;
 import com.uth.mobileBE.dto.request.ReaderRequest;
 import com.uth.mobileBE.dto.response.ReaderResponse;
 import com.uth.mobileBE.models.FeeConfig;
@@ -15,12 +16,14 @@ import com.uth.mobileBE.repositories.FeeInvoiceRepository;
 import com.uth.mobileBE.repositories.LibraryRepository;
 import com.uth.mobileBE.repositories.ReaderRepository;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -153,8 +156,37 @@ public class ReaderService {
         return readerRepository.countByLibrary_LibraryId(libraryId);
     }
 
-    private LocalDateTime calculateExpiryDate(Long days){
-        return LocalDateTime.now().plusDays(days);
+    private LocalDateTime calculateExpiryDate(Long months){
+        return LocalDateTime.now().plusMonths(months);
+    }
+
+    public ReaderResponse extendMembershipExpiry(Long id, ExtendMembershipExpiryRequest request) {
+        Long currentLibraryId = SecurityUtils.getLibraryId();
+        Library library = libraryRepository.findById(currentLibraryId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy thư viện"));
+
+        Reader reader=readerRepository.findById(id).orElseThrow(()-> new RuntimeException("Không tìm thấy độc giả này"));
+        LocalDateTime membershipExpiryNew = reader.getMembershipExpiry().plusMonths(request.getMonthRegis());
+        reader.setMembershipExpiry(membershipExpiryNew);
+        Reader saved = readerRepository.save(reader);
+
+        FeeConfig feeRegistration= feeConfigRepository.findByLibrary_LibraryIdAndFeeType(library.getLibraryId(), TypeFeeConfig.REG_NORMAL)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy phí đăng ký thẻ cho thư viện này"));
+
+        Double totalAmount = feeRegistration.getAmount() * request.getMonthRegis();
+
+
+        FeeInvoice feeInvoice = FeeInvoice.builder()
+                .reader(reader)
+                .library(library)
+                .type(TypeFeeInvoice.RENEWAL)
+                .totalAmount(totalAmount)
+                .status(StatusFeeInvoice.UNPAID)
+                .build();
+
+        feeInvoiceRepository.save(feeInvoice);
+
+        return mapToReaderResponse(saved);
     }
 
 
@@ -170,7 +202,6 @@ public class ReaderService {
                              .updatedAt(LocalDateTime.now())
                              .build();
     }
-
 
 
 

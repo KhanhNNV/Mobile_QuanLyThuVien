@@ -1,20 +1,36 @@
 package com.example.quanlythuvien.ui.reader
 
+import android.app.Dialog
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
+import android.widget.Button
+import android.widget.NumberPicker
 import androidx.appcompat.widget.PopupMenu
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quanlythuvien.R
+import com.example.quanlythuvien.core.api.RetrofitClient
+import com.example.quanlythuvien.data.model.request.ExtendMembershipExpiryRequest
+import com.example.quanlythuvien.data.remote.ReaderApiService
+import com.example.quanlythuvien.data.repository.ReaderRepository
 import com.example.quanlythuvien.ui.borrow_pay.data.LoanItemData
 import com.example.quanlythuvien.viewmodel.LoanSharedViewModel
 import com.google.android.material.tabs.TabLayout
+import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 import kotlin.getValue
 
 class ReaderDetailFragment : Fragment(R.layout.fragment_reader_detail) {
@@ -29,6 +45,10 @@ class ReaderDetailFragment : Fragment(R.layout.fragment_reader_detail) {
     private var pendingPdfName = ""
     private var pendingPdfPhone = ""
 
+    // Biến lưu thông tin reader hiện tại
+    private var currentReaderId: Long = 0
+    private var currentMembershipExpiry: String = ""
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -40,6 +60,10 @@ class ReaderDetailFragment : Fragment(R.layout.fragment_reader_detail) {
         var readerPhone = arguments?.getString("readerPhone")?: ""
         var readerType = arguments?.getString("readerType")?: ""
         var readerBarcode = arguments?.getString("readerBarcode")?: ""
+
+        // Lấy readerId từ bundle
+        currentReaderId = arguments?.getInt("readerId", 0)?.toLong() ?: 0L
+        currentMembershipExpiry = arguments?.getString("membershipExpiry") ?: ""
 
         //Gắn thông tin người dùng vào giao diện  View
         view.findViewById<TextView>(R.id.tvReaderName)?.text = readerName
@@ -161,6 +185,11 @@ class ReaderDetailFragment : Fragment(R.layout.fragment_reader_detail) {
                     createPdfLauncher.launch("TheDocGia_${pendingPdfCode}.pdf")
                     true
                 }
+                // Xử lý khi nhấn vào nút gia hạn
+                R.id.menuExtendReader -> {
+                    showExtendMembershipDialog(readerName, readerPhone)
+                    true
+                }
                 //Xữ lý khi nhấn vào nút xóa reader
                 R.id.menuDeleteReader -> {
                     //Gọi hàm hiển thị dialog xác nhận xóa
@@ -173,6 +202,148 @@ class ReaderDetailFragment : Fragment(R.layout.fragment_reader_detail) {
             popMenu.setForceShowIcon(true)
             popMenu.show()
         }
+
+    /**
+     * Hiển thị Dialog gia hạn thẻ độc giả sử dụng NumberPicker
+     */
+    private fun showExtendMembershipDialog(readerName: String, readerPhone: String) {
+        val dialog = Dialog(requireContext())
+        dialog.setContentView(R.layout.dialog_extend_membership)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+
+        val tvExtendReaderInfo = dialog.findViewById<TextView>(R.id.tvExtendReaderInfo)
+        val tvCurrentExpiryDate = dialog.findViewById<TextView>(R.id.tvCurrentExpiryDate)
+        val numberPickerMonth = dialog.findViewById<NumberPicker>(R.id.numberPickerMonth)
+        val tvNewExpiryDate = dialog.findViewById<TextView>(R.id.tvNewExpiryDate)
+        val btnCancelExtend = dialog.findViewById<Button>(R.id.btnCancelExtend)
+        val btnConfirmExtend = dialog.findViewById<Button>(R.id.btnConfirmExtend)
+
+        // Hiển thị thông tin độc giả
+        tvExtendReaderInfo.text = "$readerName - $readerPhone"
+
+        // Hiển thị ngày hết hạn hiện tại
+        val currentExpiryDisplay = if (currentMembershipExpiry.isNotEmpty()) {
+            formatDisplayDate(currentMembershipExpiry)
+        } else {
+            "Chưa có thông tin"
+        }
+        tvCurrentExpiryDate.text = currentExpiryDisplay
+
+        // Cấu hình NumberPicker
+        numberPickerMonth.minValue = 1
+        numberPickerMonth.maxValue = 24
+        numberPickerMonth.value = 2
+        numberPickerMonth.wrapSelectorWheel = false
+
+        // Hàm cập nhật ngày hết hạn mới
+        fun updateNewExpiryDate(months: Int) {
+            if (currentMembershipExpiry.isNotEmpty()) {
+                try {
+                    val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+                    val currentDate = sdf.parse(currentMembershipExpiry)
+                    if (currentDate != null) {
+                        val calendar = Calendar.getInstance()
+                        calendar.time = currentDate
+                        calendar.add(Calendar.MONTH, months)
+                        val newDate = calendar.time
+                        val outputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                        tvNewExpiryDate.text = "Ngày hết hạn mới: ${outputFormat.format(newDate)}"
+                    } else {
+                        tvNewExpiryDate.text = "Ngày hết hạn mới: +$months tháng"
+                    }
+                } catch (e: Exception) {
+                    tvNewExpiryDate.text = "Ngày hết hạn mới: +$months tháng"
+                }
+            } else {
+                tvNewExpiryDate.text = "Ngày hết hạn mới: +$months tháng"
+            }
+        }
+
+        // Khởi tạo hiển thị ban đầu
+        updateNewExpiryDate(2)
+
+        // Lắng nghe sự kiện thay đổi của NumberPicker
+        numberPickerMonth.setOnValueChangedListener { _, _, newVal ->
+            updateNewExpiryDate(newVal)
+        }
+
+        // Xử lý nút Hủy
+        btnCancelExtend.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        // Xử lý nút Xác nhận
+        btnConfirmExtend.setOnClickListener {
+            val months = numberPickerMonth.value.toLong()
+            btnConfirmExtend.isEnabled = false
+            btnConfirmExtend.text = "Đang xử lý..."
+            extendMembership(currentReaderId, months, dialog, btnConfirmExtend)
+        }
+
+        dialog.show()
+    }
+
+    /**
+     * Gọi API gia hạn thẻ độc giả
+     */
+    private fun extendMembership(readerId: Long, months: Long, dialog: Dialog, confirmButton: Button) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                val retrofit = RetrofitClient.getInstance(requireContext())
+                val apiService = retrofit.create(ReaderApiService::class.java)
+                val repository = ReaderRepository(apiService)
+
+                val request = ExtendMembershipExpiryRequest(monthRegis = months)
+                val response = repository.extendMembershipExpiry(readerId, request)
+
+                if (response.isSuccessful) {
+                    Toast.makeText(
+                        requireContext(),
+                        "Gia hạn thành công! Đã gia hạn thêm $months tháng.",
+                        Toast.LENGTH_LONG
+                    ).show()
+
+                    // Cập nhật lại thông tin hiển thị
+                    response.body()?.let { updatedReader ->
+                        currentMembershipExpiry = updatedReader.membershipExpiry ?: ""
+                        view?.findViewById<TextView>(R.id.tvExpireDate)?.text = formatDisplayDate(currentMembershipExpiry)
+                    }
+
+                    dialog.dismiss()
+                } else {
+                    val errorMsg = when (response.code()) {
+                        400 -> "Dữ liệu không hợp lệ"
+                        404 -> "Không tìm thấy độc giả"
+                        403 -> "Bạn không có quyền thực hiện"
+                        else -> "Lỗi: ${response.code()}"
+                    }
+                    Toast.makeText(requireContext(), "Gia hạn thất bại: $errorMsg", Toast.LENGTH_LONG).show()
+                    confirmButton.isEnabled = true
+                    confirmButton.text = "XÁC NHẬN"
+                }
+            } catch (e: Exception) {
+                Toast.makeText(requireContext(), "Lỗi kết nối: ${e.message}", Toast.LENGTH_LONG).show()
+                confirmButton.isEnabled = true
+                confirmButton.text = "XÁC NHẬN"
+            }
+        }
+    }
+
+    /**
+     * Format ngày tháng để hiển thị
+     */
+    private fun formatDisplayDate(dateString: String): String {
+        return try {
+            val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+            val outputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+            val date = inputFormat.parse(dateString)
+            outputFormat.format(date ?: Date())
+        } catch (e: Exception) {
+            dateString
+        }
+    }
+
     /**
      * Hiển thị Dialog xác nhận xóa Reader.
      */
