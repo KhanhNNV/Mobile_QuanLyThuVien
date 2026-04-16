@@ -1,0 +1,64 @@
+package com.example.quanlythuvien.ui.reader
+
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.quanlythuvien.data.model.response.ReaderResponse
+import com.example.quanlythuvien.data.repository.ReaderRepository
+import kotlinx.coroutines.launch
+
+class ReaderDetailViewModel(private val repository: ReaderRepository): ViewModel() {
+    private val _isLoading = MutableLiveData<Boolean>()
+    val isLoading: LiveData<Boolean> get() = _isLoading
+
+    private val _error = MutableLiveData<String>()
+    val error: LiveData<String> get() = _error
+
+    private val _updateSuccess = MutableLiveData<ReaderResponse>()
+    val updateSuccess: LiveData<ReaderResponse> get() = _updateSuccess
+
+    private val _deleteSuccess = MutableLiveData<Boolean>()
+    val deleteSuccess: LiveData<Boolean> get() = _deleteSuccess
+
+
+
+    //Hàm update
+    fun updateReader(readerId: Long, request: ReaderResponse) {
+        viewModelScope.launch {
+            //Cờ để biết đang gửi
+            _isLoading.value = true
+            try {
+                val reponse = repository.editReader(readerId, request)
+                if (reponse.isSuccessful) {
+                    _updateSuccess.value = reponse.body()
+                } else {
+                    _error.value = "Không thể cập nhật: ${reponse.code()}"
+                }
+            } catch (e: Exception) {
+                _error.value = "Lỗi kết nối: ${e.message}"
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    fun deleteReader(readerId: Long) {
+        viewModelScope.launch {
+            //Cờ để biết đang gửi
+            _isLoading.value = true
+            try {
+                val reponse = repository.deletedReader(readerId)
+                if (reponse.isSuccessful) {
+                    _deleteSuccess.value = true
+                } else {
+                    _error.value = "Không thể xóa: ${reponse.code()}"
+                }
+            } catch (e: Exception) {
+                _error.value = "Lỗi kết nối: ${e.message}"
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+}
