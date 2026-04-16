@@ -15,13 +15,10 @@ import java.time.LocalDateTime;
 @Builder
 public class UserResponse {
     private Long userId;
-    private Long libraryId;
-
     private String username;
     private String fullname;
     private Role role;
     private Boolean isActive;
-
     private LocalDateTime createdAt;
     private LocalDateTime updateAt;
 }
