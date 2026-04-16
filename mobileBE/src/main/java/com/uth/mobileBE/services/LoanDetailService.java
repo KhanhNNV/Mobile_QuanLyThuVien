@@ -31,12 +31,16 @@ public class LoanDetailService {
     private final BookCopyRepository bookCopyRepository;
     private final ViolationService violationService;
 
+    @Transactional // Đảm bảo có Transaction để save được
     public List<LoanDetailResponse> getAllDetails() {
-        return loanDetailRepository.findAll().stream()
-                .map(detail -> {
-                    evaluateAndApplyOverdue(detail);
-                    return mapToResponse(detail);
-                })
+        List<LoanDetail> details = loanDetailRepository.findAll();
+
+        // Ép cập nhật DB trước
+        details.forEach(this::evaluateAndApplyOverdue);
+
+        // Sau đó mới trả về kết quả đã được cập nhật
+        return details.stream()
+                .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 
@@ -199,7 +203,7 @@ public class LoanDetailService {
 
         return mapToResponse(detail);
     }
-    private void evaluateAndApplyOverdue(LoanDetail detail) {
+    public void evaluateAndApplyOverdue(LoanDetail detail) {
         if (detail.getStatus() == StatusLoanDetail.BORROWING && detail.getDueDate() != null) {
             LocalDateTime now = LocalDateTime.now();
             if (now.isAfter(detail.getDueDate())) {
@@ -217,7 +221,9 @@ public class LoanDetailService {
                 } else {
                     detail.setStatus(StatusLoanDetail.OVERDUE);
                 }
+
                 loanDetailRepository.save(detail);
+                syncLoanStatus(detail.getLoan().getLoanId());
             }
         }
     }
@@ -234,7 +240,7 @@ public class LoanDetailService {
         violationService.createViolation(vReq);
     }
 
-    private void syncLoanStatus(Long loanId) {
+    public void syncLoanStatus(Long loanId) {
         Loan loan = loanRepository.findById(loanId).orElse(null);
         if (loan != null) {
             List<LoanDetail> allDetails = loanDetailRepository.findByLoan_LoanId(loanId);

@@ -25,7 +25,7 @@ public class LoanService {
     @Autowired private LibraryRepository libraryRepository;
     @Autowired private ReaderRepository readerRepository;
     @Autowired private UserRepository userRepository;
-    @Autowired private LoanDetailRepository loanDetailRepository;
+    @Autowired private LoanDetailService loanDetailService;
 
     @Transactional(readOnly = true)
     // Hàm lấy danh sách theo id thư viện có kèm theo bộ lọc
@@ -45,16 +45,25 @@ public class LoanService {
                 .collect(Collectors.toList());
     }
 
-    @Transactional(readOnly = true)
+    @Transactional // Đã bỏ readOnly = true để cho phép lưu trạng thái OVERDUE mới phát hiện
     public LoanResponse getLoanById(Long id) {
+        // 1. Tìm phiếu mượn gốc
         Loan loan = loanRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy phiếu mượn gốc với ID: " + id));
 
-        // Nhờ @Transactional, loan.getLoanDetails() sẽ tự động fetch data mà không bị lỗi Lazy
-        if (loan.getLoanDetails() == null || loan.getLoanDetails().isEmpty()) {
-            System.out.println("LOG: Phiếu mượn " + id + " tồn tại nhưng bảng loan_detail lại trống!");
+        // 2. Ép các dòng sách (LoanDetail) kiểm tra quá hạn
+        if (loan.getLoanDetails() != null && !loan.getLoanDetails().isEmpty()) {
+            for (LoanDetail detail : loan.getLoanDetails()) {
+                // Hàm này bên LoanDetailService đã có lệnh loanDetailRepository.save(detail)
+                loanDetailService.evaluateAndApplyOverdue(detail);
+            }
         }
 
+        // 3. Sau khi các con đã cập nhật xong, đồng bộ trạng thái cho thằng cha (Loan)
+        // Hàm này sẽ quét lại các con trong DB và save(loan)
+        loanDetailService.syncLoanStatus(id);
+
+        // 4. Trả về kết quả đã được làm sạch và cập nhật
         return mapToResponse(loan);
     }
 
