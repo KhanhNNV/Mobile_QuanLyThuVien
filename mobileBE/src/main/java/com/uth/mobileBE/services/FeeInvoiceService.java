@@ -6,6 +6,7 @@ import com.uth.mobileBE.models.FeeInvoice;
 import com.uth.mobileBE.models.Library;
 import com.uth.mobileBE.models.Loan;
 import com.uth.mobileBE.models.Reader;
+import com.uth.mobileBE.models.enums.StatusFeeInvoice;
 import com.uth.mobileBE.repositories.FeeInvoiceRepository;
 import com.uth.mobileBE.repositories.LibraryRepository;
 import com.uth.mobileBE.repositories.LoanRepository;
@@ -120,6 +121,11 @@ public class FeeInvoiceService {
         existingInvoice.setUpdateAt(LocalDateTime.now());
 
         FeeInvoice updatedInvoice = feeInvoiceRepository.save(existingInvoice);
+        if(updatedInvoice.getStatus().equals(StatusFeeInvoice.PAID)){
+            Reader reader = updatedInvoice.getReader();
+            reader.setIsBlocked(false);
+            readerRepository.save(reader);
+        }
         return mapToResponse(updatedInvoice);
     }
 
