@@ -36,6 +36,7 @@ class StaffAdapter(
         holder.tvStaffId.text = "#${staff.userId}"
         holder.tvUserName.text = "@${staff.username}"
 
+        // Set status
         if (staff.isActive) {
             holder.tvStatusActive.text = "Hoạt động"
             holder.tvStatusActive.setBackgroundResource(R.drawable.bg_status_success)
@@ -46,20 +47,30 @@ class StaffAdapter(
             holder.tvStatusActive.setTextColor(holder.itemView.context.getColor(R.color.text_status_error))
         }
 
+        // Set role indicator
         if (staff.role == "ADMIN") {
             holder.tvName.setCompoundDrawablesWithIntrinsicBounds(
                 0, 0, R.drawable.outline_admin_panel_settings_24, 0
             )
+            holder.tvName.compoundDrawablePadding = 8
         } else {
             holder.tvName.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
         }
 
+        // Click vào nút options -> mở dialog edit
         holder.ibtStaffOptions.setOnClickListener {
             onEditClick(staff)
         }
 
+        // Click vào item -> mở dialog edit
         holder.itemView.setOnClickListener {
             onEditClick(staff)
+        }
+
+        // Long click để xóa
+        holder.itemView.setOnLongClickListener {
+            onDeleteClick(staff)
+            true
         }
     }
 

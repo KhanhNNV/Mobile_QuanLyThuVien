@@ -1,13 +1,14 @@
 package com.example.quanlythuvien.ui.admin
 
 import android.app.AlertDialog
+import android.app.Dialog
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.View
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.AutoCompleteTextView
-import android.widget.Spinner
-import android.widget.Toast
+import android.view.ViewGroup
+import android.widget.*
+import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -35,6 +36,8 @@ class StaffListFragment : Fragment(R.layout.fragment_manager_staff_of_admin) {
     private lateinit var autoSearch: AutoCompleteTextView
     private lateinit var spinnerFilter: Spinner
     private lateinit var fabAdd: FloatingActionButton
+
+    private var currentDialog: Dialog? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -73,7 +76,7 @@ class StaffListFragment : Fragment(R.layout.fragment_manager_staff_of_admin) {
         staffAdapter = StaffAdapter(
             staffList = mutableListOf(),
             onEditClick = { staff ->
-                showEditDialog(staff)
+                showEditStaffDialog(staff)
             },
             onDeleteClick = { staff ->
                 showDeleteConfirmDialog(staff)
@@ -134,9 +137,12 @@ class StaffListFragment : Fragment(R.layout.fragment_manager_staff_of_admin) {
                             }
                             is StaffState.SuccessAction -> {
                                 Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
+                                currentDialog?.dismiss()
                             }
                             is StaffState.Error -> {
                                 Toast.makeText(requireContext(), state.message, Toast.LENGTH_LONG).show()
+                                // Enable save button in dialog if error
+                                currentDialog?.findViewById<Button>(R.id.btnSave)?.isEnabled = true
                             }
                             else -> {}
                         }
@@ -148,23 +154,114 @@ class StaffListFragment : Fragment(R.layout.fragment_manager_staff_of_admin) {
 
     private fun handleEvents() {
         fabAdd.setOnClickListener {
-            Toast.makeText(requireContext(), "Chức năng thêm nhân viên đang phát triển", Toast.LENGTH_SHORT).show()
+            showAddStaffDialog()
         }
     }
 
-    private fun showEditDialog(staff: UserResponse) {
-        StaffEditDialog.newInstance(staff).show(parentFragmentManager, "StaffEditDialog")
+    private fun showAddStaffDialog() {
+        // Hiển thị dialog thêm nhân viên (nếu có)
+        Toast.makeText(requireContext(), "Chức năng thêm nhân viên đang phát triển", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun showEditStaffDialog(staffToEdit: UserResponse) {
+        val dialog = Dialog(requireContext())
+        currentDialog = dialog
+        dialog.setContentView(R.layout.dialog_edit_staff)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+
+        val tvDialogTitle = dialog.findViewById<TextView>(R.id.tvDialogTitle)
+        val edtFullname = dialog.findViewById<EditText>(R.id.edtEditFullname)
+        val edtUsername = dialog.findViewById<EditText>(R.id.edtEditUsername)
+        val edtPassword = dialog.findViewById<EditText>(R.id.edtEditPassword)
+        val swActive = dialog.findViewById<SwitchCompat>(R.id.swEditActive)
+        val spinnerRole = dialog.findViewById<Spinner>(R.id.spinnerRole)
+        val tvRoleLabel = dialog.findViewById<TextView>(R.id.tvRoleLabel)
+        val btnCancel = dialog.findViewById<Button>(R.id.btnCancel)
+        val btnSave = dialog.findViewById<Button>(R.id.btnSave)
+
+        // Setup dialog title
+        tvDialogTitle?.text = "Chỉnh sửa nhân viên"
+
+        // Setup Role Spinner
+        val roles = arrayOf("STAFF", "ADMIN")
+        val roleDisplayNames = roles.map { role ->
+            when (role) {
+                "ADMIN" -> "Quản trị viên"
+                "STAFF" -> "Nhân viên"
+                else -> role
+            }
+        }
+        val roleAdapter = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_spinner_item,
+            roleDisplayNames
+        )
+        roleAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinnerRole?.adapter = roleAdapter
+
+        // Set current data
+        edtFullname?.setText(staffToEdit.fullname)
+        edtUsername?.setText(staffToEdit.username)
+        edtUsername?.isEnabled = false // Không cho sửa username
+        swActive?.isChecked = staffToEdit.isActive
+
+        // Set role
+        val roleIndex = if (staffToEdit.role == "ADMIN") 1 else 0
+        spinnerRole?.setSelection(roleIndex)
+
+        // Ẩn password field khi edit (optional)
+        edtPassword?.visibility = View.GONE
+        dialog.findViewById<TextView>(R.id.tvPasswordLabel)?.visibility = View.GONE
+
+        btnCancel?.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        btnSave?.setOnClickListener {
+            val fullname = edtFullname?.text.toString().trim()
+            if (fullname.isEmpty()) {
+                Toast.makeText(requireContext(), "Vui lòng nhập họ tên", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val selectedRoleIndex = spinnerRole?.selectedItemPosition ?: 0
+            val newRole = roles[selectedRoleIndex]
+
+            // Disable save button during update
+            btnSave.isEnabled = false
+            btnSave.text = "Đang xử lý..."
+
+            viewModel.updateUser(
+                id = staffToEdit.userId,
+                fullname = fullname,
+                role = newRole,
+                isActive = swActive?.isChecked ?: true
+            )
+        }
+
+        dialog.setOnDismissListener {
+            currentDialog = null
+        }
+
+        dialog.show()
     }
 
     private fun showDeleteConfirmDialog(staff: UserResponse) {
         AlertDialog.Builder(requireContext())
             .setTitle("Xóa nhân viên")
-            .setMessage("Bạn có chắc chắn muốn xóa nhân viên ${staff.fullname} không?")
+            .setMessage("Bạn có chắc chắn muốn xóa nhân viên ${staff.fullname} không?\n\nLưu ý: Hành động này không thể hoàn tác.")
             .setPositiveButton("Xóa") { dialog, _ ->
                 viewModel.deleteUser(staff.userId)
                 dialog.dismiss()
             }
             .setNegativeButton("Hủy") { dialog, _ -> dialog.dismiss() }
             .show()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        currentDialog?.dismiss()
+        currentDialog = null
     }
 }

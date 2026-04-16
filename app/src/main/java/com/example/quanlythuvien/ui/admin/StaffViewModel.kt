@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.quanlythuvien.data.model.request.UpdateUserRequest
 import com.example.quanlythuvien.data.model.response.UserResponse
 import com.example.quanlythuvien.data.repository.UserRepository
+import com.example.quanlythuvien.ui.LoanPolicy.PolicyState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -40,11 +41,7 @@ class StaffViewModel(
                     applyFilters()
                     _state.value = StaffState.SuccessList(userList)
                 } else {
-                    val errorMsg = when (response.code()) {
-                        403 -> "Bạn không có quyền truy cập"
-                        else -> "Lỗi tải dữ liệu: ${response.code()}"
-                    }
-                    _state.value = StaffState.Error(errorMsg)
+                    _state.value = StaffState.Error("Lỗi tải dữ liệu: ${response.code()}")
                 }
             } catch (e: Exception) {
                 _state.value = StaffState.Error("Mất kết nối mạng: ${e.message}")

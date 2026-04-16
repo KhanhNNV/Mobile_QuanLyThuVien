@@ -13,11 +13,11 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('ADMIN')")
 public class UserController {
 
     private final UserService userService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public ResponseEntity<List<UserResponse>> getAllUsers() {
         List<UserResponse> users = userService.getAllUsersByCurrentLibrary();
@@ -27,12 +27,14 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
         UserResponse user = userService.getUserById(id);
         return ResponseEntity.ok(user);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<UserResponse> updateUser(
             @PathVariable Long id,
@@ -41,23 +43,11 @@ public class UserController {
         return ResponseEntity.ok(updatedUser);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
         return ResponseEntity.ok("Xóa user thành công");
     }
 
-    // API để lấy danh sách user đang hoạt động (cho việc assign task, v.v.)
-    @GetMapping("/active")
-    public ResponseEntity<List<UserResponse>> getActiveUsers() {
-        List<UserResponse> users = userService.getAllUsersByCurrentLibrary()
-                .stream()
-                .filter(UserResponse::getIsActive)
-                .toList();
-
-        if (users.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(users);
-    }
 }

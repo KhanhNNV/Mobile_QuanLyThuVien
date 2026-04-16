@@ -7,7 +7,6 @@ class UserRepository(private val apiService: UserApiService) {
 
     suspend fun getAllUsers() = apiService.getAllUsers()
 
-    suspend fun getActiveUsers() = apiService.getActiveUsers()
 
     suspend fun getUserById(id: Long) = apiService.getUserById(id)
 

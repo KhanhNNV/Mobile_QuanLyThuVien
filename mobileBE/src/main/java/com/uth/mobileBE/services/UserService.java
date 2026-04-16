@@ -32,7 +32,7 @@ public class UserService {
 
     public List<UserResponse> getAllUsersByCurrentLibrary() {
         Long libraryId = SecurityUtils.getLibraryId();
-        List<User> users = userRepository.findByLibraryId(libraryId);
+        List<User> users = userRepository.findByLibrary_LibraryId(libraryId);
         return users.stream()
                 .map(this::mapToUserResponse)
                 .collect(Collectors.toList());
