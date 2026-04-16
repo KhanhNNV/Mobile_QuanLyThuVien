@@ -1,6 +1,7 @@
 package com.uth.mobileBE.controllers;
 
 import com.uth.mobileBE.Utils.SecurityUtils;
+import com.uth.mobileBE.dto.request.ExtendMembershipExpiryRequest;
 import com.uth.mobileBE.dto.request.ReaderRequest;
 import com.uth.mobileBE.dto.response.ReaderResponse;
 import com.uth.mobileBE.services.ReaderService;
@@ -101,6 +102,11 @@ public class ReaderController {
             @RequestParam(defaultValue = "10") int size)
     {
         return ResponseEntity.ok(readerService.getReadersPaginated(page,size));
+    }
+
+    @PutMapping("/{id}/extend")
+    public ResponseEntity<ReaderResponse> extendMembershipExpiry(@PathVariable Long id,@RequestBody ExtendMembershipExpiryRequest request) {
+        return ResponseEntity.ok(readerService.extendMembershipExpiry(id, request));
     }
 
 }
