@@ -5,6 +5,8 @@ import com.uth.mobileBE.dto.request.FeeInvoiceRequest;
 import com.uth.mobileBE.dto.response.FeeInvoiceResponse;
 import com.uth.mobileBE.models.*;
 import com.uth.mobileBE.models.enums.StatusFeeInvoice;
+import com.uth.mobileBE.models.enums.StatusLoanDetail;
+import com.uth.mobileBE.models.enums.StatusViolation;
 import com.uth.mobileBE.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,10 @@ public class FeeInvoiceService {
 
     @Autowired
     private LoanDetailRepository loanDetailRepository;
+    
+
+    @Autowired
+    private ViolationRepository violationRepository;
 
     @Transactional
     public List<FeeInvoiceResponse> getInvoicesByLibrary(Long libraryId) {
@@ -94,16 +100,7 @@ public class FeeInvoiceService {
         if (request.getTotalAmount() != null) {
             existingInvoice.setTotalAmount(request.getTotalAmount());
         }
-        if (request.getStatus() != null) {
-            existingInvoice.setStatus(request.getStatus());
-            if (request.getStatus().name().equals("PAID")) {
-                Reader reader = existingInvoice.getReader();
-                reader.setIsBlocked(false);
-                readerRepository.save(reader);
-            }
-        }
 
-        // Cập nhật các liên kết (Foreign Keys) nếu có gửi lên
         if (request.getLibraryId() != null) {
             Library library = libraryRepository.findById(request.getLibraryId())
                     .orElseThrow(() -> new RuntimeException("Không tìm thấy Library"));
@@ -116,8 +113,48 @@ public class FeeInvoiceService {
         }
         if (request.getLoanDetailId() != null) {
             LoanDetail loanDetail = loanDetailRepository.findById(request.getLoanDetailId())
-                    .orElseThrow(() -> new RuntimeException("Không tìm thấy Loan"));
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy Loan Detail"));
             existingInvoice.setLoanDetail(loanDetail);
+        }
+
+        // XỬ LÝ LOGIC KHI ĐỔI TRẠNG THÁI SANG PAID
+        if (request.getStatus() != null) {
+            existingInvoice.setStatus(request.getStatus());
+
+            if (request.getStatus().name().equals("PAID")) {
+                // 1. Mở khóa cho độc giả
+                Reader reader = existingInvoice.getReader();
+                if (reader != null) {
+                    reader.setIsBlocked(false);
+                    readerRepository.save(reader);
+                }
+
+                // 2. Logic dành riêng cho hóa đơn phạt (PENALTY)
+                if (existingInvoice.getType() != null && existingInvoice.getType().name().equals("PENALTY")) {
+                    LoanDetail detail = existingInvoice.getLoanDetail();
+
+                    if (detail != null) {
+                        // 2.1 Cập nhật trạng thái LoanDetail
+                        // Chỉ đổi thành RETURNED nếu đang là OVERDUE hoặc DAMAGED (LOST sẽ bị bỏ qua, giữ nguyên)
+                        if (detail.getStatus() == StatusLoanDetail.OVERDUE || detail.getStatus() == StatusLoanDetail.DAMAGED) {
+                            detail.setStatus(StatusLoanDetail.RETURNED);
+                            loanDetailRepository.save(detail);
+
+                        }
+
+                        // 2.2 Cập nhật trạng thái Violation (Từ ACTIVE -> RESOLVED)
+                        // Gọi repository tìm các vi phạm đang ACTIVE của LoanDetail này
+                        List<Violation> activeViolations = violationRepository.findByLoanDetailAndStatus(detail, StatusViolation.ACTIVE);
+
+                        if (activeViolations != null && !activeViolations.isEmpty()) {
+                            for (Violation v : activeViolations) {
+                                v.setStatus(StatusViolation.RESOLVED);
+                            }
+                            violationRepository.saveAll(activeViolations);
+                        }
+                    }
+                }
+            }
         }
 
         existingInvoice.setUpdateAt(LocalDateTime.now());

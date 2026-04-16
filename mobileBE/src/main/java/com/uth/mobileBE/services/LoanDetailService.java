@@ -356,6 +356,17 @@ public class LoanDetailService {
         feeInvoiceService.createFeeInvoice(invoiceReq);
     }
 
+    public Long getLoanIdByLoanDetailId(Long loanDetailId) {
+        LoanDetail loanDetail = loanDetailRepository.findById(loanDetailId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy LoanDetail"));
+
+        if (loanDetail.getLoan() == null) {
+            throw new RuntimeException("LoanDetail chưa gắn với Loan");
+        }
+
+        return loanDetail.getLoan().getLoanId();
+    }
+
     private LoanDetailResponse mapToResponse(LoanDetail detail) {
         return LoanDetailResponse.builder()
                 .loanDetailId(detail.getLoanDetailId())
