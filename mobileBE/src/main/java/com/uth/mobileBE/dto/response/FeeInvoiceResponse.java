@@ -19,7 +19,7 @@ public class FeeInvoiceResponse {
     private Long libraryId;
     private Long readerId;
     private String readerName;
-    private Long loanId;
+    private Long loanDetailId;
 
     private TypeFeeInvoice type;
     private PaymentMethod paymentMethod;

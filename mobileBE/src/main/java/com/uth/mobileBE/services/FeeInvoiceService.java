@@ -1,16 +1,13 @@
 package com.uth.mobileBE.services;
 
+import com.uth.mobileBE.Utils.SecurityUtils;
 import com.uth.mobileBE.dto.request.FeeInvoiceRequest;
 import com.uth.mobileBE.dto.response.FeeInvoiceResponse;
-import com.uth.mobileBE.models.FeeInvoice;
-import com.uth.mobileBE.models.Library;
-import com.uth.mobileBE.models.Loan;
-import com.uth.mobileBE.models.Reader;
+import com.uth.mobileBE.models.*;
 import com.uth.mobileBE.models.enums.StatusFeeInvoice;
-import com.uth.mobileBE.repositories.FeeInvoiceRepository;
-import com.uth.mobileBE.repositories.LibraryRepository;
-import com.uth.mobileBE.repositories.LoanRepository;
-import com.uth.mobileBE.repositories.ReaderRepository;
+import com.uth.mobileBE.models.enums.StatusLoanDetail;
+import com.uth.mobileBE.models.enums.StatusViolation;
+import com.uth.mobileBE.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,7 +29,11 @@ public class FeeInvoiceService {
     private ReaderRepository readerRepository;
 
     @Autowired
-    private LoanRepository loanRepository;
+    private LoanDetailRepository loanDetailRepository;
+    
+
+    @Autowired
+    private ViolationRepository violationRepository;
 
     @Transactional
     public List<FeeInvoiceResponse> getInvoicesByLibrary(Long libraryId) {
@@ -44,16 +45,17 @@ public class FeeInvoiceService {
 
     public FeeInvoiceResponse createFeeInvoice(FeeInvoiceRequest request) {
         // Kiểm tra và lấy các Entity liên quan dựa trên ID
-        Library library = libraryRepository.findById(request.getLibraryId())
+        Long libraryId = SecurityUtils.getLibraryId();
+        Library library = libraryRepository.findById(libraryId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy Library với id: " + request.getLibraryId()));
 
         Reader reader = readerRepository.findById(request.getReaderId())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy Reader với id: " + request.getReaderId()));
 
-        Loan loan = null;
-        if (request.getLoanId() != null) {
-            loan = loanRepository.findById(request.getLoanId())
-                    .orElseThrow(() -> new RuntimeException("Không tìm thấy Loan với id: " + request.getLoanId()));
+        LoanDetail loanDetail = null;
+        if (request.getLoanDetailId() != null) {
+            loanDetail = loanDetailRepository.findById(request.getLoanDetailId())
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy Loan với id: " + request.getLoanDetailId()));
         }
 
         LocalDateTime now = LocalDateTime.now();
@@ -61,10 +63,11 @@ public class FeeInvoiceService {
         FeeInvoice feeInvoice = FeeInvoice.builder()
                 .library(library)
                 .reader(reader)
-                .loan(loan)
+                .loanDetail(loanDetail)
                 .type(request.getType())
                 .totalAmount(request.getTotalAmount())
                 .status(request.getStatus())
+                .description(request.getDescription())
                 .createdAt(now)
                 .updateAt(now)
                 .build();
@@ -97,16 +100,7 @@ public class FeeInvoiceService {
         if (request.getTotalAmount() != null) {
             existingInvoice.setTotalAmount(request.getTotalAmount());
         }
-        if (request.getStatus() != null) {
-            existingInvoice.setStatus(request.getStatus());
-            if (request.getStatus().name().equals("PAID")) {
-                Reader reader = existingInvoice.getReader();
-                reader.setIsBlocked(false);
-                readerRepository.save(reader);
-            }
-        }
 
-        // Cập nhật các liên kết (Foreign Keys) nếu có gửi lên
         if (request.getLibraryId() != null) {
             Library library = libraryRepository.findById(request.getLibraryId())
                     .orElseThrow(() -> new RuntimeException("Không tìm thấy Library"));
@@ -117,10 +111,50 @@ public class FeeInvoiceService {
                     .orElseThrow(() -> new RuntimeException("Không tìm thấy Reader"));
             existingInvoice.setReader(reader);
         }
-        if (request.getLoanId() != null) {
-            Loan loan = loanRepository.findById(request.getLoanId())
-                    .orElseThrow(() -> new RuntimeException("Không tìm thấy Loan"));
-            existingInvoice.setLoan(loan);
+        if (request.getLoanDetailId() != null) {
+            LoanDetail loanDetail = loanDetailRepository.findById(request.getLoanDetailId())
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy Loan Detail"));
+            existingInvoice.setLoanDetail(loanDetail);
+        }
+
+        // XỬ LÝ LOGIC KHI ĐỔI TRẠNG THÁI SANG PAID
+        if (request.getStatus() != null) {
+            existingInvoice.setStatus(request.getStatus());
+
+            if (request.getStatus().name().equals("PAID")) {
+                // 1. Mở khóa cho độc giả
+                Reader reader = existingInvoice.getReader();
+                if (reader != null) {
+                    reader.setIsBlocked(false);
+                    readerRepository.save(reader);
+                }
+
+                // 2. Logic dành riêng cho hóa đơn phạt (PENALTY)
+                if (existingInvoice.getType() != null && existingInvoice.getType().name().equals("PENALTY")) {
+                    LoanDetail detail = existingInvoice.getLoanDetail();
+
+                    if (detail != null) {
+                        // 2.1 Cập nhật trạng thái LoanDetail
+                        // Chỉ đổi thành RETURNED nếu đang là OVERDUE hoặc DAMAGED (LOST sẽ bị bỏ qua, giữ nguyên)
+                        if (detail.getStatus() == StatusLoanDetail.OVERDUE || detail.getStatus() == StatusLoanDetail.DAMAGED) {
+                            detail.setStatus(StatusLoanDetail.RETURNED);
+                            loanDetailRepository.save(detail);
+
+                        }
+
+                        // 2.2 Cập nhật trạng thái Violation (Từ ACTIVE -> RESOLVED)
+                        // Gọi repository tìm các vi phạm đang ACTIVE của LoanDetail này
+                        List<Violation> activeViolations = violationRepository.findByLoanDetailAndStatus(detail, StatusViolation.ACTIVE);
+
+                        if (activeViolations != null && !activeViolations.isEmpty()) {
+                            for (Violation v : activeViolations) {
+                                v.setStatus(StatusViolation.RESOLVED);
+                            }
+                            violationRepository.saveAll(activeViolations);
+                        }
+                    }
+                }
+            }
         }
 
         existingInvoice.setUpdateAt(LocalDateTime.now());
@@ -148,7 +182,7 @@ public class FeeInvoiceService {
                 .libraryId(invoice.getLibrary().getLibraryId())
                 .readerId(invoice.getReader().getReaderId()) // Giả sử model Reader có getReaderId()
                 .readerName(invoice.getReader().getFullName())
-                .loanId(invoice.getLoan() != null ? invoice.getLoan().getLoanId() : null) // Giả sử model Loan có getLoanId()
+                .loanDetailId(invoice.getLoanDetail() != null ? invoice.getLoanDetail().getLoanDetailId() : null)
                 .type(invoice.getType())
                 .totalAmount(invoice.getTotalAmount())
                 .status(invoice.getStatus())

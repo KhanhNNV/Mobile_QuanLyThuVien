@@ -4,6 +4,7 @@ import com.uth.mobileBE.Utils.SecurityUtils;
 import com.uth.mobileBE.dto.request.FeeInvoiceRequest;
 import com.uth.mobileBE.dto.response.FeeInvoiceResponse;
 import com.uth.mobileBE.services.FeeInvoiceService;
+import com.uth.mobileBE.services.LoanDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,9 @@ public class FeeInvoiceController {
 
     @Autowired
     private FeeInvoiceService feeInvoiceService;
+
+    @Autowired
+    private LoanDetailService loanDetailService;
 
 
     @GetMapping()
@@ -46,7 +50,11 @@ public class FeeInvoiceController {
     public ResponseEntity<FeeInvoiceResponse> updateFeeInvoice(
             @PathVariable Long id,
             @RequestBody FeeInvoiceRequest request) {
-        return ResponseEntity.ok(feeInvoiceService.updateFeeInvoice(id, request));
+
+        FeeInvoiceResponse response = feeInvoiceService.updateFeeInvoice(id, request);
+        Long loanId=loanDetailService.getLoanIdByLoanDetailId(response.getLoanDetailId());
+        loanDetailService.syncLoanStatus(loanId);
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}")
