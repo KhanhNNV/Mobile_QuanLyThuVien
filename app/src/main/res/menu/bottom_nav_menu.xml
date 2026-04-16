@@ -22,6 +22,11 @@
         android:title="Độc Giả" />
 
     <item
+        android:id="@+id/invoiceListFragment"
+        android:icon="@drawable/outline_ballot_24"
+        android:title="Hóa đơn" />
+
+    <item
         android:id="@+id/settingFragment"
         android:icon="@drawable/outline_settings_24"
         android:title="cài đặt" />

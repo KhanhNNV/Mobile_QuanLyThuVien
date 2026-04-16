@@ -145,4 +145,10 @@
         <item>Đã khóa</item>
     </string-array>
 
+    <string-array name="invoice_status_options">
+        <item>Tất cả</item>
+        <item>Đã thanh toán</item>
+        <item>Chưa thanh toán</item>
+    </string-array>
+
 </resources>

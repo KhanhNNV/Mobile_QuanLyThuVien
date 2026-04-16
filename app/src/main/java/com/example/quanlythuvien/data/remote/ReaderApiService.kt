@@ -24,4 +24,6 @@ interface ReaderApiService {
         @Query("query") query: String
     ): Response<List<ReaderResponse>>
 
+    @GET("api/readers/{id}")
+    suspend fun getReaderById(@Path("id") readerId: Long): Response<ReaderResponse>
 }

@@ -58,7 +58,8 @@ class MainActivity : AppCompatActivity() {
                 R.id.loanPolicyFragment,
                 R.id.categoryListFragment,
                 R.id.readerDetailFragment,
-                R.id.notificationFragment-> {
+                R.id.notificationFragment,
+                R.id.invoiceDetailFragment-> {
                     bottomNavigationView.visibility = View.GONE
                 }
                 else -> {

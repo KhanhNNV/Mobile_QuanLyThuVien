@@ -188,6 +188,24 @@
         android:label="Thêm nhân viên "
         tools:layout="@layout/fragment_employee_add"/>
 
+    <fragment
+        android:id="@+id/invoiceListFragment"
+        android:name="com.example.quanlythuvien.ui.feeInvoices.InvoiceListFragment"
+        android:label="Quản lý hóa đơn"
+        tools:layout="@layout/fragment_invoice_list">
+
+        <action
+            android:id="@+id/action_invoiceList_to_invoiceDetail"
+            app:destination="@id/invoiceDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/invoiceDetailFragment"
+        android:name="com.example.quanlythuvien.ui.feeInvoices.InvoiceDetailFragment"
+        android:label="Chi tiết hóa đơn"
+        tools:layout="@layout/fragment_invoice_detail" />
+
+
 <!--    =========================================Staff=============================================-->
 
     <fragment

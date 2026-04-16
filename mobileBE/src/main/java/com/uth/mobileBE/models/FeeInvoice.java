@@ -1,5 +1,6 @@
 package com.uth.mobileBE.models;
 
+import com.uth.mobileBE.models.enums.PaymentMethod;
 import com.uth.mobileBE.models.enums.StatusFeeInvoice;
 import com.uth.mobileBE.models.enums.TypeFeeInvoice;
 import jakarta.persistence.*;
@@ -34,6 +35,9 @@ public class FeeInvoice {
 
     @Enumerated(EnumType.STRING)
     private TypeFeeInvoice type;
+
+    @Enumerated(EnumType.STRING)
+    private PaymentMethod paymentMethod;
 
     private Double totalAmount;
 

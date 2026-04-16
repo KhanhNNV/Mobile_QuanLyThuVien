@@ -8,4 +8,7 @@ class ReaderRepository (private val apiService: ReaderApiService){
     suspend fun getReadersPaginated(page: Int, size: Int) = apiService.getReaders(page, size)
 
     suspend fun searchReaders(query: String) = apiService.searchReaders(query)
+
+    suspend fun getReaderById(readerId: Long) = apiService.getReaderById(readerId)
+
 }
