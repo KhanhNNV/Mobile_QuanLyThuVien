@@ -52,6 +52,7 @@ class ReaderListFragment : Fragment(R.layout.fragment_reader_list) {
                 putInt("readerId", reader.readerId.toInt())
                 putString("readerName", reader.fullName)
                 putString("readerPhone", reader.phone)
+                putString("readerBarcode", reader.barcode)
             }
             findNavController().navigate(R.id.readerDetailFragment, bundle)
         }

@@ -39,6 +39,7 @@ class ReaderDetailFragment : Fragment(R.layout.fragment_reader_detail) {
         var readerName = arguments?.getString("readerName")?: ""
         var readerPhone = arguments?.getString("readerPhone")?: ""
         var readerType = arguments?.getString("readerType")?: ""
+        var readerBarcode = arguments?.getString("readerBarcode")?: ""
 
         //Gắn thông tin người dùng vào giao diện  View
         view.findViewById<TextView>(R.id.tvReaderName)?.text = readerName
@@ -52,7 +53,7 @@ class ReaderDetailFragment : Fragment(R.layout.fragment_reader_detail) {
 
         //Nút 3 chấm
         view.findViewById<View>(R.id.ivMoreOption)?.setOnClickListener {
-           showOptionMenu(it,readerName, readerPhone,readerType,role = currentUserRole)
+           showOptionMenu(it,readerName, readerPhone,readerType,readerBarcode,role = currentUserRole)
         }
 
 
@@ -120,6 +121,7 @@ class ReaderDetailFragment : Fragment(R.layout.fragment_reader_detail) {
         readerName: String,
         readerPhone: String,
         readerType: String,
+        readerBarcode: String,
         role:String
     ) {
         //Tạo đối tượng popMenu
@@ -151,7 +153,7 @@ class ReaderDetailFragment : Fragment(R.layout.fragment_reader_detail) {
                 //  BẮT SỰ KIỆN IN PDF
                 R.id.menuPrintPdf -> {
 
-                    pendingPdfCode = readerPhone
+                    pendingPdfCode = readerBarcode
                     pendingPdfName = readerName
                     pendingPdfPhone = readerPhone
 
@@ -264,6 +266,7 @@ class ReaderDetailFragment : Fragment(R.layout.fragment_reader_detail) {
         canvas.drawText("THẺ ĐỘC GIẢ THƯ VIỆN", 100f, 50f, paint)
         paint.isFakeBoldText = false
 
+        canvas.drawText("Mã thẻ: $code", 50f, 100f, paint)
         canvas.drawText("Họ và tên: $name", 50f, 140f, paint)
         canvas.drawText("Số điện thoại: $phone", 50f, 180f, paint)
 
