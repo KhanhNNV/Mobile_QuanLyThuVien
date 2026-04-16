@@ -7,35 +7,42 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quanlythuvien.R
+import com.example.quanlythuvien.data.model.response.CategoryResponse
 
 class CategoryAdapter(
-    private val categoryList: List<String>,
-    private val onEditClick: (String) -> Unit // Hàm này để báo  có người bấm cây bút
+
+    private var categoryList: List<CategoryResponse>,
+
+    private val onEditClick: (CategoryResponse) -> Unit
 ) : RecyclerView.Adapter<CategoryAdapter.CategoryViewHolder>() {
 
-    // Ánh xạ các thành phần trong file item_category.xml
     class CategoryViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tvName: TextView = view.findViewById(R.id.tvItemCategoryName)
         val ivEdit: ImageView = view.findViewById(R.id.ivEditCategory)
     }
 
-    // Nạp cái layout item_category.xml vào
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_category, parent, false)
         return CategoryViewHolder(view)
     }
 
-    // Đổ dữ liệu vào từng dòng và gài sự kiện
     override fun onBindViewHolder(holder: CategoryViewHolder, position: Int) {
-        val categoryName = categoryList[position]
-        holder.tvName.text = categoryName
+        val category = categoryList[position]
 
-        // Bắt sự kiện người dùng chọt ngón tay vào cái Cây Bút
+        //Lấy tên từ object ra để gán vào TextView
+        holder.tvName.text = category.name
+
         holder.ivEdit.setOnClickListener {
-            onEditClick(categoryName)
+            // Ném nguyên cục category (có cả ID lẫn Tên) cho Fragment xử lý
+            onEditClick(category)
         }
     }
 
-    // Báo cho máy biết có bao nhiêu dòng cần vẽ
     override fun getItemCount(): Int = categoryList.size
+
+    //CẬP NHẬT GIAO DIỆN (Fragment sẽ gọi hàm này)
+    fun updateData(newList: List<CategoryResponse>) {
+        categoryList = newList
+        notifyDataSetChanged() // Quét F5 báo cho Android vẽ lại danh sách mới!
+    }
 }
