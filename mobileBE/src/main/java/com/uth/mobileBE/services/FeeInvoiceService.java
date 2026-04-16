@@ -1,16 +1,11 @@
 package com.uth.mobileBE.services;
 
+import com.uth.mobileBE.Utils.SecurityUtils;
 import com.uth.mobileBE.dto.request.FeeInvoiceRequest;
 import com.uth.mobileBE.dto.response.FeeInvoiceResponse;
-import com.uth.mobileBE.models.FeeInvoice;
-import com.uth.mobileBE.models.Library;
-import com.uth.mobileBE.models.Loan;
-import com.uth.mobileBE.models.Reader;
+import com.uth.mobileBE.models.*;
 import com.uth.mobileBE.models.enums.StatusFeeInvoice;
-import com.uth.mobileBE.repositories.FeeInvoiceRepository;
-import com.uth.mobileBE.repositories.LibraryRepository;
-import com.uth.mobileBE.repositories.LoanRepository;
-import com.uth.mobileBE.repositories.ReaderRepository;
+import com.uth.mobileBE.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,7 +27,7 @@ public class FeeInvoiceService {
     private ReaderRepository readerRepository;
 
     @Autowired
-    private LoanRepository loanRepository;
+    private LoanDetailRepository loanDetailRepository;
 
     @Transactional
     public List<FeeInvoiceResponse> getInvoicesByLibrary(Long libraryId) {
@@ -44,16 +39,17 @@ public class FeeInvoiceService {
 
     public FeeInvoiceResponse createFeeInvoice(FeeInvoiceRequest request) {
         // Kiểm tra và lấy các Entity liên quan dựa trên ID
-        Library library = libraryRepository.findById(request.getLibraryId())
+        Long libraryId = SecurityUtils.getLibraryId();
+        Library library = libraryRepository.findById(libraryId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy Library với id: " + request.getLibraryId()));
 
         Reader reader = readerRepository.findById(request.getReaderId())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy Reader với id: " + request.getReaderId()));
 
-        Loan loan = null;
-        if (request.getLoanId() != null) {
-            loan = loanRepository.findById(request.getLoanId())
-                    .orElseThrow(() -> new RuntimeException("Không tìm thấy Loan với id: " + request.getLoanId()));
+        LoanDetail loanDetail = null;
+        if (request.getLoanDetailId() != null) {
+            loanDetail = loanDetailRepository.findById(request.getLoanDetailId())
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy Loan với id: " + request.getLoanDetailId()));
         }
 
         LocalDateTime now = LocalDateTime.now();
@@ -61,10 +57,11 @@ public class FeeInvoiceService {
         FeeInvoice feeInvoice = FeeInvoice.builder()
                 .library(library)
                 .reader(reader)
-                .loan(loan)
+                .loanDetail(loanDetail)
                 .type(request.getType())
                 .totalAmount(request.getTotalAmount())
                 .status(request.getStatus())
+                .description(request.getDescription())
                 .createdAt(now)
                 .updateAt(now)
                 .build();
@@ -117,10 +114,10 @@ public class FeeInvoiceService {
                     .orElseThrow(() -> new RuntimeException("Không tìm thấy Reader"));
             existingInvoice.setReader(reader);
         }
-        if (request.getLoanId() != null) {
-            Loan loan = loanRepository.findById(request.getLoanId())
+        if (request.getLoanDetailId() != null) {
+            LoanDetail loanDetail = loanDetailRepository.findById(request.getLoanDetailId())
                     .orElseThrow(() -> new RuntimeException("Không tìm thấy Loan"));
-            existingInvoice.setLoan(loan);
+            existingInvoice.setLoanDetail(loanDetail);
         }
 
         existingInvoice.setUpdateAt(LocalDateTime.now());
@@ -148,7 +145,7 @@ public class FeeInvoiceService {
                 .libraryId(invoice.getLibrary().getLibraryId())
                 .readerId(invoice.getReader().getReaderId()) // Giả sử model Reader có getReaderId()
                 .readerName(invoice.getReader().getFullName())
-                .loanId(invoice.getLoan() != null ? invoice.getLoan().getLoanId() : null) // Giả sử model Loan có getLoanId()
+                .loanDetailId(invoice.getLoanDetail() != null ? invoice.getLoanDetail().getLoanDetailId() : null)
                 .type(invoice.getType())
                 .totalAmount(invoice.getTotalAmount())
                 .status(invoice.getStatus())

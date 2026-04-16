@@ -12,8 +12,8 @@ data class FeeInvoiceResponse(
     @SerializedName("readerId")
     val readerId: Long,
 
-    @SerializedName("loanId")
-    val loanId: Long?,
+    @SerializedName("loanDetailId")
+    val loanDetailId: Long?,
 
     @SerializedName("type")
     val type: String,

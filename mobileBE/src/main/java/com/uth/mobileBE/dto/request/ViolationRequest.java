@@ -13,6 +13,7 @@ public class ViolationRequest {
     private Long readerId;
     private Long libraryId;
     private Long loanId; // Có thể null nếu vi phạm không liên quan lượt mượn cụ thể
+    private Long loanDetailId;
     private String reason;
     private String status; // ACTIVE hoặc RESOLVED
 }

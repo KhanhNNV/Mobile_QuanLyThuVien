@@ -14,9 +14,10 @@ import lombok.NoArgsConstructor;
 public class FeeInvoiceRequest {
     private Long libraryId;  // Bắt buộc
     private Long readerId;   // Bắt buộc
-    private Long loanId;     // Có thể null
+    private Long loanDetailId;     // Có thể null
 
     private TypeFeeInvoice type;
     private Double totalAmount;
     private StatusFeeInvoice status;
+    private String description;
 }

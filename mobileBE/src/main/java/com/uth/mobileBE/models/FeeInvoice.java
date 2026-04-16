@@ -30,11 +30,13 @@ public class FeeInvoice {
     private Reader reader;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "loan_id") // Nullable
-    private Loan loan;
+    @JoinColumn(name = "loanDetail_id") // Nullable
+    private LoanDetail loanDetail;
 
     @Enumerated(EnumType.STRING)
     private TypeFeeInvoice type;
+
+    private String description;
 
     @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod;
