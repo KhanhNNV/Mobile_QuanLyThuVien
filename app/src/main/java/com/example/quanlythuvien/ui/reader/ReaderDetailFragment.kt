@@ -7,8 +7,10 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.PopupMenu
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -21,6 +23,11 @@ import com.example.quanlythuvien.utils.GenericViewModelFactory
 import com.example.quanlythuvien.utils.TokenManager
 import com.example.quanlythuvien.viewmodel.LoanSharedViewModel
 import com.google.android.material.tabs.TabLayout
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
+import java.util.Locale
 
 class ReaderDetailFragment : Fragment(R.layout.fragment_reader_detail) {
 
@@ -29,7 +36,7 @@ class ReaderDetailFragment : Fragment(R.layout.fragment_reader_detail) {
 
     private val loanSharedViewModel: LoanSharedViewModel by activityViewModels()
 
-    private val detailViewModel: ReaderDetailViewModel by activityViewModels {
+    private val detailViewModel: ReaderDetailViewModel by viewModels {
         GenericViewModelFactory {
             val app = requireContext().applicationContext as Application
             val apiService = RetrofitClient.getInstance(app).create(ReaderApiService::class.java)
@@ -37,30 +44,45 @@ class ReaderDetailFragment : Fragment(R.layout.fragment_reader_detail) {
         }
     }
 
+    // Biến tạm để nhớ thông tin chờ lưu PDF
+    private var pendingPdfCode = ""
+    private var pendingPdfName = ""
+    private var pendingPdfPhone = ""
+    
+    private var currentReaderName = ""
+    private var currentReaderPhone = ""
+    private var currentReaderId = -1L
+    private val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.getDefault())
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val readerId = arguments?.getInt("readerId", -1)?.toLong() ?: -1L
-        val readerName = arguments?.getString("readerName").orEmpty()
-        val readerPhone = arguments?.getString("readerPhone").orEmpty()
-        val readerType = arguments?.getString("readerType").orEmpty()
+        currentReaderId = arguments?.getLong("readerId", -1L) ?: -1L
+        currentReaderName = arguments?.getString("readerName").orEmpty()
+        currentReaderPhone = arguments?.getString("readerPhone").orEmpty()
 
-        bindHeader(view, readerName, readerPhone, readerType, readerId)
-        setupRecycler(view, readerName)
+
+        bindHeader(view, currentReaderName, currentReaderPhone, currentReaderId)
+        setupRecycler(view, currentReaderName)
         setupTabs(view)
         observeViewModel(view)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (currentReaderId > 0) {
+            detailViewModel.getReaderDetail(currentReaderId)
+        }
     }
 
     private fun bindHeader(
         view: View,
         readerName: String,
         readerPhone: String,
-        readerType: String,
         readerId: Long
     ) {
         view.findViewById<TextView>(R.id.tvReaderName).text = readerName
-        view.findViewById<TextView>(R.id.tvReaderInfo).text = readerPhone
-        view.findViewById<TextView>(R.id.tvReaderStatus).text = readerType
+        view.findViewById<TextView>(R.id.tvReaderPhone).text = readerPhone
         view.findViewById<TextView>(R.id.tvAvatar).text = readerName.firstOrNull()?.uppercase() ?: ""
         view.findViewById<TextView>(R.id.tvHeaderTitle).text = "Chi tiết độc giả"
 
@@ -71,10 +93,9 @@ class ReaderDetailFragment : Fragment(R.layout.fragment_reader_detail) {
         view.findViewById<View>(R.id.ivMoreOption).setOnClickListener { anchor ->
             showOptionMenu(
                 anchorView = anchor,
-                readerId = readerId,
-                readerName = readerName,
-                readerPhone = readerPhone,
-                readerType = readerType,
+                readerId = currentReaderId,
+                readerName = currentReaderName,
+                readerPhone = currentReaderPhone,
                 role = getCurrentRole()
             )
         }
@@ -123,7 +144,6 @@ class ReaderDetailFragment : Fragment(R.layout.fragment_reader_detail) {
         readerId: Long,
         readerName: String,
         readerPhone: String,
-        readerType: String,
         role: String
     ) {
         val popup = PopupMenu(requireContext(), anchorView)
@@ -140,12 +160,23 @@ class ReaderDetailFragment : Fragment(R.layout.fragment_reader_detail) {
                     val bundle = Bundle().apply {
                         putString("readerName", readerName)
                         putString("readerPhone", readerPhone)
-                        putString("readerType", readerType)
+                        putLong("readerId", readerId)
                     }
                     findNavController().navigate(R.id.actionReaderDetailToReaderAdd, bundle)
                     true
                 }
+                //  BẮT SỰ KIỆN IN PDF
+                R.id.menuPrintPdf -> {
 
+                    pendingPdfCode = readerPhone
+                    pendingPdfName = readerName
+                    pendingPdfPhone = readerPhone
+
+                    // Mở hộp thoại chọn thư mục lưu file với tên mặc định
+                    createPdfLauncher.launch("TheDocGia_${pendingPdfCode}.pdf")
+                    true
+                }
+                //Xữ lý khi nhấn vào nút xóa reader
                 R.id.menuDeleteReader -> {
                     showDeleteConfirmationDialog(readerId)
                     true
@@ -193,6 +224,39 @@ class ReaderDetailFragment : Fragment(R.layout.fragment_reader_detail) {
                 findNavController().popBackStack()
             }
         }
+
+        detailViewModel.readerData.observe(viewLifecycleOwner) { data ->
+            currentReaderName = data.fullName
+            currentReaderPhone = data.phone
+
+            rootView.findViewById<TextView>(R.id.tvReaderName).text = currentReaderName
+            val barcodeDisplay = data.barcode.ifBlank { "—" }
+            rootView.findViewById<TextView>(R.id.tvReaderPhone).text =
+                "${data.phone}  ·  $barcodeDisplay"
+            rootView.findViewById<TextView>(R.id.tvAvatar).text = currentReaderName.firstOrNull()?.uppercase() ?: ""
+            rootView.findViewById<TextView>(R.id.tvJoinDate).text = formatServerDate(data.createdAt)
+            rootView.findViewById<TextView>(R.id.tvExpireDate).text = formatServerDate(data.membershipExpiry)
+
+            val daysChip = rootView.findViewById<TextView>(R.id.tvMembershipDaysRemaining)
+            daysChip.text = formatMembershipDaysRemaining(data.membershipExpiry)
+            if (membershipDaysChipIsWarning(data.membershipExpiry)) {
+                daysChip.setBackgroundResource(R.drawable.bg_chip_warning)
+                daysChip.setTextColor(ContextCompat.getColor(requireContext(), R.color.chip_warning))
+            } else {
+                daysChip.setBackgroundResource(R.drawable.bg_chip_primary)
+                daysChip.setTextColor(ContextCompat.getColor(requireContext(), R.color.chip_primary))
+            }
+
+            val statusView = rootView.findViewById<TextView>(R.id.tvReaderStatus)
+            if (data.isBlocked) {
+                statusView.visibility = View.VISIBLE
+                statusView.text = "Đã chặn"
+                statusView.setBackgroundResource(R.drawable.bg_chip_error)
+                statusView.setTextColor(ContextCompat.getColor(requireContext(), R.color.chip_error))
+            } else {
+                statusView.visibility = View.GONE
+            }
+        }
     }
 
     private fun getCurrentRole(): String {
@@ -222,4 +286,79 @@ class ReaderDetailFragment : Fragment(R.layout.fragment_reader_detail) {
         }
         bookAdapter.submitList(filtered)
     }
+
+    //HÀM TẠO VÀ LƯU PDF
+    private fun writePdfToUri(uri: android.net.Uri, code: String, name: String, phone: String) {
+        val pdfDocument = android.graphics.pdf.PdfDocument()
+        val pageInfo = android.graphics.pdf.PdfDocument.PageInfo.Builder(400, 300, 1).create()
+        val page = pdfDocument.startPage(pageInfo)
+        val canvas = page.canvas
+
+        val paint = android.graphics.Paint()
+        paint.color = android.graphics.Color.BLACK
+        paint.textSize = 16f
+
+        paint.isFakeBoldText = true
+        canvas.drawText("THẺ ĐỘC GIẢ THƯ VIỆN", 100f, 50f, paint)
+        paint.isFakeBoldText = false
+
+        canvas.drawText("Họ và tên: $name", 50f, 140f, paint)
+        canvas.drawText("Số điện thoại: $phone", 50f, 180f, paint)
+
+        pdfDocument.finishPage(page)
+        try {
+            requireContext().contentResolver.openOutputStream(uri)?.use { outputStream ->
+                pdfDocument.writeTo(outputStream)
+            }
+            Toast.makeText(requireContext(), "Lưu PDF thành công! Mở mục Tệp (Files) để xem.", Toast.LENGTH_LONG).show()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(requireContext(), "Lỗi khi lưu PDF: ${e.message}", Toast.LENGTH_SHORT).show()
+        } finally {
+            pdfDocument.close()
+        }
+    }
+    private val createPdfLauncher = registerForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.CreateDocument("application/pdf")
+    ) { uri ->
+        if (uri != null) {
+            // Nếu người dùng chọn chỗ lưu thành công, tiến hành vẽ và ghi PDF vào chỗ đó
+            writePdfToUri(uri, pendingPdfCode, pendingPdfName, pendingPdfPhone)
+        } else {
+            Toast.makeText(requireContext(), "Đã hủy lưu file PDF", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun formatServerDate(raw: String?): String {
+        if (raw.isNullOrBlank()) return "--/--/----"
+        return runCatching { LocalDateTime.parse(raw).format(dateFormatter) }
+            .getOrDefault(raw)
+    }
+
+    private fun expiryToLocalDate(raw: String?): LocalDate? {
+        if (raw.isNullOrBlank()) return null
+        return runCatching { LocalDateTime.parse(raw).toLocalDate() }
+            .recoverCatching { LocalDate.parse(raw) }
+            .getOrNull()
+    }
+
+    private fun formatMembershipDaysRemaining(membershipExpiry: String?): String {
+        val expiryDate = expiryToLocalDate(membershipExpiry)
+        if (expiryDate == null) return "Thẻ: chưa có hạn"
+        val days = ChronoUnit.DAYS.between(LocalDate.now(), expiryDate)
+        return when {
+            days < 0 -> "Quá hạn: ${-days} ngày"
+            days == 0L -> "Còn hạn: hôm nay"
+            else -> "Còn hạn: $days ngày"
+        }
+    }
+
+    /** Chip vàng: quá hạn, hết hạn trong ngày, hoặc chưa có ngày hết hạn. */
+    private fun membershipDaysChipIsWarning(membershipExpiry: String?): Boolean {
+        val expiryDate = expiryToLocalDate(membershipExpiry)
+        if (expiryDate == null) return true
+        val days = ChronoUnit.DAYS.between(LocalDate.now(), expiryDate)
+        return days <= 0L
+    }
+
 }

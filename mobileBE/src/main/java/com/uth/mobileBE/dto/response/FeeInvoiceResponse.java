@@ -1,5 +1,6 @@
 package com.uth.mobileBE.dto.response;
 
+import com.uth.mobileBE.models.enums.PaymentMethod;
 import com.uth.mobileBE.models.enums.StatusFeeInvoice;
 import com.uth.mobileBE.models.enums.TypeFeeInvoice;
 import lombok.AllArgsConstructor;
@@ -15,13 +16,13 @@ import java.time.LocalDateTime;
 @Builder
 public class FeeInvoiceResponse {
     private Long invoiceId;
-
-    // Trả về ID của các entity liên quan
     private Long libraryId;
     private Long readerId;
+    private String readerName;
     private Long loanId;
 
     private TypeFeeInvoice type;
+    private PaymentMethod paymentMethod;
     private Double totalAmount;
     private StatusFeeInvoice status;
 

@@ -1,14 +1,22 @@
 package com.uth.mobileBE.services;
 
 import com.uth.mobileBE.Utils.SecurityUtils;
+import com.uth.mobileBE.dto.request.CreateReaderRequest;
 import com.uth.mobileBE.dto.request.ReaderRequest;
 import com.uth.mobileBE.dto.request.RenewReaderMembershipRequest;
 import com.uth.mobileBE.dto.response.ReaderResponse;
+import com.uth.mobileBE.models.FeeConfig;
+import com.uth.mobileBE.models.FeeInvoice;
 import com.uth.mobileBE.models.Library;
 import com.uth.mobileBE.models.Reader;
 import com.uth.mobileBE.models.User;
 import com.uth.mobileBE.models.enums.Role;
 import com.uth.mobileBE.models.enums.StatusLibrary;
+import com.uth.mobileBE.models.enums.StatusFeeInvoice;
+import com.uth.mobileBE.models.enums.TypeFeeConfig;
+import com.uth.mobileBE.models.enums.TypeFeeInvoice;
+import com.uth.mobileBE.repositories.FeeConfigRepository;
+import com.uth.mobileBE.repositories.FeeInvoiceRepository;
 import com.uth.mobileBE.repositories.LibraryRepository;
 import com.uth.mobileBE.repositories.ReaderRepository;
 import com.uth.mobileBE.repositories.UserRepository;
@@ -30,28 +38,59 @@ public class ReaderService {
     private final ReaderRepository readerRepository;
     private final LibraryRepository libraryRepository;
     private final UserRepository userRepository;
+    private final FeeInvoiceRepository feeInvoiceRepository;
+    private final FeeConfigRepository feeConfigRepository;
 
     //Tạo người độc giả
     @Transactional
-    public ReaderResponse createReader(ReaderRequest request) {
-        Long libraryId = SecurityUtils.getLibraryId();
-        Library libraryRef = libraryRepository.getReferenceById(libraryId);
+    public ReaderResponse createReader(CreateReaderRequest request) {
+        Long currentLibraryId = SecurityUtils.getLibraryId();
+        Library library = libraryRepository.findById(currentLibraryId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy thư viện"));
+
+
+        // Lấy số ID to nhất trong hệ thống hiện tại
+        Long maxId = readerRepository.findMaxReaderId();
+
+        // Tạo mã mới bằng cách lấy ID to nhất + 1 (Ví dụ đang có người DG-5 thì tạo DG-6)
+        String generatedBarcode = "READER-" + (maxId + 1);
+        // ----------------------------------------------
+
+        LocalDateTime membershipExpiry = calculateExpiryDate(request.getMonthRegis());
+
         Reader reader = Reader.builder()
-                              .fullName(request.getFullName())
-                              .phone(request.getPhone())
-                              .barcode(request.getBarcode())
-                              .membershipExpiry(request.getMembershipExpiry())
-                              .library(libraryRef)
-                              .isBlocked(false)
-                              .build();
+                .fullName(request.getFullName())
+                .phone(request.getPhone())
+                .barcode(generatedBarcode)
+                .membershipExpiry(membershipExpiry)
+                .library(library)
+                .isBlocked(true)
+                .createdAt(LocalDateTime.now())
+                .build();
 
         Reader saved = readerRepository.save(reader);
-        return mapToReaderResponse(saved);
+
+        FeeConfig feeRegistration= feeConfigRepository.findByLibrary_LibraryIdAndFeeType(library.getLibraryId(), TypeFeeConfig.REG_NORMAL)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy phí đăng ký thẻ cho thư viện này"));
+
+        Double totalAmount = feeRegistration.getAmount() * request.getMonthRegis();
+
+
+        FeeInvoice feeInvoice = FeeInvoice.builder()
+                .reader(reader)
+                .library(library)
+                .type(TypeFeeInvoice.REGISTRATION)
+                .totalAmount(totalAmount)
+                .status(StatusFeeInvoice.UNPAID)
+                .build();
+
+        feeInvoiceRepository.save(feeInvoice);
+        return mapReaderAfterExpirySync(saved);
     }
 
     public List<ReaderResponse> getAllReaders() {
         return readerRepository.findAll().stream()
-                               .map(this::mapToReaderResponse)
+                               .map(this::mapReaderAfterExpirySync)
                                .collect(Collectors.toList());
     }
     /**
@@ -63,14 +102,14 @@ public class ReaderService {
         Long libraryId = SecurityUtils.getLibraryId();
         Pageable pageable = PageRequest.of(page, size);
         return readerRepository.findByLibrary_LibraryId(libraryId, pageable)
-                               .map(this::mapToReaderResponse);
+                               .map(this::mapReaderAfterExpirySync);
 
     }
     //Tìm lọc độc giả
     public ReaderResponse getReaderById(Long id) {
         Reader reader = readerRepository.findById(id)
                                         .orElseThrow(() -> new RuntimeException("Không tìm thấy độc giả"));
-        return mapToReaderResponse(reader);
+        return mapReaderAfterExpirySync(reader);
     }
 
     /**Search reader
@@ -83,7 +122,7 @@ public class ReaderService {
         }
         Long libraryId = SecurityUtils.getLibraryId();
         List<Reader> listReader = readerRepository.searchReadersByLibraryId(libraryId, request.trim());
-        return listReader.stream().map(reader -> mapToReaderResponse(reader))
+        return listReader.stream().map(this::mapReaderAfterExpirySync)
                                    .collect(Collectors.toList());
     }
 
@@ -104,13 +143,35 @@ public class ReaderService {
         if (!reader.getLibrary().getLibraryId().equals(libraryId)) {
             throw new RuntimeException("Từ chối truy cập: Bạn không có quyền chỉnh sửa độc giả của thư viện khác.");
         }
-        // Cập nhật các trường thông tin
-        reader.setFullName(request.getFullName());
-        reader.setPhone(request.getPhone());
-        //reader.setBarcode(request.getBarcode());
-        reader.setMembershipExpiry(request.getMembershipExpiry());
+
+        User currentUser = userRepository.findByUsername(SecurityUtils.getUsername())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng hiện tại"));
+        Role role = currentUser.getRole();
+
+        if (role == Role.ADMIN) {
+            reader.setFullName(request.getFullName());
+            reader.setPhone(request.getPhone());
+            if (request.getBarcode() != null && !request.getBarcode().trim().isEmpty()) {
+                reader.setBarcode(request.getBarcode().trim());
+            }
+            if (request.getMembershipExpiry() != null) {
+                reader.setMembershipExpiry(request.getMembershipExpiry());
+            }
+            if (request.getIsBlocked() != null) {
+                reader.setIsBlocked(request.getIsBlocked());
+            }
+        } else if (role == Role.STAFF) {
+            reader.setFullName(request.getFullName());
+            reader.setPhone(request.getPhone());
+            if (request.getIsBlocked() != null) {
+                reader.setIsBlocked(request.getIsBlocked());
+            }
+        } else {
+            throw new RuntimeException("Bạn không có quyền cập nhật độc giả");
+        }
 
         Reader updated = readerRepository.save(reader);
+        updated = syncAutoBlockIfExpired(updated);
         return mapToReaderResponse(updated);
     }
 
@@ -136,6 +197,10 @@ public class ReaderService {
 
     public Long countReaders(Long libraryId) {
         return readerRepository.countByLibrary_LibraryId(libraryId);
+    }
+
+    private LocalDateTime calculateExpiryDate(Long days){
+        return LocalDateTime.now().plusDays(days);
     }
 
 
@@ -190,9 +255,27 @@ public class ReaderService {
 
         reader.setMembershipExpiry(base.plusDays(request.getExtendMonths().longValue()));
         Reader saved = readerRepository.save(reader);
-
-        return mapToReaderResponse(saved);
+        return mapReaderAfterExpirySync(saved);
     }
+
+    /**
+     * Nếu đã quá ngày hết hạn thẻ thì tự động đánh dấu khóa (block).
+     */
+    private Reader syncAutoBlockIfExpired(Reader reader) {
+        if (reader.getMembershipExpiry() == null) {
+            return reader;
+        }
+        if (LocalDateTime.now().isAfter(reader.getMembershipExpiry()) && !Boolean.TRUE.equals(reader.getIsBlocked())) {
+            reader.setIsBlocked(true);
+            return readerRepository.save(reader);
+        }
+        return reader;
+    }
+
+    private ReaderResponse mapReaderAfterExpirySync(Reader reader) {
+        return mapToReaderResponse(syncAutoBlockIfExpired(reader));
+    }
+
     private ReaderResponse mapToReaderResponse(Reader reader) {
         return ReaderResponse.builder()
                              .readerId(reader.getReaderId())
@@ -202,7 +285,7 @@ public class ReaderService {
                              .isBlocked(reader.getIsBlocked())
                              .createdAt(reader.getCreatedAt())
                              .membershipExpiry(reader.getMembershipExpiry())
-                             // .updatedAt(reader.getUpdatedAt()) // (Bổ sung nếu entity có trường này)
+                             .updatedAt(LocalDateTime.now())
                              .build();
     }
 

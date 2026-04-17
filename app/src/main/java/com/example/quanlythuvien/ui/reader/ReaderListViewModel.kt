@@ -93,7 +93,7 @@ class ReaderListViewModel(application: Application) : AndroidViewModel(applicati
     private fun setupSearchListener() {
         viewModelScope.launch {
             _searchQuery
-                .debounce(500)                     // Đợi 0.5s sau lần gõ cuối
+                .debounce(500)        // Đợi 0.5s sau lần gõ cuối
                 .distinctUntilChanged()            // Không gọi lại nếu từ khóa không đổi
                 .collect { query ->
                     performSearch(query.trim())

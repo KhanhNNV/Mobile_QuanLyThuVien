@@ -43,13 +43,20 @@ class ReaderListFragment : Fragment(R.layout.fragment_reader_list) {
         setupSearchListener()
     }
 
+    override fun onResume() {
+        super.onResume()
+        // Yêu cầu tải lại danh sách từ đầu mỗi khi quay lại màn hình này 
+        // để cập nhật các thay đổi do xoá, sửa, thêm mới.
+        viewModel.loadInitialReaders()
+    }
+
     private fun setupRecyclerView(view: View) {
         val recyclerView = view.findViewById<RecyclerView>(R.id.rvReaders)
         val layoutManager = LinearLayoutManager(requireContext())
 
         readerAdapter = ReaderAdapter { reader ->
             val bundle = Bundle().apply {
-                putInt("readerId", reader.readerId.toInt())
+                putLong("readerId", reader.readerId)
                 putString("readerName", reader.fullName)
                 putString("readerPhone", reader.phone)
             }

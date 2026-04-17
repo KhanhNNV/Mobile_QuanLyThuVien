@@ -12,6 +12,7 @@ import com.uth.mobileBE.repositories.LoanRepository;
 import com.uth.mobileBE.repositories.ReaderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -31,6 +32,14 @@ public class FeeInvoiceService {
 
     @Autowired
     private LoanRepository loanRepository;
+
+    @Transactional
+    public List<FeeInvoiceResponse> getInvoicesByLibrary(Long libraryId) {
+        return feeInvoiceRepository.findByLibrary_LibraryId(libraryId)
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
 
     public FeeInvoiceResponse createFeeInvoice(FeeInvoiceRequest request) {
         // Kiểm tra và lấy các Entity liên quan dựa trên ID
@@ -70,11 +79,13 @@ public class FeeInvoiceService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public FeeInvoiceResponse getFeeInvoiceById(Long id) {
         FeeInvoice feeInvoice = getFeeInvoiceEntityById(id);
         return mapToResponse(feeInvoice);
     }
 
+    @Transactional
     public FeeInvoiceResponse updateFeeInvoice(Long id, FeeInvoiceRequest request) {
         FeeInvoice existingInvoice = getFeeInvoiceEntityById(id);
 
@@ -117,6 +128,7 @@ public class FeeInvoiceService {
         feeInvoiceRepository.delete(feeInvoice);
     }
 
+
     // --- CÁC HÀM HỖ TRỢ DÙNG NỘI BỘ ---
 
     private FeeInvoice getFeeInvoiceEntityById(Long id) {
@@ -129,10 +141,12 @@ public class FeeInvoiceService {
                 .invoiceId(invoice.getInvoiceId())
                 .libraryId(invoice.getLibrary().getLibraryId())
                 .readerId(invoice.getReader().getReaderId()) // Giả sử model Reader có getReaderId()
+                .readerName(invoice.getReader().getFullName())
                 .loanId(invoice.getLoan() != null ? invoice.getLoan().getLoanId() : null) // Giả sử model Loan có getLoanId()
                 .type(invoice.getType())
                 .totalAmount(invoice.getTotalAmount())
                 .status(invoice.getStatus())
+                .paymentMethod(invoice.getPaymentMethod())
                 .createdAt(invoice.getCreatedAt())
                 .updateAt(invoice.getUpdateAt())
                 .build();

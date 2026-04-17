@@ -1,6 +1,7 @@
 package com.uth.mobileBE.controllers;
 
 import com.uth.mobileBE.Utils.SecurityUtils;
+import com.uth.mobileBE.dto.request.CreateReaderRequest;
 import com.uth.mobileBE.dto.request.ReaderRequest;
 import com.uth.mobileBE.dto.request.RenewReaderMembershipRequest;
 import com.uth.mobileBE.dto.response.ReaderResponse;
@@ -24,7 +25,7 @@ public class ReaderController {
      * @return thông tin độc giả đã tạo
      */
     @PostMapping
-    public ResponseEntity<ReaderResponse> create(@RequestBody ReaderRequest request) {
+    public ResponseEntity<ReaderResponse> create(@RequestBody CreateReaderRequest request) {
         return ResponseEntity.ok(readerService.createReader(request));
     }
 
