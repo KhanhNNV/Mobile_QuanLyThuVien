@@ -24,15 +24,17 @@
     <color name="chip_secondary">#3B82F6</color>
     <color name="chip_active">#304671</color>
     <color  name="chip_error">#EE3535</color>
-
+    <color name="chip_warning">#B45309</color>
 
     <color name="bg_chip_active">#B1C6F9</color>
     <color name="bg_chip_primary">#B4D8FF</color>
     <color name="bg_chip_secondary">#DBEAFE</color>
     <color name="bg_chip_error">#FFDAD6</color>
+    <color name="bg_chip_warning">#FEF3C7</color>
 
     <color name="stroke_chip_primary">#93C5FD</color>
     <color name="stroke_chip_secondary">#BFDBFE</color>
+    <color name="stroke_chip_warning">#FCD34D</color>
 
     <color name="status_success">#BBF7D0</color>
     <color name="status_error">#FECACA</color>

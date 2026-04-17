@@ -28,7 +28,6 @@ class ReaderListViewModel(application: Application) : AndroidViewModel(applicati
 
     //Giữ các từ khóa tìm kiếm
     private val _searchQuery = MutableStateFlow("")
-    val searchQuery = _searchQuery.asStateFlow()
 
     // CÁC BIẾN QUẢN LÝ TRẠNG THÁI PHÂN TRANG
     private var currentPage = 0
@@ -60,32 +59,6 @@ class ReaderListViewModel(application: Application) : AndroidViewModel(applicati
         if (isLoading || isLastPage || isSearchMode) return
         currentPage++
         fetchReaders()
-    }
-
-    fun searchReaders(query: String) {
-        val keyword = query.trim()
-        if (keyword.isEmpty()) {
-            loadInitialReaders()
-            return
-        }
-
-        isSearchMode = true
-        isLoading = true
-        viewModelScope.launch {
-            try {
-                val response = readerRepository.searchReaders(keyword)
-                if (response.isSuccessful) {
-                    _readers.value = response.body().orEmpty()
-                    isLastPage = true
-                } else {
-                    _error.value = "Không thể tìm kiếm: ${response.code()}"
-                }
-            } catch (e: Exception) {
-                _error.value = "Lỗi tìm kiếm: ${e.message}"
-            } finally {
-                isLoading = false
-            }
-        }
     }
 
     /**
@@ -120,7 +93,7 @@ class ReaderListViewModel(application: Application) : AndroidViewModel(applicati
     private fun setupSearchListener() {
         viewModelScope.launch {
             _searchQuery
-                .debounce(500)                     // Đợi 0.5s sau lần gõ cuối
+                .debounce(500)        // Đợi 0.5s sau lần gõ cuối
                 .distinctUntilChanged()            // Không gọi lại nếu từ khóa không đổi
                 .collect { query ->
                     performSearch(query.trim())

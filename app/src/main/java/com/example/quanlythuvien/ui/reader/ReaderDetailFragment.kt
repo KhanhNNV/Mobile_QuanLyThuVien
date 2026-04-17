@@ -3,6 +3,7 @@ package com.example.quanlythuvien.ui.reader
 import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.app.Application
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
@@ -12,164 +13,172 @@ import androidx.appcompat.widget.PopupMenu
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quanlythuvien.R
-import com.example.quanlythuvien.core.api.RetrofitClient
+import java.util.Locale
+import java.time.format.DateTimeFormatter
 import com.example.quanlythuvien.data.model.request.ExtendMembershipExpiryRequest
 import com.example.quanlythuvien.data.remote.ReaderApiService
 import com.example.quanlythuvien.data.repository.ReaderRepository
+import com.example.quanlythuvien.core.api.RetrofitClient
 import com.example.quanlythuvien.ui.borrow_pay.data.LoanItemData
+import com.example.quanlythuvien.utils.GenericViewModelFactory
+import com.example.quanlythuvien.utils.TokenManager
 import com.example.quanlythuvien.viewmodel.LoanSharedViewModel
 import com.google.android.material.tabs.TabLayout
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
-import java.util.Locale
 import kotlin.getValue
 
 class ReaderDetailFragment : Fragment(R.layout.fragment_reader_detail) {
+
     private lateinit var bookAdapter: ReaderDetailAdapter
-    private var allDataMockReaderBook: List<MockReaderBook> = listOf()
+    private var allDataMockReaderBook: List<MockReaderBook> = emptyList()
+
     private val loanSharedViewModel: LoanSharedViewModel by activityViewModels()
 
-    var onItemClick: ((MockReaderBook) -> Unit)? = null
+    private val detailViewModel: ReaderDetailViewModel by viewModels {
+        GenericViewModelFactory {
+            val app = requireContext().applicationContext as Application
+            val apiService = RetrofitClient.getInstance(app).create(ReaderApiService::class.java)
+            ReaderDetailViewModel(ReaderRepository(apiService))
+        }
+    }
 
     // Biến tạm để nhớ thông tin chờ lưu PDF
     private var pendingPdfCode = ""
     private var pendingPdfName = ""
     private var pendingPdfPhone = ""
 
-    // Biến lưu thông tin reader hiện tại
-    private var currentReaderId: Long = 0
+    private var currentReaderName = ""
+    private var currentReaderPhone = ""
+    private var currentReaderId = -1L
     private var currentMembershipExpiry: String = ""
+
+    private var currentReaderBarcode = ""
+    private val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.getDefault())
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
-
-
-        //Lấy thông tin người dùng từ bundle
-        var readerName = arguments?.getString("readerName")?: ""
-        var readerPhone = arguments?.getString("readerPhone")?: ""
-        var readerType = arguments?.getString("readerType")?: ""
-        var readerBarcode = arguments?.getString("readerBarcode")?: ""
-
-        // Lấy readerId từ bundle
-        currentReaderId = arguments?.getInt("readerId", 0)?.toLong() ?: 0L
+        currentReaderId = arguments?.getLong("readerId", -1L) ?: -1L
+        currentReaderName = arguments?.getString("readerName").orEmpty()
+        currentReaderPhone = arguments?.getString("readerPhone").orEmpty()
         currentMembershipExpiry = arguments?.getString("membershipExpiry") ?: ""
-
-        //Gắn thông tin người dùng vào giao diện  View
-        view.findViewById<TextView>(R.id.tvReaderName)?.text = readerName
-        view.findViewById<TextView>(R.id.tvReaderInfo)?.text = readerPhone
-        view.findViewById<TextView>(R.id.tvReaderStatus)?.text = readerType
-        view.findViewById<TextView>(R.id.tvAvatar)?.text = readerName?.firstOrNull()?.uppercase()
-        view.findViewById<TextView>(R.id.tvHeaderTitle)?.text = "Chi tiết độc giả"
-        view.findViewById<View>(R.id.btnBack)?.setOnClickListener {
-            findNavController().navigateUp()
-        }
-
-        //Nút 3 chấm
-        view.findViewById<View>(R.id.ivMoreOption)?.setOnClickListener {
-           showOptionMenu(it,readerName, readerPhone,readerType,readerBarcode,role = currentUserRole)
-        }
+        currentReaderBarcode = arguments?.getString("readerBarcode")?: ""
 
 
-        //Khởi tọa data MOCK cho book
-        setupMockData()
+        bindHeader(view, currentReaderName, currentReaderPhone, currentReaderId)
+        setupRecycler(view, currentReaderName)
+        setupTabs(view)
+        observeViewModel(view)
+    }
 
-        val rvBooks = view.findViewById<RecyclerView>(R.id.rvReaderBooks)
-
-        //Xữ lý khi nhấn vào từng book
-        bookAdapter = ReaderDetailAdapter {
-
-                selectedBook ->
-            // 1. Tạo hoặc lấy thông tin Phiếu mượn tương ứng với cuốn sách này
-            // Vì hiện tại bạn đang dùng Mock dữ liệu, ta sẽ tạo một LoanItemData giả
-            val mockLoan =LoanItemData(
-                loanId = 12345, // ID thực tế bạn sẽ lấy từ dữ liệu sách hoặc phiếu
-                readerName = arguments?.getString("readerName") ?: "Độc giả",
-                borrowDate = selectedBook.borrowDate,
-                overallStatus = if (selectedBook.isReturned) "RETURNED" else "BORROWING",
-                borrowedBooks = mutableListOf() // Bạn có thể đưa danh sách sách vào đây
-            )
-
-            // 2. Lưu thông tin này vào ViewModel để trang LoanDetailFragment có thể đọc được
-            loanSharedViewModel.selectedLoanToView.value = mockLoan
-            //Mốt truyền dữ liệu thông qua API
-            findNavController().navigate(R.id.loanFragment)
-
-
-        }
-        rvBooks?.layoutManager = LinearLayoutManager(requireContext())
-        rvBooks?.adapter = bookAdapter
-
-        // Logic Filter sử dụng TabLayout
-        val tabLayout = view.findViewById<TabLayout>(R.id.tabLayout)
-        tabLayout?.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
-            override fun onTabSelected(tab: TabLayout.Tab?) {
-                when (tab?.position) {
-                    0 -> filterBooks(status = 0) // Đang mượn
-                    1 -> filterBooks(status = 1) // Đã trả
-                    2 -> filterBooks(status = 2) // Quá hạn
-                }
-            }
-
-            override fun onTabUnselected(tab: TabLayout.Tab?) {}
-            override fun onTabReselected(tab: TabLayout.Tab?) {}
-        })
-        view.post {
-            filterBooks(status = 0)
+    override fun onResume() {
+        super.onResume()
+        if (currentReaderId > 0) {
+            detailViewModel.getReaderDetail(currentReaderId)
         }
     }
 
-
-    /**
-     * Hiển thị PopupMenu chứa các thao tác với đối tượng Reader.
-     *
-     * @param readerName Tên hiển thị của Reader.
-     * @param readerPhone SĐT liên lạc.
-     * @param readerType Phân loại.
-     */
-
-    //Giả sử người dùng là nhân viên
-    val currentUserRole = "STAFF"
-    private fun showOptionMenu(
+    private fun bindHeader(
         view: View,
         readerName: String,
         readerPhone: String,
-        readerType: String,
-        readerBarcode: String,
-        role:String
+        readerId: Long
     ) {
-        //Tạo đối tượng popMenu
-        val popMenu = PopupMenu(requireContext(), view)
+        view.findViewById<TextView>(R.id.tvReaderName).text = readerName
+        view.findViewById<TextView>(R.id.tvReaderPhone).text = readerPhone
+        view.findViewById<TextView>(R.id.tvAvatar).text = readerName.firstOrNull()?.uppercase() ?: ""
+        view.findViewById<TextView>(R.id.tvHeaderTitle).text = "Chi tiết độc giả"
 
-        //Chuyển file xml sang đối tượng popMenu
-        popMenu.menuInflater.inflate(R.menu.menu_reader_options, popMenu.menu)
-
-        //Nếu là staff ẩn nút xóa
-        if (role == "STAFF") {
-            val deleteMenuItem = popMenu.menu.findItem(R.id.menuDeleteReader)
-            deleteMenuItem?.isVisible = false
+        view.findViewById<View>(R.id.btnBack).setOnClickListener {
+            findNavController().navigateUp()
         }
 
-        //Xữ lý sự kiện click
-        popMenu.setOnMenuItemClickListener { item ->
+        view.findViewById<View>(R.id.ivMoreOption).setOnClickListener { anchor ->
+            showOptionMenu(
+                anchorView = anchor,
+                readerId = currentReaderId,
+                readerName = currentReaderName,
+                readerPhone = currentReaderPhone,
+                role = getCurrentRole()
+            )
+        }
+    }
+
+    private fun setupRecycler(view: View, readerName: String) {
+        setupMockData()
+
+        val rvBooks = view.findViewById<RecyclerView>(R.id.rvReaderBooks)
+        bookAdapter = ReaderDetailAdapter { selectedBook ->
+            val mockLoan = LoanItemData(
+                loanId = 12345,
+                readerName = readerName.ifBlank { "Độc giả" },
+                borrowDate = selectedBook.borrowDate,
+                overallStatus = if (selectedBook.isReturned) "RETURNED" else "BORROWING",
+                borrowedBooks = mutableListOf()
+            )
+            loanSharedViewModel.selectedLoanToView.value = mockLoan
+            findNavController().navigate(R.id.loanFragment)
+        }
+
+        rvBooks.layoutManager = LinearLayoutManager(requireContext())
+        rvBooks.adapter = bookAdapter
+    }
+
+    private fun setupTabs(view: View) {
+        val tabLayout = view.findViewById<TabLayout>(R.id.tabLayout)
+        tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                when (tab?.position) {
+                    0 -> filterBooks(0) // đang mượn
+                    1 -> filterBooks(1) // đã trả
+                    2 -> filterBooks(2) // quá hạn
+                }
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab?) = Unit
+            override fun onTabReselected(tab: TabLayout.Tab?) = Unit
+        })
+
+        view.post { filterBooks(0) }
+    }
+
+    private fun showOptionMenu(
+        anchorView: View,
+        readerId: Long,
+        readerName: String,
+        readerPhone: String,
+        role: String
+    ) {
+        val popup = PopupMenu(requireContext(), anchorView)
+        popup.menuInflater.inflate(R.menu.menu_reader_options, popup.menu)
+
+        // STAFF: ẩn xóa
+        if (role == "STAFF") {
+            popup.menu.findItem(R.id.menuDeleteReader)?.isVisible = false
+        }
+
+        popup.setOnMenuItemClickListener { item ->
             when (item.itemId) {
-                //Xữ lý khi nhấn vào nút edit reader
                 R.id.menuEditReader -> {
-                    //Truyền dữ từ tham số
                     val bundle = Bundle().apply {
                         putString("readerName", readerName)
                         putString("readerPhone", readerPhone)
-                        putString("readerType", readerType)
+                        putLong("readerId", readerId)
                     }
                     findNavController().navigate(R.id.actionReaderDetailToReaderAdd, bundle)
                     true
@@ -177,7 +186,7 @@ class ReaderDetailFragment : Fragment(R.layout.fragment_reader_detail) {
                 //  BẮT SỰ KIỆN IN PDF
                 R.id.menuPrintPdf -> {
 
-                    pendingPdfCode = readerBarcode
+                    pendingPdfCode = currentReaderBarcode
                     pendingPdfName = readerName
                     pendingPdfPhone = readerPhone
 
@@ -192,16 +201,16 @@ class ReaderDetailFragment : Fragment(R.layout.fragment_reader_detail) {
                 }
                 //Xữ lý khi nhấn vào nút xóa reader
                 R.id.menuDeleteReader -> {
-                    //Gọi hàm hiển thị dialog xác nhận xóa
-                    showDeleteConfirmationDialog()
+                    showDeleteConfirmationDialog(readerId)
                     true
                 }
+
                 else -> false
-                }
             }
-            popMenu.setForceShowIcon(true)
-            popMenu.show()
         }
+        popup.setForceShowIcon(true)
+        popup.show()
+    }
 
     /**
      * Hiển thị Dialog gia hạn thẻ độc giả sử dụng NumberPicker
@@ -347,79 +356,102 @@ class ReaderDetailFragment : Fragment(R.layout.fragment_reader_detail) {
     /**
      * Hiển thị Dialog xác nhận xóa Reader.
      */
-    private fun showDeleteConfirmationDialog(){
+    private fun showDeleteConfirmationDialog(readerId: Long){
         AlertDialog.Builder(requireContext())
             .setTitle("Xóa Độc Giả")
             .setMessage("Bạn có chắc chắn muốn xóa độc giả này?")
-                //Nút xác nhận xóa
+            //Nút xác nhận xóa
             .setPositiveButton("Có") { dialog, _ ->
-                //Hiển thị Toast đã xóa
-                Toast.makeText(requireContext(), "Đã xóa độc giả", Toast.LENGTH_SHORT).show()
-                //Quay lại trang trước
-                findNavController().popBackStack()
-                dialog.dismiss()//Xóa cái dialog
-            }
-                //Nút xác nhận hủy
-            .setNegativeButton("Hủy") { dialog, _ ->
+                if (readerId <= 0L) {
+                    Toast.makeText(requireContext(), "Không tìm thấy mã độc giả", Toast.LENGTH_SHORT).show()
+                } else {
+                    detailViewModel.deleteReader(readerId)
+                }
                 dialog.dismiss()
             }
-            // (Tùy chọn) Ngăn người dùng tắt Dialog bằng cách chạm ra ngoài
+            .setNegativeButton("Hủy") { dialog, _ -> dialog.dismiss() }
             .setCancelable(false)
             .show()
     }
 
+    private fun observeViewModel(rootView: View) {
+        detailViewModel.isLoading.observe(viewLifecycleOwner) { loading ->
+            rootView.findViewById<View>(R.id.ivMoreOption).isEnabled = !loading
+        }
+
+        detailViewModel.error.observe(viewLifecycleOwner) { msg ->
+            if (!msg.isNullOrBlank()) {
+                Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        detailViewModel.deleteSuccess.observe(viewLifecycleOwner) { success ->
+            if (success == true) {
+                Toast.makeText(requireContext(), "Đã xóa độc giả", Toast.LENGTH_SHORT).show()
+                findNavController().popBackStack()
+            }
+        }
+
+        detailViewModel.readerData.observe(viewLifecycleOwner) { data ->
+            currentReaderName = data.fullName
+            currentReaderPhone = data.phone
+
+            rootView.findViewById<TextView>(R.id.tvReaderName).text = currentReaderName
+            val barcodeDisplay = data.barcode.ifBlank { "—" }
+            rootView.findViewById<TextView>(R.id.tvReaderPhone).text =
+                "${data.phone}  ·  $barcodeDisplay"
+            rootView.findViewById<TextView>(R.id.tvAvatar).text = currentReaderName.firstOrNull()?.uppercase() ?: ""
+            rootView.findViewById<TextView>(R.id.tvJoinDate).text = formatServerDate(data.createdAt)
+            rootView.findViewById<TextView>(R.id.tvExpireDate).text = formatServerDate(data.membershipExpiry)
+
+            val daysChip = rootView.findViewById<TextView>(R.id.tvMembershipDaysRemaining)
+            daysChip.text = formatMembershipDaysRemaining(data.membershipExpiry)
+            if (membershipDaysChipIsWarning(data.membershipExpiry)) {
+                daysChip.setBackgroundResource(R.drawable.bg_chip_warning)
+                daysChip.setTextColor(ContextCompat.getColor(requireContext(), R.color.chip_warning))
+            } else {
+                daysChip.setBackgroundResource(R.drawable.bg_chip_primary)
+                daysChip.setTextColor(ContextCompat.getColor(requireContext(), R.color.chip_primary))
+            }
+
+            val statusView = rootView.findViewById<TextView>(R.id.tvReaderStatus)
+            if (data.isBlocked) {
+                statusView.visibility = View.VISIBLE
+                statusView.text = "Đã chặn"
+                statusView.setBackgroundResource(R.drawable.bg_chip_error)
+                statusView.setTextColor(ContextCompat.getColor(requireContext(), R.color.chip_error))
+            } else {
+                statusView.visibility = View.GONE
+            }
+        }
+    }
+
+    private fun getCurrentRole(): String {
+        val rawRole = TokenManager(requireContext()).getRole().orEmpty()
+        return when {
+            rawRole.contains("ADMIN", ignoreCase = true) -> "ADMIN"
+            rawRole.contains("STAFF", ignoreCase = true) -> "STAFF"
+            else -> ""
+        }
+    }
 
     private fun setupMockData() {
         allDataMockReaderBook = listOf(
-            MockReaderBook(
-                "Lập trình Java căn bản",
-                "Trần Văn B",
-                "978-111",
-                "01/10/2025",
-                "15/10/2025",
-                isOverdue = true,
-                isReturned = false
-            ),
-            MockReaderBook(
-                "Kotlin Coroutines",
-                "JetBrains",
-                "978-222",
-                "10/10/2025",
-                "24/10/2025",
-                isOverdue = false,
-                isReturned = false
-            ),
-            MockReaderBook(
-                "Cấu trúc dữ liệu & Giải thuật",
-                "Nguyễn C",
-                "978-333",
-                "01/09/2025",
-                "15/09/2025",
-                isOverdue = false,
-                isReturned = true
-            ),
-            MockReaderBook(
-                "Clean Code",
-                "Robert C. Martin",
-                "978-444",
-                "15/08/2025",
-                "30/08/2025",
-                isOverdue = false,
-                isReturned = true
-            )
+            MockReaderBook("Lập trình Java căn bản", "Trần Văn B", "978-111", "01/10/2025", "15/10/2025", isOverdue = true, isReturned = false),
+            MockReaderBook("Kotlin Coroutines", "JetBrains", "978-222", "10/10/2025", "24/10/2025", isOverdue = false, isReturned = false),
+            MockReaderBook("Cấu trúc dữ liệu & Giải thuật", "Nguyễn C", "978-333", "01/09/2025", "15/09/2025", isOverdue = false, isReturned = true),
+            MockReaderBook("Clean Code", "Robert C. Martin", "978-444", "15/08/2025", "30/08/2025", isOverdue = false, isReturned = true)
         )
     }
 
-
     private fun filterBooks(status: Int) {
-        // Mốt viết logic phân chia vào đây
-        val filteredList = when (status) {
-            0 -> allDataMockReaderBook.filter { !it.isReturned && !it.isOverdue } // Đang mượn và chưa quá hạn
-            1 -> allDataMockReaderBook.filter { it.isReturned }                   // Đã trả
-            2 -> allDataMockReaderBook.filter { !it.isReturned && it.isOverdue }  // Đang mượn nhưng quá hạn
+        val filtered = when (status) {
+            0 -> allDataMockReaderBook.filter { !it.isReturned && !it.isOverdue }
+            1 -> allDataMockReaderBook.filter { it.isReturned }
+            2 -> allDataMockReaderBook.filter { !it.isReturned && it.isOverdue }
             else -> allDataMockReaderBook
         }
-        bookAdapter.submitList(filteredList)
+        bookAdapter.submitList(filtered)
     }
 
     //HÀM TẠO VÀ LƯU PDF
@@ -465,6 +497,36 @@ class ReaderDetailFragment : Fragment(R.layout.fragment_reader_detail) {
         }
     }
 
+    private fun formatServerDate(raw: String?): String {
+        if (raw.isNullOrBlank()) return "--/--/----"
+        return runCatching { LocalDateTime.parse(raw).format(dateFormatter) }
+            .getOrDefault(raw)
+    }
+
+    private fun expiryToLocalDate(raw: String?): LocalDate? {
+        if (raw.isNullOrBlank()) return null
+        return runCatching { LocalDateTime.parse(raw).toLocalDate() }
+            .recoverCatching { LocalDate.parse(raw) }
+            .getOrNull()
+    }
+
+    private fun formatMembershipDaysRemaining(membershipExpiry: String?): String {
+        val expiryDate = expiryToLocalDate(membershipExpiry)
+        if (expiryDate == null) return "Thẻ: chưa có hạn"
+        val days = ChronoUnit.DAYS.between(LocalDate.now(), expiryDate)
+        return when {
+            days < 0 -> "Quá hạn: ${-days} ngày"
+            days == 0L -> "Còn hạn: hôm nay"
+            else -> "Còn hạn: $days ngày"
+        }
+    }
+
+    /** Chip vàng: quá hạn, hết hạn trong ngày, hoặc chưa có ngày hết hạn. */
+    private fun membershipDaysChipIsWarning(membershipExpiry: String?): Boolean {
+        val expiryDate = expiryToLocalDate(membershipExpiry)
+        if (expiryDate == null) return true
+        val days = ChronoUnit.DAYS.between(LocalDate.now(), expiryDate)
+        return days <= 0L
+    }
+
 }
-
-

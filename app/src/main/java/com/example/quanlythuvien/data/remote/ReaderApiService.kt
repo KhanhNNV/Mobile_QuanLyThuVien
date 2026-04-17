@@ -6,12 +6,12 @@ import com.example.quanlythuvien.data.model.response.PageResponse
 import com.example.quanlythuvien.data.model.response.ReaderResponse
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
-
 
 interface ReaderApiService {
     @GET("api/readers/count")
@@ -22,8 +22,7 @@ interface ReaderApiService {
     //API Gọi danh sách reader (Phân trang)
     @GET("api/readers")
     suspend fun getReaders(
-        @Query("page") page: Int,
-        @Query("size") size: Int
+        @Query("page") page: Int, @Query("size") size: Int
     ): Response<PageResponse<ReaderResponse>>
 
     //API gọi search reader
@@ -38,4 +37,14 @@ interface ReaderApiService {
     @PUT("api/readers/{id}/extend")
     suspend fun extendMembershipExpiry(@Path("id") readerId: Long,
                                        @Body request: ExtendMembershipExpiryRequest): Response<ReaderResponse>
+    //API gọi delete reader,
+    @DELETE("api/readers/{id}")
+    suspend fun deleteReader(@Path("id") readerId: Long): Response<Void>
+
+    //API gọi edit reader
+    @PUT("api/readers/{id}")
+    suspend fun updateReader(
+        @Path("id") readerId: Long, @Body request: ReaderRequest
+    ): Response<ReaderResponse>
+
 }

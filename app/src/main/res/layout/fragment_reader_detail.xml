@@ -73,12 +73,16 @@
 
                     <TextView
                         android:id="@+id/tvReaderPhone"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
                         android:text="09172220000"
                         android:textColor="@color/text_secondary"
                         android:textSize="14sp"
+                        android:maxLines="2"
+                        android:ellipsize="end"
                         app:layout_constraintStart_toStartOf="@+id/tvReaderName"
+                        app:layout_constraintEnd_toStartOf="@+id/ivMoreOption"
                         app:layout_constraintTop_toBottomOf="@+id/tvReaderName" />
 
                     <LinearLayout
@@ -142,13 +146,13 @@
                         app:layout_constraintTop_toBottomOf="@+id/layoutDatesVertical">
 
                         <TextView
-                            android:id="@+id/tvReaderType"
+                            android:id="@+id/tvMembershipDaysRemaining"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:background="@drawable/bg_chip_primary"
                             android:paddingHorizontal="10dp"
                             android:paddingVertical="4dp"
-                            android:text="Sinh viên"
+                            android:text="Còn hạn: "
                             android:textColor="@color/chip_primary"
                             android:textSize="11sp"
                             android:textStyle="bold" />
@@ -164,7 +168,8 @@
                             android:text="Còn hạn"
                             android:textColor="@color/chip_active"
                             android:textSize="11sp"
-                            android:textStyle="bold" />
+                            android:textStyle="bold"
+                            android:visibility="gone" />
 
                         <TextView
                             android:id="@+id/tvDebtAmount"

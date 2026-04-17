@@ -10,11 +10,11 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReaderRequest {
+public class CreateReaderRequest {
     private String fullName;
     private String phone;
     private String barcode;
     private Long libraryId;
-    private LocalDateTime membershipExpiry;
-    private Boolean isBlocked;
+    private Long monthRegis;
+
 }

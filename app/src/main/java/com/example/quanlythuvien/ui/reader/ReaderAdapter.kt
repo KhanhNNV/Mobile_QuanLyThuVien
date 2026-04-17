@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quanlythuvien.R
 import com.example.quanlythuvien.data.model.response.ReaderResponse
@@ -43,20 +44,24 @@ class ReaderAdapter(
 
     class ReaderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val tvReaderName: TextView = itemView.findViewById(R.id.tvReaderName)
-        private val tvReaderInfo: TextView = itemView.findViewById(R.id.tvReaderInfo)
+        private val tvReaderPhone: TextView = itemView.findViewById(R.id.tvReaderInfo)
         private val tvReaderStatus: TextView = itemView.findViewById(R.id.tvReaderStatus)
         private val tvAvatar: TextView = itemView.findViewById(R.id.tvAvatar)
 
         fun bind(reader: ReaderResponse) {
-            // Hiển thị tên và số điện thoại
             tvReaderName.text = reader.fullName
-            tvReaderInfo.text = reader.phone
-
-            // Ẩn trạng thái
-            tvReaderStatus.visibility = View.GONE
-
-            // Tạo Avatar đơn giản bằng chữ cái đầu của tên
+            val barcodeShow = reader.barcode.ifBlank { "—" }
+            tvReaderPhone.text = "$barcodeShow · ${reader.phone}"
             tvAvatar.text = reader.fullName.firstOrNull()?.uppercase() ?: ""
+
+            if (reader.isBlocked) {
+                tvReaderStatus.visibility = View.VISIBLE
+                tvReaderStatus.text = "Đã chặn"
+                tvReaderStatus.setBackgroundResource(R.drawable.bg_chip_error)
+                tvReaderStatus.setTextColor(ContextCompat.getColor(itemView.context, R.color.chip_error))
+            } else {
+                tvReaderStatus.visibility = View.GONE
+            }
         }
     }
 }

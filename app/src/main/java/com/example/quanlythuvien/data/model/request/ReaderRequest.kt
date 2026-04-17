@@ -5,5 +5,7 @@ data class ReaderRequest(
     val phone: String,
     val barcode: String,
     val libraryId: Long,
-    val monthRegis: Long
+    val monthRegis: Long = 0L,
+    val membershipExpiry: String? = null,
+    val isBlocked: Boolean? = null
 )
