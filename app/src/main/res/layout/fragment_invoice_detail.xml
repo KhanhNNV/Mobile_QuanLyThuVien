@@ -82,6 +82,43 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     tools:text="Ngày tạo: 12/10/2023 14:30" />
+
+                <LinearLayout
+                    android:id="@+id/layoutLoanDetailLink"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:orientation="horizontal"
+                    android:paddingVertical="8dp"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+                    <ImageView
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:src="@drawable/baseline_arrow_forward_ios_24"
+                        app:tint="@color/theme_primary"
+                        android:layout_marginEnd="8dp"
+                        android:layout_gravity="center_vertical"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Phiếu mượn bị phạt: "
+                        android:textColor="@color/chip_warning"
+                        android:textSize="16dp"/>
+
+                    <TextView
+                        android:id="@+id/tvLoanDetailId"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#1976D2"
+                        android:textStyle="bold"
+                        tools:text="#0"
+                        android:textSize="16dp"/>
+                </LinearLayout>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 

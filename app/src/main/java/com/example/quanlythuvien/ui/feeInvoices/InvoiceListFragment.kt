@@ -35,7 +35,6 @@ class InvoiceListFragment : Fragment(R.layout.fragment_invoice_list) {
     private lateinit var recyclerView: RecyclerView
     private lateinit var invoiceAdapter: InvoiceAdapter
     private lateinit var viewModel: InvoiceViewModel
-    private lateinit var sharedViewModel: InvoiceSharedViewModel
     private lateinit var autoSearch: AutoCompleteTextView
     private lateinit var spinnerStatus: Spinner
 
@@ -68,9 +67,6 @@ class InvoiceListFragment : Fragment(R.layout.fragment_invoice_list) {
             InvoiceViewModel(invoiceRepository)
         }
         viewModel = ViewModelProvider(this, factory)[InvoiceViewModel::class.java]
-
-        // SharedViewModel cho việc chia sẻ dữ liệu giữa các fragment
-        sharedViewModel = ViewModelProvider(requireActivity())[InvoiceSharedViewModel::class.java]
     }
 
     private fun setupRecyclerView() {
@@ -79,8 +75,10 @@ class InvoiceListFragment : Fragment(R.layout.fragment_invoice_list) {
             invoiceList = mutableListOf(),
             onItemClick = { invoice ->
                 // Dùng SharedViewModel để lưu ID và chuyển trang
-                sharedViewModel.selectInvoice(invoice.invoiceId)
-                findNavController().navigate(R.id.action_invoiceList_to_invoiceDetail)
+                val bundle = Bundle().apply {
+                    putLong("feeInvoiceId", invoice.invoiceId!!) // Truyền ID sang trang kia
+                }
+                findNavController().navigate(R.id.action_invoiceList_to_invoiceDetail,bundle)
             },
             onOptionsClick = { invoice, view ->
                 showPopupMenu(invoice, view)
@@ -152,15 +150,6 @@ class InvoiceListFragment : Fragment(R.layout.fragment_invoice_list) {
                     }
                 }
 
-                // Lắng nghe sự kiện refresh từ SharedViewModel
-                launch {
-                    sharedViewModel.shouldRefreshList.collectLatest { shouldRefresh ->
-                        if (shouldRefresh) {
-                            viewModel.fetchInvoices()
-                            sharedViewModel.resetRefreshFlag()
-                        }
-                    }
-                }
             }
         }
     }
@@ -175,9 +164,11 @@ class InvoiceListFragment : Fragment(R.layout.fragment_invoice_list) {
         popup.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.action_view_detail -> {
-                    // Dùng SharedViewModel để lưu ID và chuyển trang
-                    sharedViewModel.selectInvoice(invoice.invoiceId)
-                    findNavController().navigate(R.id.action_invoiceList_to_invoiceDetail)
+                    val bundle = Bundle().apply {
+                        putLong("feeInvoiceId", invoice.invoiceId!!)
+                    }
+                    findNavController().navigate(R.id.action_invoiceList_to_invoiceDetail, bundle)
+
                     true
                 }
                 R.id.action_print -> {

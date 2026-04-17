@@ -20,6 +20,7 @@ public class FeeInvoiceResponse {
     private Long readerId;
     private String readerName;
     private Long loanDetailId;
+    private Long loanId;
 
     private TypeFeeInvoice type;
     private PaymentMethod paymentMethod;
