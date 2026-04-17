@@ -17,6 +17,9 @@ public interface ReaderRepository extends JpaRepository<Reader, Long> {
     @Query("SELECT COALESCE(MAX(r.readerId), 0) FROM Reader r")
     Long findMaxReaderId();
 
+    // Kiểm tra barcode đã tồn tại chưa
+    boolean existsByBarcode(String barcode);
+
     // Tìm kiếm tương đối theo Tên, Số điện thoại hoặc Mã thẻ (Barcode)
     @Query("SELECT r FROM Reader r WHERE r.library.libraryId = :libraryId AND (" +
             "LOWER(r.fullName) LIKE LOWER(CONCAT('%', :query, '%')) OR " +

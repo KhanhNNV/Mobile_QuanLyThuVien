@@ -104,12 +104,12 @@ class ReaderAddFragment : Fragment(R.layout.fragment_reader_add) {
             if (isAdminRole()) {
                 layoutMembershipExpiry.visibility = View.VISIBLE
                 layoutReaderBarcode.visibility = View.VISIBLE
+                updateBlockButton()
+                btnToggleBlockReader.visibility = View.VISIBLE
             } else {
                 layoutMembershipExpiry.visibility = View.GONE
                 layoutReaderBarcode.visibility = View.GONE
             }
-            btnToggleBlockReader.visibility = View.VISIBLE
-            updateBlockButton()
             viewModel.getReaderDetail(editReaderId)
         } else {
             layoutMembershipMonths.visibility = View.VISIBLE

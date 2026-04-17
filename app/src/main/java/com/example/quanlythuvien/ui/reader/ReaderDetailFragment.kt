@@ -13,7 +13,6 @@ import androidx.appcompat.widget.PopupMenu
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -23,13 +22,12 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quanlythuvien.R
-import com.example.quanlythuvien.core.api.RetrofitClient
+import java.util.Locale
+import java.time.format.DateTimeFormatter
 import com.example.quanlythuvien.data.model.request.ExtendMembershipExpiryRequest
 import com.example.quanlythuvien.data.remote.ReaderApiService
 import com.example.quanlythuvien.data.repository.ReaderRepository
 import com.example.quanlythuvien.core.api.RetrofitClient
-import com.example.quanlythuvien.data.remote.ReaderApiService
-import com.example.quanlythuvien.data.repository.ReaderRepository
 import com.example.quanlythuvien.ui.borrow_pay.data.LoanItemData
 import com.example.quanlythuvien.utils.GenericViewModelFactory
 import com.example.quanlythuvien.utils.TokenManager
@@ -37,14 +35,11 @@ import com.example.quanlythuvien.viewmodel.LoanSharedViewModel
 import com.google.android.material.tabs.TabLayout
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
-import java.util.Locale
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
-import java.util.Locale
 import kotlin.getValue
 
 class ReaderDetailFragment : Fragment(R.layout.fragment_reader_detail) {
@@ -70,6 +65,9 @@ class ReaderDetailFragment : Fragment(R.layout.fragment_reader_detail) {
     private var currentReaderName = ""
     private var currentReaderPhone = ""
     private var currentReaderId = -1L
+    private var currentMembershipExpiry: String = ""
+
+    private var currentReaderBarcode = ""
     private val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.getDefault())
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -78,6 +76,8 @@ class ReaderDetailFragment : Fragment(R.layout.fragment_reader_detail) {
         currentReaderId = arguments?.getLong("readerId", -1L) ?: -1L
         currentReaderName = arguments?.getString("readerName").orEmpty()
         currentReaderPhone = arguments?.getString("readerPhone").orEmpty()
+        currentMembershipExpiry = arguments?.getString("membershipExpiry") ?: ""
+        currentReaderBarcode = arguments?.getString("readerBarcode")?: ""
 
 
         bindHeader(view, currentReaderName, currentReaderPhone, currentReaderId)
@@ -186,7 +186,7 @@ class ReaderDetailFragment : Fragment(R.layout.fragment_reader_detail) {
                 //  BẮT SỰ KIỆN IN PDF
                 R.id.menuPrintPdf -> {
 
-                    pendingPdfCode = readerBarcode
+                    pendingPdfCode = currentReaderBarcode
                     pendingPdfName = readerName
                     pendingPdfPhone = readerPhone
 
@@ -206,11 +206,11 @@ class ReaderDetailFragment : Fragment(R.layout.fragment_reader_detail) {
                 }
 
                 else -> false
-                }
             }
-            popup.setForceShowIcon(true)
-            popup.show()
         }
+        popup.setForceShowIcon(true)
+        popup.show()
+    }
 
     /**
      * Hiển thị Dialog gia hạn thẻ độc giả sử dụng NumberPicker
@@ -356,11 +356,11 @@ class ReaderDetailFragment : Fragment(R.layout.fragment_reader_detail) {
     /**
      * Hiển thị Dialog xác nhận xóa Reader.
      */
-    private fun showDeleteConfirmationDialog(){
+    private fun showDeleteConfirmationDialog(readerId: Long){
         AlertDialog.Builder(requireContext())
             .setTitle("Xóa Độc Giả")
             .setMessage("Bạn có chắc chắn muốn xóa độc giả này?")
-                //Nút xác nhận xóa
+            //Nút xác nhận xóa
             .setPositiveButton("Có") { dialog, _ ->
                 if (readerId <= 0L) {
                     Toast.makeText(requireContext(), "Không tìm thấy mã độc giả", Toast.LENGTH_SHORT).show()
