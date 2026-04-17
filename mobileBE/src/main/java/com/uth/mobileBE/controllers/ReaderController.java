@@ -2,6 +2,7 @@ package com.uth.mobileBE.controllers;
 
 import com.uth.mobileBE.Utils.SecurityUtils;
 import com.uth.mobileBE.dto.request.CreateReaderRequest;
+import com.uth.mobileBE.dto.request.ExtendMembershipExpiryRequest;
 import com.uth.mobileBE.dto.request.ReaderRequest;
 import com.uth.mobileBE.dto.request.RenewReaderMembershipRequest;
 import com.uth.mobileBE.dto.response.ReaderResponse;
@@ -9,6 +10,7 @@ import com.uth.mobileBE.services.ReaderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -65,6 +67,7 @@ public class ReaderController {
      * @return thông báo xóa thành công
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> delete(@PathVariable Long id) {
         readerService.deleteReader(id);
         return ResponseEntity.ok("Xóa độc giả thành công");
@@ -105,12 +108,17 @@ public class ReaderController {
         return ResponseEntity.ok(readerService.getReadersPaginated(page,size));
     }
 
+
     @PutMapping("/{id}/renew-membership")
     public ResponseEntity<ReaderResponse> renewMembership(
             @PathVariable Long id,
             @RequestBody RenewReaderMembershipRequest request
     ) {
         return ResponseEntity.ok(readerService.renewMembership(id, request));
+    }
+    @PutMapping("/{id}/extend")
+    public ResponseEntity<ReaderResponse> extendMembershipExpiry(@PathVariable Long id,@RequestBody ExtendMembershipExpiryRequest request) {
+        return ResponseEntity.ok(readerService.extendMembershipExpiry(id, request));
     }
 
 }

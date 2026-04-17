@@ -17,7 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quanlythuvien.R
 import com.example.quanlythuvien.core.api.RetrofitClient
-import com.example.quanlythuvien.data.model.request.LoanDetailRequest
+import com.example.quanlythuvien.data.model.request.UpdateLoanDetailRequest
 import com.example.quanlythuvien.data.model.response.LoanResponse
 import com.example.quanlythuvien.data.remote.LoanApiService
 import com.example.quanlythuvien.data.remote.LoanDetailApiService
@@ -43,7 +43,6 @@ class LoanDetailFragment : Fragment() {
     private lateinit var tokenManager: TokenManager
     private lateinit var bookAdapter: LoanDetailAdapter
     private var currentLoanId: Long = 0L
-    private var currentLoanData: LoanResponse? = null
 
     // Tạo biến cục bộ để check quyền Admin
     private var checkIsAdmin: Boolean = false
@@ -80,8 +79,6 @@ class LoanDetailFragment : Fragment() {
         if (currentLoanId != 0L) {
             viewModel.fetchLoanById(currentLoanId)
         }
-
-        // ĐÃ THÊM: Gọi API lấy danh sách sách rảnh rỗi để nạp vào Spinner
         viewModel.fetchAvailableBooks()
     }
 
@@ -128,7 +125,8 @@ class LoanDetailFragment : Fragment() {
     private fun setupRecyclerView() {
         bookAdapter = LoanDetailAdapter(checkIsAdmin) { targetBook, action ->
             when (action) {
-                "EDIT" -> handleEditBook(targetBook)
+                "RETURN" -> handleReturnBook(targetBook)
+                "EDIT" -> handleEditBook(targetBook) // <--- THÊM DÒNG NÀY VÀO ĐÂY
                 "DELETE" -> if (checkIsAdmin) handleDeleteBook(targetBook)
             }
         }
@@ -141,7 +139,6 @@ class LoanDetailFragment : Fragment() {
             viewModel.state.collectLatest { state ->
                 when (state) {
                     is LoanDetailState.Success -> {
-                        currentLoanData = state.loan
                         bindDataToUI(state.loan)
                     }
                     is LoanDetailState.DeleteLoanSuccess -> {
@@ -150,7 +147,7 @@ class LoanDetailFragment : Fragment() {
                     }
                     is LoanDetailState.UpdateBookSuccess -> {
                         setFragmentResult("REFRESH_LOAN_LIST", bundleOf("IS_CHANGED" to true))
-                        Toast.makeText(requireContext(), "Cập nhật thành công", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(), "Thao tác thành công", Toast.LENGTH_SHORT).show()
                     }
                     is LoanDetailState.Error -> {
                         Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
@@ -164,18 +161,20 @@ class LoanDetailFragment : Fragment() {
     private fun bindDataToUI(loan: LoanResponse) {
         tvReaderName.text = loan.readerName
         tvLoanId.text = loan.loanId.toString()
-        tvBorrowDate.text = loan.borrowDate
+        tvBorrowDate.text = formatDisplayDate(loan.borrowDate) // Format cho đẹp nếu cần
         editStatusUI(loan.status, tvStatus)
 
-        val uiDetails = loan.bookDetails?.map { detail ->
+        // Map danh sách sách mượn (sử dụng loanDetails thay cho bookDetails cũ)
+        val uiDetails = loan.loanDetails?.map { detail ->
             LoanDetailItemData(
+                loanDetailId = detail.loanDetailId, // Sử dụng ID chính xác để gọi API
                 bookId = detail.copyId ?: 0L,
-                title = detail.title ?: "Không rõ",
+                title = detail.bookTitle ?: "Không rõ",
                 author = detail.author ?: "Không rõ",
                 categoryName = detail.category ?: "Không rõ",
                 dueDate = formatDisplayDate(detail.dueDate).ifEmpty { "Chưa có" },
                 returnDate = formatDisplayDate(detail.returnDate),
-                status = detail.status ?: "BORROWING"
+                status = detail.status
             )
         } ?: emptyList()
 
@@ -191,93 +190,170 @@ class LoanDetailFragment : Fragment() {
             .show()
     }
 
+    // ==========================================
+// 1. LUỒNG TRẢ SÁCH (DÙNG 4 ENUM CONDITION)
+// ==========================================
+    private fun handleReturnBook(targetBook: LoanDetailItemData) {
+        // Hiển thị tiếng Việt cho thân thiện, gửi giá trị tiếng Anh cho Server
+        val displayConditions = arrayOf(
+            "Mới (NEW) - Sách còn nguyên vẹn",
+            "Tốt (GOOD) - Có dấu hiệu sử dụng nhẹ",
+            "Trung bình (FAIR) - Bị nhăn, mòn góc",
+            "Kém (POOR) - Rách, ướt, không thể tái sử dụng"
+        )
+        val serverConditions = arrayOf("NEW", "GOOD", "FAIR", "POOR")
+        var selectedIndex = 0
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Xác nhận trả sách")
+            .setMessage("Cuốn sách: ${targetBook.title}\nVui lòng đánh giá tình trạng sách khi thu hồi:")
+            .setSingleChoiceItems(displayConditions, selectedIndex) { _, which ->
+                selectedIndex = which
+            }
+            .setPositiveButton("Xác nhận Trả") { dialog, _ ->
+                val condition = serverConditions[selectedIndex]
+                // Khi gửi condition FAIR/POOR, Backend đã có sẵn logic đổi status thành DAMAGED
+                viewModel.returnBook(targetBook.loanDetailId, condition, currentLoanId)
+                dialog.dismiss()
+            }
+            .setNegativeButton("Hủy bỏ", null)
+            .show()
+    }
+
+    // ==========================================
+// 2. LUỒNG SỬA DỮ LIỆU ADMIN (CÓ GIA HẠN NGÀY)
+// ==========================================
     private fun handleEditBook(targetBook: LoanDetailItemData) {
         val dialog = BottomSheetDialog(requireContext())
         val viewDialog = layoutInflater.inflate(R.layout.layout_dialog_edit_loan_detail, null)
         dialog.setContentView(viewDialog)
 
-        // 1. Ánh xạ các View
         val spnStatus = viewDialog.findViewById<Spinner>(R.id.spnEditStatus)
         val edtDueDate = viewDialog.findViewById<EditText>(R.id.edtEditDueDate)
         val btnSave = viewDialog.findViewById<Button>(R.id.btnSaveEdit)
         val btnCancel = viewDialog.findViewById<Button>(R.id.btnCancelEdit)
         val spnReplacementBook = viewDialog.findViewById<Spinner>(R.id.spnSelectBookInLoan)
 
-        // 2. Cài đặt Spinner Trạng thái (Giữ nguyên cũ vì nó dùng item mặc định của Android)
-        val statusList = listOf("BORROWING", "RETURNED_NORMAL", "LATE", "LOST", "DAMAGED")
-        spnStatus.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, statusList)
-        val currentStatusIndex = statusList.indexOf(targetBook.status)
-        if (currentStatusIndex >= 0) spnStatus.setSelection(currentStatusIndex)
-
-        // 3. Cài đặt Spinner Sách thay thế với Custom Adapter
-        val spinnerList = mutableListOf<BookData>()
-        // Thêm option mặc định
-        spinnerList.add(BookData(copyId = 0L, title = "Giữ nguyên (Không đổi)", author = "", categoryName = ""))
-
-        // Lấy dữ liệu hiện tại từ ViewModel
-        val availableCopies = viewModel.availableBooks.value
-        spinnerList.addAll(availableCopies)
-
-        // SỬ DỤNG CUSTOM ADAPTER BẠN VỪA TẠO
-        val replacementAdapter = BookSpinnerAdapter(requireContext(), spinnerList)
-        spnReplacementBook.adapter = replacementAdapter
-
-        // 4. Cài đặt Hạn trả (DatePicker)
+        // Khôi phục hiển thị và chức năng chọn ngày (Gia hạn)
+        edtDueDate.visibility = View.VISIBLE
         edtDueDate.setText(if (targetBook.dueDate == "Chưa có") "" else targetBook.dueDate)
         edtDueDate.setOnClickListener {
             val calendar = Calendar.getInstance()
-            // Nếu đã có ngày trong ô, hãy parse nó để DatePicker mở đúng ngày đó
-            DatePickerDialog(requireContext(), { _, year, month, dayOfMonth ->
-                val newDate = String.format(Locale.getDefault(), "%02d/%02d/%04d", dayOfMonth, month + 1, year)
-                edtDueDate.setText(newDate)
-            }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show()
+            DatePickerDialog(
+                requireContext(),
+                { _, year, month, dayOfMonth ->
+                    val newDate = String.format(
+                        Locale.getDefault(),
+                        "%02d/%02d/%04d",
+                        dayOfMonth,
+                        month + 1,
+                        year
+                    )
+                    edtDueDate.setText(newDate)
+                },
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
+            ).show()
         }
 
-        // 5. Xử lý nút Lưu thay đổi
+        // Cài đặt 3 Trạng thái cho Admin
+        val statusList = listOf("BORROWING", "RETURNED", "LOST")
+        spnStatus.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, statusList)
+
+        val currentStatusIndex = statusList.indexOf(targetBook.status)
+        if (currentStatusIndex >= 0) {
+            spnStatus.setSelection(currentStatusIndex)
+        } else {
+            spnStatus.setSelection(0)
+        }
+
+        val spinnerList = mutableListOf<BookData>()
+        spinnerList.add(BookData(copyId = 0L, title = "Giữ nguyên (Không đổi)", author = "", barcode = ""))
+        val availableCopies = viewModel.availableBooks.value
+        spinnerList.addAll(availableCopies)
+
+        val replacementAdapter = BookSpinnerAdapter(requireContext(), spinnerList)
+        spnReplacementBook.adapter = replacementAdapter
+
+        // ==========================================
+        // XỬ LÝ NÚT LƯU THAY ĐỔI
+        // ==========================================
         btnSave.setOnClickListener {
-            // Lấy Object BookData từ Spinner (Cực kỳ an toàn vì dùng Custom Adapter)
+            val selectedStatus = spnStatus.selectedItem.toString()
             val selectedBookData = spnReplacementBook.selectedItem as BookData
+            val newCopyId = if (selectedBookData.copyId == 0L) targetBook.bookId else selectedBookData.copyId
+            val formattedDueDate = formatIsoDate(edtDueDate.text.toString())
 
-            // Nếu người dùng chọn sách mới (copyId != 0), ta lấy ID mới, nếu không giữ ID cũ
-            val newCopyId = if (selectedBookData.copyId == 0L) {
-                targetBook.bookId
+            // NẾU CHỌN TRẠNG THÁI "RETURNED" -> MỞ DIALOG KIỂM TRA TÌNH TRẠNG
+            if (selectedStatus == "RETURNED") {
+                val displayConditions = arrayOf(
+                    "Mới (NEW) - Sách còn nguyên vẹn",
+                    "Tốt (GOOD) - Có dấu hiệu sử dụng nhẹ",
+                    "Trung bình (FAIR) - Bị nhăn, mòn góc",
+                    "Kém (POOR) - Rách, ướt, không thể tái sử dụng"
+                )
+                val serverConditions = arrayOf("NEW", "GOOD", "FAIR", "POOR") // Thêm mảng này
+                var selectedConditionIndex = 0
+
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle("Đánh giá tình trạng sách")
+                    .setSingleChoiceItems(displayConditions, selectedConditionIndex) { _, which ->
+                        selectedConditionIndex = which
+                    }
+                    .setPositiveButton("Xác nhận") { condDialog, _ ->
+                        val finalStatus = if (selectedConditionIndex >= 2) "DAMAGED" else "RETURNED"
+                        val finalCondition = serverConditions[selectedConditionIndex] // Lấy đúng chữ FAIR/POOR
+
+                        val request = UpdateLoanDetailRequest(
+                            copyId = newCopyId,
+                            status = finalStatus,
+                            dueDate = formattedDueDate,
+                            condition = finalCondition // Gửi thêm tình trạng sách xuống Backend
+                        )
+                        viewModel.updateBookInLoan(targetBook.loanDetailId, request, currentLoanId)
+                        condDialog.dismiss()
+                        dialog.dismiss()
+                    }
+                    .setNegativeButton("Hủy bỏ", null)
+                    .show()
+
             } else {
-                selectedBookData.copyId
+                val request = UpdateLoanDetailRequest(
+                    copyId = newCopyId,
+                    status = selectedStatus,
+                    dueDate = formattedDueDate,
+                    condition = null // Nếu mượn tiếp hoặc làm mất thì không cập nhật condition
+                )
+                viewModel.updateBookInLoan(targetBook.loanDetailId, request, currentLoanId)
+                dialog.dismiss()
             }
-
-            val request = LoanDetailRequest(
-                loanId = currentLoanId,
-                copyId = newCopyId,
-                dueDate = formatIsoDate(edtDueDate.text.toString()),
-                status = spnStatus.selectedItem.toString()
-            )
-
-            // Thực hiện cập nhật qua ViewModel
-            viewModel.updateBookInLoan(currentLoanId, targetBook.bookId, request)
-            dialog.dismiss()
         }
 
-        // 6. Xử lý nút Hủy bỏ
         btnCancel.setOnClickListener { dialog.dismiss() }
-
         dialog.show()
     }
+
     private fun handleDeleteBook(targetBook: LoanDetailItemData) {
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Xóa sách")
-            .setMessage("Xóa cuốn sách này khỏi phiếu mượn?")
+            .setTitle("Xóa sách khỏi phiếu")
+            .setMessage("Bạn muốn xóa cuốn sách '${targetBook.title}' khỏi phiếu mượn này?\nLưu ý: Thao tác này không thể hoàn tác.")
             .setPositiveButton("Xóa") { _, _ ->
-                viewModel.deleteBookFromLoan(currentLoanId, targetBook.bookId)
+                // Gọi API Xóa với ID của chi tiết sách
+                viewModel.deleteBookFromLoan(targetBook.loanDetailId, currentLoanId)
             }
             .setNegativeButton("Hủy", null)
             .show()
     }
 
+    // --- HÀM CẬP NHẬT TRẠNG THÁI UI THEO ENUM MỚI CỦA PHIẾU GỐC ---
     private fun editStatusUI(status: String, tvStatus: TextView) {
-        val (text, color, bg) = when (status) {
-            "BORROWING" -> Triple("Đang mượn", R.color.text_status_info, R.drawable.bg_status_info)
-            "RETURNED"-> Triple("Đã trả", R.color.text_status_success, R.drawable.bg_status_success)
-            else -> Triple("Quá hạn", R.color.text_status_error, R.drawable.bg_status_error)
+        val (text, color, bg) = when (status.uppercase()) {
+            "ACTIVE" -> Triple("Đang hoạt động", R.color.text_status_info, R.drawable.bg_status_info)
+            "COMPLETED"-> Triple("Hoàn tất", R.color.text_status_success, R.drawable.bg_status_success)
+            "OVERDUE" -> Triple("Quá hạn", R.color.text_status_error, R.drawable.bg_status_error)
+            "VIOLATED" -> Triple("Vi phạm", R.color.text_status_error, R.drawable.bg_status_error)
+            else -> Triple("Không xác định", R.color.text_secondary, R.drawable.bg_status_info)
         }
         tvStatus.text = text
         tvStatus.setTextColor(ContextCompat.getColor(requireContext(), color))
@@ -295,14 +371,17 @@ class LoanDetailFragment : Fragment() {
         }
     }
 
-    private fun formatIsoDate(displayDate: String): String {
-        if (displayDate.isEmpty() || displayDate == "Chưa có") return ""
+    // Đã đổi String thành String? (có dấu hỏi chấm)
+    private fun formatIsoDate(displayDate: String): String? {
+        // Đổi return "" thành return null
+        if (displayDate.isEmpty() || displayDate == "Chưa có") return null
+
         return try {
             val sdfIn = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
             val sdfOut = SimpleDateFormat("yyyy-MM-dd'T'00:00:00", Locale.getDefault())
             sdfOut.format(sdfIn.parse(displayDate)!!)
         } catch (e: Exception) {
-            displayDate
+            null // Đổi displayDate thành null
         }
     }
 }

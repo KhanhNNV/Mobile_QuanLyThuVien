@@ -8,7 +8,8 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface LoanApiService {
-    @GET("api/loans/borrowing/count")
+
+    @GET("api/loans/active/count")
     suspend fun countBorrowingLoans(): Response<Long>
 
     @GET("api/loans/overdue/count")
@@ -22,12 +23,9 @@ interface LoanApiService {
         @Query("search") search: String? = null
     ): Response<List<LoanResponse>>
 
-    // Lấy chi tiết phiếu mượn theo ID
     @GET("api/loans/{id}")
     suspend fun getLoanById(@Path("id") id: Long): Response<LoanResponse>
 
-    // Xóa phiếu mượn theo ID
-    // Backend trả về ResponseEntity<Void> nên bên Kotlin mình dùng Response<Unit>
     @DELETE("api/loans/{id}")
     suspend fun deleteLoan(@Path("id") id: Long): Response<Unit>
 }

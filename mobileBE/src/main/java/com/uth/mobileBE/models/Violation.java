@@ -31,6 +31,10 @@ public class Violation {
     @JoinColumn(name = "loan_id")
     private Loan loan;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "loanDetail_id")
+    private LoanDetail loanDetail;
+
     private String reason;
 
     @Enumerated(EnumType.STRING)

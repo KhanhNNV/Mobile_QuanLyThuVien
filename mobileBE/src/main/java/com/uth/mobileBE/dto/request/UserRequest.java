@@ -12,10 +12,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class UserRequest {
-    private Long libraryId;
     private String username;
-    private String password;
     private String fullname;
     private Role role;
     private Boolean isActive;
+    private String password;
 }

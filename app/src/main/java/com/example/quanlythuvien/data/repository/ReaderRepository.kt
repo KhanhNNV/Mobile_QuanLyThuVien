@@ -1,5 +1,6 @@
 package com.example.quanlythuvien.data.repository
 
+import com.example.quanlythuvien.data.model.request.ExtendMembershipExpiryRequest
 import com.example.quanlythuvien.data.model.request.ReaderRequest
 import com.example.quanlythuvien.data.remote.BookApiService
 import com.example.quanlythuvien.data.model.response.ReaderResponse
@@ -18,5 +19,7 @@ class ReaderRepository (private val apiService: ReaderApiService){
     suspend fun editReader(readerId:Long, request: ReaderRequest) = apiService.updateReader(readerId, request)
 
     suspend fun getReaderById(readerId: Long) = apiService.getReaderById(readerId)
+
+    suspend fun extendMembershipExpiry(readerId: Long, request: ExtendMembershipExpiryRequest) = apiService.extendMembershipExpiry(readerId,request)
 
 }

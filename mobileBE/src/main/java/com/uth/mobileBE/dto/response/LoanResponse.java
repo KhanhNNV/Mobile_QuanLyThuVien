@@ -20,8 +20,7 @@ public class LoanResponse {
 
     private StatusLoan status;
 
-    private List<BookDetailInfoDto> bookDetails;
-
+    private List<LoanDetailResponse> loanDetails;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;

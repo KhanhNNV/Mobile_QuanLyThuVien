@@ -34,23 +34,25 @@ class BorrowPayFragment : Fragment() {
 
     // --- VIEW MODELS ---
     private val sharedViewModel: SharedFilterLoanViewModel by activityViewModels()
-    private lateinit var viewModel: BorrowPayViewModel // Thêm ViewModel gọi API
+    private lateinit var viewModel: BorrowPayViewModel
 
     // --- UI COMPONENTS ---
     private lateinit var fasAddLoan: FloatingActionButton
     private lateinit var autoSearch: AutoCompleteTextView
     private lateinit var btnToggleFilter: ImageView
     private lateinit var layoutFilterContainer: ConstraintLayout
-    private lateinit var rgStatus: RadioGroup
-    private lateinit var rbOption1: RadioButton
-    private lateinit var rbOption2: RadioButton
-    private lateinit var rbOption3: RadioButton
+
+    // Đã xóa rgStatus, khai báo đủ 4 nút Radio
+    private lateinit var rbOption1: RadioButton // Overdue
+    private lateinit var rbOption2: RadioButton // Active
+    private lateinit var rbOption3: RadioButton // Complete
+    private lateinit var rbOption4: RadioButton // Violated
+
     private lateinit var edtFromDate: EditText
     private lateinit var edtToDate: EditText
     private lateinit var btnResetFilter: Button
     private lateinit var btnConfirmFilter: Button
     private lateinit var recyclerView: RecyclerView
-    private lateinit var progressBar: ProgressBar // Nên thêm 1 ProgressBar vào file XML để hiện khi tải dữ liệu
 
     // --- ADAPTER ---
     private lateinit var adapter: BorrowPayAdapter
@@ -70,11 +72,9 @@ class BorrowPayFragment : Fragment() {
         observeViewModel()
         setupSharedFilterObserver()
 
-        // Gọi API nạp dữ liệu lần đầu tiên (Tất cả phiếu mượn)
         viewModel.fetchLoans()
     }
 
-    // Mỗi khi màn hình này hiện lại (từ màn Detail quay về), tự động gọi API cập nhật dữ liệu mới nhất
     override fun onResume() {
         super.onResume()
         applyFilter()
@@ -85,22 +85,21 @@ class BorrowPayFragment : Fragment() {
         autoSearch = view.findViewById(R.id.autoSearch)
         btnToggleFilter = view.findViewById(R.id.btnToggleFilter)
         layoutFilterContainer = view.findViewById(R.id.layoutFilterContainer)
-        rgStatus = view.findViewById(R.id.rgStatus)
+
+        // Khởi tạo 4 nút
         rbOption1 = view.findViewById(R.id.rbOption1)
         rbOption2 = view.findViewById(R.id.rbOption2)
         rbOption3 = view.findViewById(R.id.rbOption3)
+        rbOption4 = view.findViewById(R.id.rbOption4)
+
         edtFromDate = view.findViewById(R.id.edtFromDate)
         edtToDate = view.findViewById(R.id.edtToDate)
         btnResetFilter = view.findViewById(R.id.btnResetFilter)
         btnConfirmFilter = view.findViewById(R.id.btnConfirmFilter)
         recyclerView = view.findViewById(R.id.recyclerView)
-
-        // Gợi ý: Hãy thêm thẻ <ProgressBar android:id="@+id/progressBar" ... /> vào file fragment_borrow_pay.xml
-        // progressBar = view.findViewById(R.id.progressBar)
     }
 
     private fun setupViewModel() {
-        // Khởi tạo Retrofit, Repository và ViewModel giống cách làm ở LoginFragment
         val apiService = RetrofitClient.getInstance(requireContext()).create(LoanApiService::class.java)
         val repository = LoanRepository(apiService)
         val factory = GenericViewModelFactory { BorrowPayViewModel(repository) }
@@ -109,7 +108,6 @@ class BorrowPayFragment : Fragment() {
 
     private fun setupRecyclerView() {
         adapter = BorrowPayAdapter { clickedItem ->
-            // BƯỚC QUAN TRỌNG: Chỉ truyền ID sang màn hình Detail, không truyền cả Object nữa
             val bundle = Bundle().apply {
                 putLong("EXTRA_LOAN_ID", clickedItem.loanId)
             }
@@ -122,7 +120,6 @@ class BorrowPayFragment : Fragment() {
     private fun setupListeners() {
         fasAddLoan.setOnClickListener { findNavController().navigate(R.id.loanAddFragment) }
 
-        // Gọi API tìm kiếm mỗi khi người dùng dừng gõ phím
         autoSearch.addTextChangedListener { applyFilter() }
 
         btnToggleFilter.setOnClickListener {
@@ -140,35 +137,49 @@ class BorrowPayFragment : Fragment() {
         edtFromDate.setOnClickListener { showDatePickerForFilter(edtFromDate) }
         edtToDate.setOnClickListener { showDatePickerForFilter(edtToDate) }
 
+        // --- BƯỚC QUAN TRỌNG: Logic thủ công cho 4 RadioButton thay vì RadioGroup ---
+        val radioButtons = listOf(rbOption1, rbOption2, rbOption3, rbOption4)
+        for (rb in radioButtons) {
+            rb.setOnClickListener { clickedView ->
+                // Khi 1 nút được bấm, bỏ tick tất cả các nút khác
+                for (otherRb in radioButtons) {
+                    if (otherRb.id != clickedView.id) {
+                        otherRb.isChecked = false
+                    }
+                }
+            }
+        }
+
         btnConfirmFilter.setOnClickListener { applyFilter() }
 
         btnResetFilter.setOnClickListener {
             edtFromDate.text.clear()
             edtToDate.text.clear()
-            rgStatus.clearCheck()
             autoSearch.text.clear()
-            applyFilter() // Tải lại toàn bộ dữ liệu
+
+            // Bỏ chọn thủ công 4 nút
+            rbOption1.isChecked = false
+            rbOption2.isChecked = false
+            rbOption3.isChecked = false
+            rbOption4.isChecked = false
+
+            applyFilter()
         }
     }
 
-    // --- QUAN SÁT DỮ LIỆU TỪ API TRẢ VỀ ---
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.loanListState.collectLatest { state ->
                 when (state) {
-                    is LoanListState.Idle -> { /* Không làm gì */ }
-                    is LoanListState.Loading -> {
-                        // progressBar.visibility = View.VISIBLE
-                    }
+                    is LoanListState.Idle -> { }
+                    is LoanListState.Loading -> { }
                     is LoanListState.Success -> {
-                        // progressBar.visibility = View.GONE
                         adapter.submitList(state.loans)
                         if (state.loans.isEmpty()) {
                             Toast.makeText(requireContext(), "Không tìm thấy phiếu phù hợp!", Toast.LENGTH_SHORT).show()
                         }
                     }
                     is LoanListState.Error -> {
-                        // progressBar.visibility = View.GONE
                         Toast.makeText(requireContext(), state.error, Toast.LENGTH_LONG).show()
                     }
                 }
@@ -176,28 +187,27 @@ class BorrowPayFragment : Fragment() {
         }
     }
 
-    // --- HÀM GỌI API BỘ LỌC (Thay thế cho logic lọc nội bộ cũ) ---
     private fun applyFilter() {
-        // 1. Lấy trạng thái
-        val status = when (rgStatus.checkedRadioButtonId) {
-            R.id.rbOption1 -> "OVERDUE"
-            R.id.rbOption2 -> "BORROWING"
-            R.id.rbOption3 -> "RETURNED"
+        // 1. Lấy trạng thái thủ công và gửi ĐÚNG CHUẨN ENUM BACKEND MỚI
+        val status = when {
+            rbOption1.isChecked -> "OVERDUE"
+            rbOption2.isChecked -> "ACTIVE"
+            rbOption3.isChecked -> "COMPLETED"
+            rbOption4.isChecked -> "VIOLATED"
             else -> null
         }
 
-        // 2. Lấy ngày và chuyển đổi từ "dd/MM/yyyy" sang chuẩn "yyyy-MM-dd'T'00:00:00" cho Backend
+        // 2. Format ngày
         val fromDateIso = convertDateToIso(edtFromDate.text.toString().trim())
         val toDateIso = convertDateToIso(edtToDate.text.toString().trim())
 
-        // 3. Lấy từ khóa tìm kiếm
+        // 3. Search
         val search = autoSearch.text.toString().trim().takeIf { it.isNotEmpty() }
 
-        // 4. Ra lệnh cho ViewModel gọi API
+        // 4. Gọi API
         viewModel.fetchLoans(status, fromDateIso, toDateIso, search)
     }
 
-    // Hàm chuyển đổi định dạng ngày cho khớp với Backend Spring Boot
     private fun convertDateToIso(dateStr: String): String? {
         if (dateStr.isEmpty()) return null
         return try {
@@ -210,8 +220,6 @@ class BorrowPayFragment : Fragment() {
         }
     }
 
-
-    //Hàm hiển thị DatePicker
     private fun showDatePickerForFilter(editText: EditText) {
         val calendar = Calendar.getInstance()
         DatePickerDialog(requireContext(), { _, year, month, dayOfMonth ->
@@ -226,12 +234,22 @@ class BorrowPayFragment : Fragment() {
                 layoutFilterContainer.visibility = View.VISIBLE
                 btnToggleFilter.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.btn_primary)
                 btnToggleFilter.imageTintList = ContextCompat.getColorStateList(requireContext(), R.color.white)
+
+                // Reset tất cả nút trước khi check nút mới
+                rbOption1.isChecked = false
+                rbOption2.isChecked = false
+                rbOption3.isChecked = false
+                rbOption4.isChecked = false
+
+                // Khớp chính xác với các Enum mới
                 when (type) {
-                    "OVERDUE" -> rgStatus.check(R.id.rbOption1)
-                    "BORROWING" -> rgStatus.check(R.id.rbOption2)
-                    "RETURNED" -> rgStatus.check(R.id.rbOption3)
+                    "OVERDUE" -> rbOption1.isChecked = true
+                    "ACTIVE" -> rbOption2.isChecked = true
+                    "COMPLETED" -> rbOption3.isChecked = true
+                    "VIOLATED" -> rbOption4.isChecked = true
                 }
-                applyFilter() // Lọc ngay lập tức
+
+                applyFilter()
                 sharedViewModel.clearFilter()
             }
         }

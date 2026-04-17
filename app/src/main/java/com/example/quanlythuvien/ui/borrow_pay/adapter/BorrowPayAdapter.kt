@@ -1,6 +1,7 @@
 package com.example.quanlythuvien.ui.borrow_pay.adapter
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -41,27 +42,27 @@ class BorrowPayAdapter(
             // bạn có thể format lại chuỗi item.borrowDate ở ViewModel cho đẹp trước khi đưa vào đây.
             // Tạm thời hiển thị trực tiếp:
             tvBorrowDate.text = item.borrowDate
+            Log.d("ĐỨC", "Dữ liệu borrowDate nhận được: ${item.borrowDate}")
 
             val context = itemView.context
 
             // --- BƯỚC QUAN TRỌNG: Dùng trực tiếp overallStatus từ Backend ---
             when (item.overallStatus.uppercase()) {
-                "BORROWING" -> {
+                "ACTIVE" -> {
                     tvLoanStatus.text = "Đang mượn"
                     updateStatusStyle(context, R.color.text_status_info, R.drawable.bg_status_info)
                 }
-                "RETURNED" -> {
-                    tvLoanStatus.text = "Đã trả"
+                "COMPLETED" -> {
+                    tvLoanStatus.text = "Hoàn tất"
                     updateStatusStyle(context, R.color.text_status_success, R.drawable.bg_status_success)
                 }
                 "OVERDUE" -> {
                     tvLoanStatus.text = "Quá hạn"
                     updateStatusStyle(context, R.color.text_status_error, R.drawable.bg_status_error)
                 }
-                else -> {
-                    // Đề phòng Backend trả về một trạng thái lạ
-                    tvLoanStatus.text = "Không rõ"
-                    updateStatusStyle(context, R.color.text_status_info, R.drawable.bg_status_info)
+                "VIOLATED" -> {
+                    tvLoanStatus.text = "Vi phạm"
+                    updateStatusStyle(context, R.color.text_status_error, R.drawable.bg_status_error) // Có thể đổi màu đỏ đậm hơn nếu muốn
                 }
             }
 

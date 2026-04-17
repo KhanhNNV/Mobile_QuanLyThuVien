@@ -2,17 +2,15 @@ package com.uth.mobileBE.services;
 
 import com.uth.mobileBE.dto.request.ViolationRequest;
 import com.uth.mobileBE.dto.response.ViolationResponse;
-import com.uth.mobileBE.models.Library;
-import com.uth.mobileBE.models.Reader;
-import com.uth.mobileBE.models.Violation;
+import com.uth.mobileBE.models.*;
 import com.uth.mobileBE.models.enums.StatusViolation;
-import com.uth.mobileBE.repositories.LibraryRepository;
-import com.uth.mobileBE.repositories.ReaderRepository;
-import com.uth.mobileBE.repositories.ViolationRepository;
+import com.uth.mobileBE.repositories.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tools.jackson.databind.json.JsonMapper;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,6 +20,9 @@ public class ViolationService {
     private final ViolationRepository violationRepository;
     private final ReaderRepository readerRepository;
     private final LibraryRepository libraryRepository;
+    private final LoanRepository loanRepository;
+    private final LoanDetailRepository loanDetailRepository;
+    private final JsonMapper.Builder builder;
 
     @Transactional
     public ViolationResponse createViolation(ViolationRequest request) {
@@ -31,16 +32,38 @@ public class ViolationService {
         Library library = libraryRepository.findById(request.getLibraryId())
                                            .orElseThrow(() -> new RuntimeException("Không tìm thấy thư viện"));
 
-        Violation violation = Violation.builder()
-                                       .reader(reader)
-                                       .library(library)
-                                       .reason(request.getReason())
-                                       .status(StatusViolation.ACTIVE)
-                                       .build();
+        Violation.ViolationBuilder builder = Violation.builder()
+                .reader(reader)
+                .library(library)
+                .reason(request.getReason())
+                .status(StatusViolation.ACTIVE);
 
-        Violation saved = violationRepository.save(violation);
+        // Chỉ tìm và gắn Loan nếu loanId được gửi lên
+        if (request.getLoanId() != null) {
+            Loan loan = loanRepository.findById(request.getLoanId())
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy Phiếu mượn với ID: " + request.getLoanId()));
+            builder.loan(loan);
+        }
+
+        if (request.getLoanDetailId() != null) {
+            LoanDetail loanDetail = loanDetailRepository.findById(request.getLoanDetailId())
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy Phiếu mượn chi tiết với ID: " + request.getLoanDetailId()));
+            builder.loanDetail(loanDetail);
+        }
+
+        Violation saved = violationRepository.save(builder.build());
         return mapToViolationResponse(saved);
     }
+
+    public void resolveViolationByLoanId(Long loanid) {
+        Violation violation = violationRepository.findByLoan_LoanId(loanid).orElseThrow(()->
+                new RuntimeException("Không tìm thấy phiếu mượn của vi phạm này"));
+        violation.setStatus(StatusViolation.RESOLVED);
+        violation.setUpdatedAt(LocalDateTime.now());
+        violationRepository.save(violation);
+    }
+
+
 
     // --- BỔ SUNG CRUD ---
 

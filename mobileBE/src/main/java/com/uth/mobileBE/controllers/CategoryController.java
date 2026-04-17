@@ -5,8 +5,10 @@ import com.uth.mobileBE.dto.request.CategoryRequest;
 import com.uth.mobileBE.dto.response.CategoryResponse;
 import com.uth.mobileBE.services.CategoryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -48,9 +50,18 @@ public class CategoryController {
     }
 
     // API: DELETE /api/categories/{categoryId}
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{categoryId}")
     public ResponseEntity<String> deleteCategory(@PathVariable Long categoryId) {
-        categoryService.deleteCategory(categoryId);
-        return ResponseEntity.ok("Xóa thể loại thành công!");
+        try {
+            categoryService.deleteCategory(categoryId);
+            return ResponseEntity.ok("Xóa thể loại thành công!");
+        } catch (DataIntegrityViolationException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Không thể xóa! Thể loại này đang có Sách hoặc Chính sách mượn áp dụng.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Lỗi hệ thống: " + e.getMessage());
+        }
     }
 }

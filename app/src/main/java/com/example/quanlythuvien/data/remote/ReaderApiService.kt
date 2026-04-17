@@ -1,5 +1,6 @@
 package com.example.quanlythuvien.data.remote
 
+import com.example.quanlythuvien.data.model.request.ExtendMembershipExpiryRequest
 import com.example.quanlythuvien.data.model.request.ReaderRequest
 import com.example.quanlythuvien.data.model.response.PageResponse
 import com.example.quanlythuvien.data.model.response.ReaderResponse
@@ -32,6 +33,10 @@ interface ReaderApiService {
 
     @GET("api/readers/{id}")
     suspend fun getReaderById(@Path("id") readerId: Long): Response<ReaderResponse>
+
+    @PUT("api/readers/{id}/extend")
+    suspend fun extendMembershipExpiry(@Path("id") readerId: Long,
+                                       @Body request: ExtendMembershipExpiryRequest): Response<ReaderResponse>
     //API gọi delete reader,
     @DELETE("api/readers/{id}")
     suspend fun deleteReader(@Path("id") readerId: Long): Response<Void>

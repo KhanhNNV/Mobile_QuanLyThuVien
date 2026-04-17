@@ -150,7 +150,7 @@
 
     <fragment
         android:id="@+id/staffListFragment"
-        android:name="com.example.quanlythuvien.ui.admin.CrudStaffFragment"
+        android:name="com.example.quanlythuvien.ui.admin.StaffListFragment"
         android:label="Quản lý Nhân viên"
         tools:layout="@layout/fragment_manager_staff_of_admin" />
 

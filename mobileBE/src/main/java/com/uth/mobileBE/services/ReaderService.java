@@ -2,6 +2,7 @@ package com.uth.mobileBE.services;
 
 import com.uth.mobileBE.Utils.SecurityUtils;
 import com.uth.mobileBE.dto.request.CreateReaderRequest;
+import com.uth.mobileBE.dto.request.ExtendMembershipExpiryRequest;
 import com.uth.mobileBE.dto.request.ReaderRequest;
 import com.uth.mobileBE.dto.request.RenewReaderMembershipRequest;
 import com.uth.mobileBE.dto.response.ReaderResponse;
@@ -85,12 +86,12 @@ public class ReaderService {
                 .build();
 
         feeInvoiceRepository.save(feeInvoice);
-        return mapReaderAfterExpirySync(saved);
+        return mapToReaderResponse(saved);
     }
 
     public List<ReaderResponse> getAllReaders() {
         return readerRepository.findAll().stream()
-                               .map(this::mapReaderAfterExpirySync)
+                               .map(this::mapToReaderResponse)
                                .collect(Collectors.toList());
     }
     /**
@@ -102,14 +103,14 @@ public class ReaderService {
         Long libraryId = SecurityUtils.getLibraryId();
         Pageable pageable = PageRequest.of(page, size);
         return readerRepository.findByLibrary_LibraryId(libraryId, pageable)
-                               .map(this::mapReaderAfterExpirySync);
+                               .map(this::mapToReaderResponse);
 
     }
     //Tìm lọc độc giả
     public ReaderResponse getReaderById(Long id) {
         Reader reader = readerRepository.findById(id)
                                         .orElseThrow(() -> new RuntimeException("Không tìm thấy độc giả"));
-        return mapReaderAfterExpirySync(reader);
+        return mapToReaderResponse(reader);
     }
 
     /**Search reader
@@ -122,7 +123,7 @@ public class ReaderService {
         }
         Long libraryId = SecurityUtils.getLibraryId();
         List<Reader> listReader = readerRepository.searchReadersByLibraryId(libraryId, request.trim());
-        return listReader.stream().map(this::mapReaderAfterExpirySync)
+        return listReader.stream().map(reader -> mapToReaderResponse(reader))
                                    .collect(Collectors.toList());
     }
 
@@ -135,6 +136,9 @@ public class ReaderService {
     @Transactional
     public ReaderResponse updateReader(Long id, ReaderRequest request) {
         Long libraryId = SecurityUtils.getLibraryId();
+        String currentUsername = SecurityUtils.getUsername();
+        User currentUser = userRepository.findByUsername(currentUsername)
+                                         .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng hiện tại"));
         Reader reader = readerRepository.findById(id)
                                         .orElseThrow(() -> new RuntimeException("Không tìm thấy độc giả để cập nhật"));
 
@@ -143,35 +147,24 @@ public class ReaderService {
         if (!reader.getLibrary().getLibraryId().equals(libraryId)) {
             throw new RuntimeException("Từ chối truy cập: Bạn không có quyền chỉnh sửa độc giả của thư viện khác.");
         }
+        // Cập nhật các trường thông tin
+        reader.setFullName(request.getFullName());
+        reader.setPhone(request.getPhone());
 
-        User currentUser = userRepository.findByUsername(SecurityUtils.getUsername())
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng hiện tại"));
-        Role role = currentUser.getRole();
-
-        if (role == Role.ADMIN) {
-            reader.setFullName(request.getFullName());
-            reader.setPhone(request.getPhone());
-            if (request.getBarcode() != null && !request.getBarcode().trim().isEmpty()) {
-                reader.setBarcode(request.getBarcode().trim());
-            }
-            if (request.getMembershipExpiry() != null) {
-                reader.setMembershipExpiry(request.getMembershipExpiry());
+        if (currentUser.getRole() == Role.ADMIN) {
+            if (request.getBarcode() != null && !request.getBarcode().equals(reader.getBarcode())) {
+                // Nếu barcode mới khác barcode cũ, kiểm tra xem nó đã tồn tại trong DB chưa
+                if (readerRepository.existsByBarcode(request.getBarcode())) {
+                    throw new RuntimeException("Lỗi: Mã barcode '" + request.getBarcode() + "' đã được sử dụng bởi độc giả khác!");
+                }
+                reader.setBarcode(request.getBarcode());
             }
             if (request.getIsBlocked() != null) {
                 reader.setIsBlocked(request.getIsBlocked());
             }
-        } else if (role == Role.STAFF) {
-            reader.setFullName(request.getFullName());
-            reader.setPhone(request.getPhone());
-            if (request.getIsBlocked() != null) {
-                reader.setIsBlocked(request.getIsBlocked());
-            }
-        } else {
-            throw new RuntimeException("Bạn không có quyền cập nhật độc giả");
+            reader.setMembershipExpiry(request.getMembershipExpiry());
         }
-
         Reader updated = readerRepository.save(reader);
-        updated = syncAutoBlockIfExpired(updated);
         return mapToReaderResponse(updated);
     }
 
@@ -185,7 +178,6 @@ public class ReaderService {
         Long libraryId = SecurityUtils.getLibraryId();
         Reader reader = readerRepository.findById(id)
                                         .orElseThrow(() -> new RuntimeException("Không tìm thấy độc giả để xóa"));
-
 
         //Kiểm tra độc giả này có phi thuộc thư viện này
         if (!reader.getLibrary().getLibraryId().equals(libraryId)) {
@@ -255,27 +247,37 @@ public class ReaderService {
 
         reader.setMembershipExpiry(base.plusDays(request.getExtendMonths().longValue()));
         Reader saved = readerRepository.save(reader);
-        return mapReaderAfterExpirySync(saved);
-    }
 
-    /**
-     * Nếu đã quá ngày hết hạn thẻ thì tự động đánh dấu khóa (block).
-     */
-    private Reader syncAutoBlockIfExpired(Reader reader) {
-        if (reader.getMembershipExpiry() == null) {
-            return reader;
-        }
-        if (LocalDateTime.now().isAfter(reader.getMembershipExpiry()) && !Boolean.TRUE.equals(reader.getIsBlocked())) {
-            reader.setIsBlocked(true);
-            return readerRepository.save(reader);
-        }
-        return reader;
+        return mapToReaderResponse(saved);
     }
+    public ReaderResponse extendMembershipExpiry(Long id, ExtendMembershipExpiryRequest request) {
+        Long currentLibraryId = SecurityUtils.getLibraryId();
+        Library library = libraryRepository.findById(currentLibraryId)
+                                           .orElseThrow(() -> new RuntimeException("Không tìm thấy thư viện"));
 
-    private ReaderResponse mapReaderAfterExpirySync(Reader reader) {
-        return mapToReaderResponse(syncAutoBlockIfExpired(reader));
+        Reader reader=readerRepository.findById(id).orElseThrow(()-> new RuntimeException("Không tìm thấy độc giả này"));
+        LocalDateTime membershipExpiryNew = reader.getMembershipExpiry().plusMonths(request.getMonthRegis());
+        reader.setMembershipExpiry(membershipExpiryNew);
+        Reader saved = readerRepository.save(reader);
+
+        FeeConfig feeRegistration= feeConfigRepository.findByLibrary_LibraryIdAndFeeType(library.getLibraryId(), TypeFeeConfig.REG_NORMAL)
+                                                      .orElseThrow(() -> new RuntimeException("Không tìm thấy phí đăng ký thẻ cho thư viện này"));
+
+        Double totalAmount = feeRegistration.getAmount() * request.getMonthRegis();
+
+
+        FeeInvoice feeInvoice = FeeInvoice.builder()
+                                          .reader(reader)
+                                          .library(library)
+                                          .type(TypeFeeInvoice.RENEWAL)
+                                          .totalAmount(totalAmount)
+                                          .status(StatusFeeInvoice.UNPAID)
+                                          .build();
+
+        feeInvoiceRepository.save(feeInvoice);
+
+        return mapToReaderResponse(saved);
     }
-
     private ReaderResponse mapToReaderResponse(Reader reader) {
         return ReaderResponse.builder()
                              .readerId(reader.getReaderId())
