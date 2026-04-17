@@ -21,11 +21,13 @@ import com.example.quanlythuvien.data.remote.LibraryApiService
 import com.example.quanlythuvien.data.remote.LoanApiService
 import com.example.quanlythuvien.data.remote.LoanDetailApiService
 import com.example.quanlythuvien.data.remote.ReaderApiService
+import com.example.quanlythuvien.data.remote.ViolationApiService
 import com.example.quanlythuvien.data.repository.BookRepository
 import com.example.quanlythuvien.data.repository.LibraryRepository
 import com.example.quanlythuvien.data.repository.LoanDetailRepository
 import com.example.quanlythuvien.data.repository.LoanRepository
 import com.example.quanlythuvien.data.repository.ReaderRepository
+import com.example.quanlythuvien.data.repository.ViolationRepository
 import com.example.quanlythuvien.utils.GenericViewModelFactory
 import com.example.quanlythuvien.utils.TokenManager
 import com.example.quanlythuvien.utils.setupCustomHeader
@@ -44,6 +46,9 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
     private lateinit var cvTotalBorrowing: MaterialCardView
     private lateinit var cvTotalReader: MaterialCardView
     private lateinit var cvTotalDelayed: MaterialCardView
+    private lateinit var cvAddBook: MaterialCardView
+    private lateinit var cvAddLoan: MaterialCardView
+    private lateinit var cvCreateReader: MaterialCardView
     private lateinit var tvTotalBookQuantity: TextView
     private lateinit var tvTotalLoanBorrowing: TextView
     private lateinit var tvTotalLoanDelayed: TextView
@@ -76,6 +81,9 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
         cvTotalBorrowing = view.findViewById(R.id.cvTotalBorrowing)
         cvTotalReader=view.findViewById(R.id.cvTotalReader)
         cvTotalDelayed=view.findViewById(R.id.cvTotalDelayed)
+        cvAddBook=view.findViewById(R.id.cvAddBook)
+        cvAddLoan=view.findViewById(R.id.cvAddLoan)
+        cvCreateReader=view.findViewById(R.id.cvCreateReader)
         tvTotalBookQuantity = view.findViewById(R.id.tvTotalBookQuantity)
         tvTotalLoanBorrowing = view.findViewById(R.id.tvTotalLoanBorrowing)
         tvTotalLoanDelayed = view.findViewById(R.id.tvTotalLoanDelayed)
@@ -93,17 +101,17 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
         val loanApi = retrofit.create(LoanApiService::class.java)
         val readerApi = retrofit.create(ReaderApiService::class.java)
         val loanDetailApi= retrofit.create(LoanDetailApiService::class.java)
-        val libraryApi = retrofit.create(LibraryApiService::class.java)
+        val vioApi=retrofit.create(ViolationApiService::class.java)
 
         // Khởi tạo 3 Repository
         val bookRepo = BookRepository(bookApi)
         val loanRepo = LoanRepository(loanApi)
         val readerRepo = ReaderRepository(readerApi)
         val loanDetailRepo= LoanDetailRepository(loanDetailApi)
-        val libraryRepo = LibraryRepository(libraryApi)
+        val vioRepo= ViolationRepository(vioApi)
 
         val factory = GenericViewModelFactory {
-            DashboardViewModel(bookRepo, loanRepo, readerRepo,loanDetailRepo)
+            DashboardViewModel(bookRepo, loanRepo, readerRepo,loanDetailRepo, vioRepo)
         }
         viewModel = ViewModelProvider(this, factory)[DashboardViewModel::class.java]
 
@@ -195,9 +203,8 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
 
         // Sử dụng SharedViewModel để truyền tín hiệu thay vì dùng Bundle.
         // Tránh lỗi kẹt bộ lọc do app:restoreState="true" tự động khôi phục UI cũ và ghi đè Bundle mới.
-        // Lưu ý: Đích đến (BorrowPay) phải gọi clearFilter() ngay sau khi nhận được lệnh.
         cvTotalBorrowing.setOnClickListener {
-            sharedViewModel.setFilter("BORROWING") // Cập nhật ViewModel
+            sharedViewModel.setFilter("ACTIVE") // Cập nhật ViewModel
             findNavController().navigate(R.id.action_dashboard_to_borrowPay)
         }
 
@@ -206,6 +213,15 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
             findNavController().navigate(R.id.action_dashboard_to_borrowPay)
         }
 
+        cvAddBook.setOnClickListener {
+            findNavController().navigate(R.id.bookAddFragment)
+        }
+        cvAddLoan.setOnClickListener {
+            findNavController().navigate(R.id.createLoanFragment)
+        }
+        cvCreateReader.setOnClickListener {
+            findNavController().navigate(R.id.readerAddFragment)
+        }
     }
 
     private fun loadCountAllBooks(){

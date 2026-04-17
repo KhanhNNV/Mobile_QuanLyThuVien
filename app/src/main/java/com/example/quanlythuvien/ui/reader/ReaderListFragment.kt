@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quanlythuvien.R
 import com.example.quanlythuvien.utils.setupCustomHeader
+import com.example.quanlythuvien.utils.setupHeaderWithBack
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 
@@ -26,10 +27,9 @@ class ReaderListFragment : Fragment(R.layout.fragment_reader_list) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setupCustomHeader(
+        setupHeaderWithBack(
             view = view,
-            title = "Độc giả",
-            subtitle = "*Lấy tổng số độc giả"
+            title = "Độc giả"
         )
 
         val fasAddReader = view.findViewById<FloatingActionButton>(R.id.fasAddReader)

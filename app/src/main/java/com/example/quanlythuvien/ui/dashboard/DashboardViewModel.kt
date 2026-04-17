@@ -7,6 +7,7 @@ import com.example.quanlythuvien.data.repository.LibraryRepository
 import com.example.quanlythuvien.data.repository.LoanDetailRepository
 import com.example.quanlythuvien.data.repository.LoanRepository
 import com.example.quanlythuvien.data.repository.ReaderRepository
+import com.example.quanlythuvien.data.repository.ViolationRepository
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,7 +17,8 @@ class DashboardViewModel(
     private val bookRepository: BookRepository,
     private val loanRepository: LoanRepository,
     private val readerRepository: ReaderRepository,
-    private val loanDetailRepository: LoanDetailRepository
+    private val loanDetailRepository: LoanDetailRepository,
+    private val violationRepository: ViolationRepository
 ) : ViewModel() {
 
     // State Tổng sách
@@ -112,12 +114,18 @@ class DashboardViewModel(
             _alertState.value = AlertState.Loading
             try {
                 // Gọi đồng thời 2 API
+                //lấy số sách có copy available <2
                 val bookAlertsDeferred = async { bookRepository.getLowCopyAlerts() }
+                // lấy số phiếu hết hạn hôm nay
                 val loanAlertsDeferred = async { loanDetailRepository.getDueTodayAlerts() }
+                // lấy số vi phạm chưa xử lý
+                val violationAlertsDeferred = async { violationRepository.getViolationQuantityAlerts() }
 
                 // Đợi 2 API trả về kết quả
                 val bookResponse = bookAlertsDeferred.await()
                 val loanResponse = loanAlertsDeferred.await()
+                val violationResponse = violationAlertsDeferred.await()
+
 
                 val allAlerts = mutableListOf<String>()
 
@@ -127,6 +135,9 @@ class DashboardViewModel(
 
                 if (loanResponse.isSuccessful) {
                     loanResponse.body()?.let { allAlerts.addAll(it) }
+                }
+                if (violationResponse.isSuccessful) {
+                    violationResponse.body()?.let { allAlerts.addAll(it) }
                 }
 
                 if (allAlerts.isEmpty()) {

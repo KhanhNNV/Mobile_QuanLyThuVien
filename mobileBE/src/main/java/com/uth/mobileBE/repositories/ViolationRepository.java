@@ -20,4 +20,6 @@ public interface ViolationRepository extends JpaRepository<Violation,Long> {
 
     List<Violation> findByReader_ReaderIdAndStatus(Long readerId, StatusViolation status);
 
+    Long countByLibrary_LibraryIdAndStatus(Long libraryId, StatusViolation status);
+
 }
