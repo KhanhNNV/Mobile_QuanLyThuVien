@@ -2,6 +2,7 @@ package com.example.quanlythuvien.ui.reader
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.quanlythuvien.core.network.ApiErrorParser
 import com.example.quanlythuvien.data.model.request.ReaderRequest
 import com.example.quanlythuvien.data.model.response.ReaderResponse
 import com.example.quanlythuvien.data.repository.ReaderRepository
@@ -27,13 +28,16 @@ class ReaderAddViewModel(private val repository: ReaderRepository) : ViewModel()
             _addReaderState.value = ReaderAddState.Loading
             try {
                 val response = repository.createReader(request)
-                if (response.isSuccessful && response.body() != null) {
-                    _addReaderState.value = ReaderAddState.Success(response.body()!!)
+                val body = response.body()
+                if (response.isSuccessful && body != null) {
+                    _addReaderState.value = ReaderAddState.Success(body)
                 } else {
-                    _addReaderState.value = ReaderAddState.Error("Lỗi: ${response.code()}")
+                    _addReaderState.value = ReaderAddState.Error(
+                        ApiErrorParser.parseErrorMessage(response, "Không thể thêm độc giả.")
+                    )
                 }
             } catch (e: Exception) {
-                _addReaderState.value = ReaderAddState.Error("Mất kết nối: ${e.message}")
+                _addReaderState.value = ReaderAddState.Error("Mất kết nối: ${e.message ?: "không xác định"}")
             }
         }
     }
@@ -43,13 +47,16 @@ class ReaderAddViewModel(private val repository: ReaderRepository) : ViewModel()
             _addReaderState.value = ReaderAddState.Loading
             try {
                 val response = repository.editReader(readerId, request)
-                if (response.isSuccessful && response.body() != null) {
-                    _addReaderState.value = ReaderAddState.Success(response.body()!!)
+                val body = response.body()
+                if (response.isSuccessful && body != null) {
+                    _addReaderState.value = ReaderAddState.Success(body)
                 } else {
-                    _addReaderState.value = ReaderAddState.Error("Lỗi: ${response.code()}")
+                    _addReaderState.value = ReaderAddState.Error(
+                        ApiErrorParser.parseErrorMessage(response, "Không thể cập nhật độc giả.")
+                    )
                 }
             } catch (e: Exception) {
-                _addReaderState.value = ReaderAddState.Error("Mất kết nối: ${e.message}")
+                _addReaderState.value = ReaderAddState.Error("Mất kết nối: ${e.message ?: "không xác định"}")
             }
         }
     }
@@ -61,10 +68,10 @@ class ReaderAddViewModel(private val repository: ReaderRepository) : ViewModel()
                 if (response.isSuccessful && response.body() != null) {
                     _readerDetail.value = response.body()
                 } else {
-                    _detailLoadError.tryEmit("Không thể tải chi tiết độc giả")
+                    _detailLoadError.tryEmit(ApiErrorParser.parseErrorMessage(response, "Không thể tải chi tiết độc giả."))
                 }
             } catch (e: Exception) {
-                _detailLoadError.tryEmit("Mất kết nối: ${e.message}")
+                _detailLoadError.tryEmit("Mất kết nối: ${e.message ?: "không xác định"}")
             }
         }
     }

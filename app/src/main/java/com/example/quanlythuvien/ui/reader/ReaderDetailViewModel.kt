@@ -4,12 +4,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.quanlythuvien.core.network.ApiErrorParser
 import com.example.quanlythuvien.data.model.request.ReaderRequest
 import com.example.quanlythuvien.data.model.response.ReaderResponse
 import com.example.quanlythuvien.data.repository.ReaderRepository
 import kotlinx.coroutines.launch
 
-class ReaderDetailViewModel(private val repository: ReaderRepository): ViewModel() {
+class ReaderDetailViewModel(private val repository: ReaderRepository) : ViewModel() {
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> get() = _isLoading
 
@@ -25,40 +26,38 @@ class ReaderDetailViewModel(private val repository: ReaderRepository): ViewModel
     private val _readerData = MutableLiveData<ReaderResponse>()
     val readerData: LiveData<ReaderResponse> get() = _readerData
 
-
-
     fun getReaderDetail(readerId: Long) {
         viewModelScope.launch {
             _isLoading.value = true
             try {
                 val response = repository.getReaderById(readerId)
-                if (response.isSuccessful && response.body() != null) {
-                    _readerData.value = response.body()!!
+                val body = response.body()
+                if (response.isSuccessful && body != null) {
+                    _readerData.value = body
                 } else {
-                    _error.value = "Không thể tải chi tiết: ${response.code()}"
+                    _error.value = ApiErrorParser.parseErrorMessage(response, "Không thể tải chi tiết độc giả.")
                 }
             } catch (e: Exception) {
-                _error.value = "Lỗi kết nối: ${e.message}"
+                _error.value = "Lỗi kết nối: ${e.message ?: "không xác định"}"
             } finally {
                 _isLoading.value = false
             }
         }
     }
 
-    //Hàm update
     fun updateReader(readerId: Long, request: ReaderRequest) {
         viewModelScope.launch {
-            //Cờ để biết đang gửi
             _isLoading.value = true
             try {
-                val reponse = repository.editReader(readerId, request)
-                if (reponse.isSuccessful) {
-                    _updateSuccess.value = reponse.body()
+                val response = repository.editReader(readerId, request)
+                val body = response.body()
+                if (response.isSuccessful && body != null) {
+                    _updateSuccess.value = body
                 } else {
-                    _error.value = "Không thể cập nhật: ${reponse.code()}"
+                    _error.value = ApiErrorParser.parseErrorMessage(response, "Không thể cập nhật độc giả.")
                 }
             } catch (e: Exception) {
-                _error.value = "Lỗi kết nối: ${e.message}"
+                _error.value = "Lỗi kết nối: ${e.message ?: "không xác định"}"
             } finally {
                 _isLoading.value = false
             }
@@ -67,17 +66,16 @@ class ReaderDetailViewModel(private val repository: ReaderRepository): ViewModel
 
     fun deleteReader(readerId: Long) {
         viewModelScope.launch {
-            //Cờ để biết đang gửi
             _isLoading.value = true
             try {
-                val reponse = repository.deletedReader(readerId)
-                if (reponse.isSuccessful) {
+                val response = repository.deletedReader(readerId)
+                if (response.isSuccessful) {
                     _deleteSuccess.value = true
                 } else {
-                    _error.value = "Không thể xóa: ${reponse.code()}"
+                    _error.value = ApiErrorParser.parseErrorMessage(response, "Không thể xóa độc giả.")
                 }
             } catch (e: Exception) {
-                _error.value = "Lỗi kết nối: ${e.message}"
+                _error.value = "Lỗi kết nối: ${e.message ?: "không xác định"}"
             } finally {
                 _isLoading.value = false
             }

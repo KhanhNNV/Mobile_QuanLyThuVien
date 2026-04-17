@@ -1,8 +1,8 @@
 package com.example.quanlythuvien.ui.borrow_pay
 
-import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.quanlythuvien.core.network.ApiErrorParser
 import com.example.quanlythuvien.data.model.request.CreateLoanWithDetailsRequest
 import com.example.quanlythuvien.data.repository.BookCopyRepository
 import com.example.quanlythuvien.data.repository.LoanRepository
@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import org.json.JSONObject
 
 class CreateLoanViewModel(
     private val loanRepository: LoanRepository,
@@ -119,61 +118,21 @@ class CreateLoanViewModel(
                 if (response.isSuccessful) {
                     _uiState.update { it.copy(isLoading = false, isCreateSuccess = true) }
                 } else {
-                    // Phân tích lỗi 400 Bad Request
-                    val errorBodyString = response.errorBody()?.string()
-                    parseErrorResponse(errorBodyString)
-                }
-            } catch (e: Exception) {
-                _uiState.update { it.copy(isLoading = false, error = "Mất kết nối: ${e.message}") }
-            }
-        }
-    }
-
-    // Hàm bóc tách JSON lỗi tĩnh
-    private fun parseErrorResponse(errorBodyString: String?) {
-        if (errorBodyString.isNullOrEmpty()) {
-            _uiState.update { it.copy(isLoading = false, error = "Lỗi không xác định từ máy chủ") }
-            return
-        }
-
-        try {
-            val jsonObject = JSONObject(errorBodyString)
-            val detailsOpt = jsonObject.opt("details")
-            val messages = mutableListOf<String>()
-
-            if (detailsOpt is JSONObject) {
-                // Trường hợp 1: Có vi phạm mảng (Object)
-                val mainMsg = detailsOpt.optString("message", "Có vi phạm xảy ra")
-                messages.add(mainMsg)
-
-                val violationsArr = detailsOpt.optJSONArray("violations")
-                if (violationsArr != null) {
-                    for (i in 0 until violationsArr.length()) {
-                        val v = violationsArr.getJSONObject(i)
-                        val reason = v.optString("reason", "")
-                        val bookTitle = v.optString("bookTitle", "")
-
-                        if (reason.isNotEmpty()) {
-                            val bulletPoint = if (bookTitle.isNotEmpty()) "- [$bookTitle] $reason" else "- $reason"
-                            messages.add(bulletPoint)
-                        }
+                    val message = ApiErrorParser.parseRawError(
+                        response.errorBody()?.string(),
+                        "Lỗi không xác định từ máy chủ"
+                    )
+                    _uiState.update { state ->
+                        state.copy(
+                            isLoading = false,
+                            error = message,
+                            violationMessages = if (message.contains("\n")) message.split("\n").filter { it.isNotBlank() } else emptyList()
+                        )
                     }
                 }
-                _uiState.update { it.copy(isLoading = false, violationMessages = messages) }
-
-            } else if (detailsOpt is String) {
-                // Trường hợp 2: Bị khóa tài khoản (String)
-                messages.add(detailsOpt)
-                _uiState.update { it.copy(isLoading = false, violationMessages = messages) }
-
-            } else {
-                // Lỗi chung
-                val message = jsonObject.optString("message", "Lỗi xử lý hệ thống")
-                _uiState.update { it.copy(isLoading = false, error = message) }
+            } catch (e: Exception) {
+                _uiState.update { it.copy(isLoading = false, error = "Mất kết nối: ${e.message ?: "không xác định"}") }
             }
-
-        } catch (e: Exception) {
-            _uiState.update { it.copy(isLoading = false, error = "Lỗi phân tích phản hồi: ${e.message}") }
         }
     }
 }

@@ -164,7 +164,7 @@ class ReaderAddFragment : Fragment(R.layout.fragment_reader_add) {
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.detailLoadError.collect { msg ->
-                Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), msg, Toast.LENGTH_LONG).show()
             }
         }
     }
