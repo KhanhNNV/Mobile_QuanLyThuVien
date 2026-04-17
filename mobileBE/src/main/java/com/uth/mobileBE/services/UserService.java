@@ -29,6 +29,7 @@ public class UserService {
     private final UserRepository userRepository;
     @Autowired
     private final PasswordEncoder passwordEncoder;
+    private final LibraryRepository libraryRepository;
 
     public List<UserResponse> getAllUsersByCurrentLibrary() {
         Long libraryId = SecurityUtils.getLibraryId();
@@ -120,6 +121,32 @@ public class UserService {
         }
 
         userRepository.delete(targetUser);
+    }
+
+    @Transactional
+    public UserResponse createUser(UserRequest request) {
+        // Kiểm tra xem username đã có ai xài chưa
+        if (userRepository.existsByUsername(request.getUsername())) {
+            throw new RuntimeException("Tên đăng nhập đã tồn tại!");
+        }
+
+        // Lấy ID thư viện của người đang thao tác (Admin)
+        Long currentLibraryId = SecurityUtils.getLibraryId();
+        Library library = libraryRepository.findById(currentLibraryId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy thư viện"));
+
+        // Tạo nhân viên mới
+        User newUser = User.builder()
+                .username(request.getUsername())
+                .passwordHash(passwordEncoder.encode(request.getPassword())) // MÃ HÓA MẬT KHẨU
+                .fullname(request.getFullname())
+                .library(library) // Gắn vào cùng thư viện với Admin
+                .role(request.getRole() != null ? request.getRole() : Role.STAFF) // Mặc định là STAFF nếu không truyền
+                .isActive(true) // Mặc định tạo ra là được phép hoạt động
+                .build();
+
+        User savedUser = userRepository.save(newUser);
+        return mapToUserResponse(savedUser);
     }
 
     private void validateRoleUpdate(User currentUser, User targetUser, Role newRole) {

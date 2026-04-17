@@ -184,7 +184,7 @@
 
     <fragment
         android:id="@+id/employeeAddFragment"
-        android:name="com.example.quanlythuvien.ui.employee.EmployeeAddFragment"
+        android:name="com.example.quanlythuvien.ui.admin.StaffAddFragment"
         android:label="Thêm nhân viên "
         tools:layout="@layout/fragment_employee_add"/>
 

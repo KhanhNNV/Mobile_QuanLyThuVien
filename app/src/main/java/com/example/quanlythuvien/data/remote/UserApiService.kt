@@ -1,6 +1,7 @@
 package com.example.quanlythuvien.data.remote
 
 import com.example.quanlythuvien.data.model.request.UpdateUserRequest
+import com.example.quanlythuvien.data.model.request.UserRequest
 import com.example.quanlythuvien.data.model.response.UserResponse
 import retrofit2.Response
 import retrofit2.http.*
@@ -24,4 +25,7 @@ interface UserApiService {
 
     @DELETE("api/users/{id}")
     suspend fun deleteUser(@Path("id") id: Long): Response<String>
+
+    @POST("api/users")
+    suspend fun createUser(@Body request: UserRequest): Response<UserResponse>
 }

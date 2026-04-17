@@ -159,8 +159,7 @@ class StaffListFragment : Fragment(R.layout.fragment_manager_staff_of_admin) {
     }
 
     private fun showAddStaffDialog() {
-        // Hiển thị dialog thêm nhân viên (nếu có)
-        Toast.makeText(requireContext(), "Chức năng thêm nhân viên đang phát triển", Toast.LENGTH_SHORT).show()
+        findNavController().navigate(R.id.employeeAddFragment)
     }
 
     private fun showEditStaffDialog(staffToEdit: UserResponse) {
