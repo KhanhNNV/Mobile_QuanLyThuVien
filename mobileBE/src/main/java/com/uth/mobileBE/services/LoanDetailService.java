@@ -262,7 +262,6 @@ public class LoanDetailService {
                     copy.setStatus(StatusBookCopy.LOST);
                     bookCopyRepository.save(copy);
 
-                    createViolationForDetail(detail, "Sách trễ hạn quá 15 ngày, tự động đánh dấu LOST");
                     double basePrice = detail.getBookCopy().getBook().getBasePrice();
                     FeeConfig feeConfig = feeConfigRepository.findByLibrary_LibraryIdAndFeeType(detail.getLoan().getLibrary().getLibraryId(),TypeFeeConfig.LOST_BOOK)
                             .orElseThrow(()-> new RuntimeException("Chưa có phí phạt mất sách cho thư viện này"));

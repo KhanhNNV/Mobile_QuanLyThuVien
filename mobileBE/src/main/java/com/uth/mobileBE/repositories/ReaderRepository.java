@@ -36,5 +36,7 @@ public interface ReaderRepository extends JpaRepository<Reader, Long> {
      * @return một trang (Page) chứa danh sách các Reader tương ứng với thư viện
      */
     Page<Reader> findByLibrary_LibraryId(Long libraryId, Pageable pageable);
+
+    List<Reader> findByLibrary_LibraryId(Long libraryId);
 }
 

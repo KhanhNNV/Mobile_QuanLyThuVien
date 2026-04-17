@@ -177,8 +177,8 @@
     </fragment>
 
     <fragment
-        android:id="@+id/loanAddFragment"
-        android:name="com.example.quanlythuvien.ui.borrow_pay.LoanAddFragment"
+        android:id="@+id/createLoanFragment"
+        android:name="com.example.quanlythuvien.ui.borrow_pay.CreateLoanFragment"
         android:label="Thêm phiếu mượn"
         tools:layout="@layout/fragment_loan_add" />
 

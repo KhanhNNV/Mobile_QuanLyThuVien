@@ -21,6 +21,7 @@
             android:textStyle="bold"
             android:layout_marginBottom="24dp"/>
 
+        <!-- Phần chọn độc giả -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -28,43 +29,40 @@
             android:textStyle="bold" />
 
         <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"> <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/readerDropdownLayout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/edtLoanReaderId"
-            android:inputType="textCapCharacters"
-            android:hint="@string/pm3"/>
+            android:hint="@string/pm3"
+            app:endIconMode="dropdown_menu">
+
+            <AutoCompleteTextView
+                android:id="@+id/autoCompleteReader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:maxLines="1"
+                android:completionThreshold="1" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
             android:id="@+id/tvReaderName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Tên độc giả: [Chờ nhập mã...]"
+            android:text="Tên độc giả: [Chưa chọn]"
             android:textColor="@color/btn_primary"
             android:textStyle="italic"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="4dp"
             android:layout_marginTop="4dp"
             android:layout_marginStart="4dp"/>
-        <TextView
-            android:id="@+id/tvReaderViolation"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Cảnh báo: Đang có vi phạm chưa xử lý!"
-            android:textColor="@color/red"
-            android:textStyle="bold|italic"
-            android:layout_marginBottom="16dp"
-            android:layout_marginTop="4dp"
-            android:layout_marginStart="4dp"
-            android:visibility="gone"
-            tools:visibility="visible" />
+
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginVertical="16dp"/>
+            android:layout_marginVertical="16dp"
+            android:background="@color/gray"/>
 
+        <!-- Phần chọn sách -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -73,31 +71,78 @@
             android:layout_marginBottom="8dp"/>
 
         <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/bookDropdownLayout"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp">
+            android:hint="Chọn sách để mượn"
+            app:endIconMode="dropdown_menu">
 
             <AutoCompleteTextView
-                android:id="@+id/autoSearchBook"
+                android:id="@+id/autoCompleteBook"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Gõ để tìm mã hoặc tên sách..."
+                android:inputType="text"
+                android:maxLines="1"
                 android:completionThreshold="1" />
         </com.google.android.material.textfield.TextInputLayout>
 
+        <!-- Nút thêm sách -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAddBook"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="16dp"
+            android:text="Thêm sách vào danh sách"
+            android:textColor="@color/white"
+            app:backgroundTint="@color/btn_primary"
+            app:icon="@drawable/ic_add"
+            app:iconGravity="textStart" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="8dp"
+            android:background="@color/gray"/>
+
+        <!-- Tiêu đề danh sách sách đã chọn -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Danh sách sách đã chọn"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginBottom="8dp"
+            android:visibility="gone"
+            android:id="@+id/tvSelectedBooksTitle"/>
+
+        <!-- Danh sách sách đã chọn -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvSelectedBooks"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
+            android:minHeight="100dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:listitem="@layout/item_selected_book"/>
+
+        <TextView
+            android:id="@+id/tvEmptyBookList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Chưa có sách nào được chọn"
+            android:textColor="@color/text_secondary"
+            android:gravity="center"
+            android:padding="16dp"
+            android:textStyle="italic"/>
+
         <View
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1" />
 
+        <!-- Nút điều khiển -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

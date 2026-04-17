@@ -1,5 +1,6 @@
 package com.example.quanlythuvien.data.repository
 
+import com.example.quanlythuvien.data.model.request.CreateLoanWithDetailsRequest
 import com.example.quanlythuvien.data.remote.LoanApiService
 
 class LoanRepository(private val apiService: LoanApiService) {
@@ -21,4 +22,6 @@ class LoanRepository(private val apiService: LoanApiService) {
 
     // Xóa một phiếu mượn
     suspend fun deleteLoan(id: Long) = apiService.deleteLoan(id)
+
+    suspend fun createLoanWithDetails(request: CreateLoanWithDetailsRequest) = apiService.createLoanWithDetails(request)
 }
