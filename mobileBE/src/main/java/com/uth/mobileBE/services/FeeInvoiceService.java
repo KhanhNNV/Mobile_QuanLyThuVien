@@ -3,12 +3,14 @@ package com.uth.mobileBE.services;
 import com.uth.mobileBE.Utils.SecurityUtils;
 import com.uth.mobileBE.dto.request.FeeInvoiceRequest;
 import com.uth.mobileBE.dto.response.FeeInvoiceResponse;
+import com.uth.mobileBE.events.LoanStatusSyncEvent;
 import com.uth.mobileBE.models.*;
 import com.uth.mobileBE.models.enums.StatusFeeInvoice;
 import com.uth.mobileBE.models.enums.StatusLoanDetail;
 import com.uth.mobileBE.models.enums.StatusViolation;
 import com.uth.mobileBE.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +36,12 @@ public class FeeInvoiceService {
 
     @Autowired
     private ViolationRepository violationRepository;
+
+    private final ApplicationEventPublisher eventPublisher;
+
+    public FeeInvoiceService(ApplicationEventPublisher eventPublisher) {
+        this.eventPublisher = eventPublisher;
+    }
 
     @Transactional
     public List<FeeInvoiceResponse> getInvoicesByLibrary(Long libraryId) {
@@ -140,8 +148,9 @@ public class FeeInvoiceService {
                             detail.setStatus(StatusLoanDetail.RETURNED);
                             loanDetailRepository.save(detail);
 
-                        }
+                            eventPublisher.publishEvent(new LoanStatusSyncEvent(detail.getLoan().getLoanId()));
 
+                        }
                         // 2.2 Cập nhật trạng thái Violation (Từ ACTIVE -> RESOLVED)
                         // Gọi repository tìm các vi phạm đang ACTIVE của LoanDetail này
                         List<Violation> activeViolations = violationRepository.findByLoanDetailAndStatus(detail, StatusViolation.ACTIVE);
@@ -158,9 +167,7 @@ public class FeeInvoiceService {
         }
 
         existingInvoice.setUpdateAt(LocalDateTime.now());
-
-        FeeInvoice updatedInvoice = feeInvoiceRepository.save(existingInvoice);
-        return mapToResponse(updatedInvoice);
+        return mapToResponse(feeInvoiceRepository.save(existingInvoice));
     }
 
     public void deleteFeeInvoice(Long id) {

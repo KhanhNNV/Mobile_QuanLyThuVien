@@ -18,4 +18,6 @@ public interface ViolationRepository extends JpaRepository<Violation,Long> {
 
     List<Violation> findByLoanDetailAndStatus(LoanDetail detail, StatusViolation status);
 
+    List<Violation> findByReader_ReaderIdAndStatus(Long readerId, StatusViolation status);
+
 }

@@ -1,13 +1,22 @@
 package com.uth.mobileBE.services;
 
 import com.uth.mobileBE.Utils.LoanSpecification;
+import com.uth.mobileBE.Utils.SecurityUtils;
+import com.uth.mobileBE.dto.request.CreateLoanWithDetailsRequest;
 import com.uth.mobileBE.dto.request.LoanRequest;
 import com.uth.mobileBE.dto.response.LoanDetailResponse;
 import com.uth.mobileBE.dto.response.LoanResponse;
+import com.uth.mobileBE.dto.response.ViolationResponse;
+import com.uth.mobileBE.exceptions.ReaderHasActiveViolationsException;
+import com.uth.mobileBE.mapper.ViolationMapper;
+import com.uth.mobileBE.models.BookCopy;
 import com.uth.mobileBE.models.Loan;
 import com.uth.mobileBE.models.LoanDetail;
+import com.uth.mobileBE.models.Violation;
+import com.uth.mobileBE.models.enums.StatusBookCopy;
 import com.uth.mobileBE.models.enums.StatusLoan;
 import com.uth.mobileBE.models.enums.StatusLoanDetail;
+import com.uth.mobileBE.models.enums.StatusViolation;
 import com.uth.mobileBE.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
@@ -27,6 +36,14 @@ public class LoanService {
     @Autowired private UserRepository userRepository;
     @Autowired private LoanDetailService loanDetailService;
 
+    @Autowired private BookCopyRepository bookCopyRepository;
+    @Autowired private ViolationRepository violationRepository;
+    @Autowired private LoanPolicyRepository loanPolicyRepository;
+    @Autowired private LoanDetailRepository loanDetailRepository;
+    @Autowired
+    private ViolationMapper violationMapper;
+
+
     @Transactional(readOnly = true)
     // Hàm lấy danh sách theo id thư viện có kèm theo bộ lọc
     public List<LoanResponse> getLoansWithFilter(
@@ -43,6 +60,100 @@ public class LoanService {
         return loanRepository.findAll(spec).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
+    }
+
+
+    @Transactional
+    public LoanResponse createLoanWithDetails(CreateLoanWithDetailsRequest request) {
+        Long libaryId= SecurityUtils.getLibraryId();
+        String username = SecurityUtils.getUsername();
+        var library = libraryRepository.findById(libaryId)
+                .orElseThrow(() -> new RuntimeException("Thư viện không tồn tại"));
+        var reader = readerRepository.findById(request.getReaderId())
+                .orElseThrow(() -> new RuntimeException("Người đọc không tồn tại"));
+        var user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Nhân viên không tồn tại"));
+
+
+        // Kiểm tra các Violation đang ACTIVE
+        List<Violation> activeViolations = violationRepository.findByReader_ReaderIdAndStatus(
+                reader.getReaderId(), StatusViolation.ACTIVE);
+
+        if (!activeViolations.isEmpty()) {
+            // Ném lỗi kèm theo danh sách vi phạm để Controller bắt và trả về cho Client
+            throw new ReaderHasActiveViolationsException(
+                    "Độc giả đang có vi phạm chưa xử lý. Không thể mượn sách.", violationMapper.toResponseList(activeViolations));
+        }
+
+        if (reader.getIsBlocked() != null && reader.getIsBlocked()) {
+            throw new RuntimeException("Độc giả này đang bị khóa tài khoản.");
+        }
+
+        Loan loan = Loan.builder()
+                .library(library)
+                .reader(reader)
+                .processedBy(user)
+                .borrowDate(LocalDateTime.now())
+                .status(StatusLoan.ACTIVE)
+                .build();
+
+        loan = loanRepository.save(loan);
+
+        if (loan.getLoanDetails() == null) {
+            loan.setLoanDetails(new java.util.ArrayList<>());
+        }
+
+        // Khởi tạo các Chi tiết Phiếu Mượn (LoanDetail)
+        for (Long copyId : request.getCopyIds()) {
+            BookCopy copy = bookCopyRepository.findById(copyId)
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy mã sách: " + copyId));
+
+            if (copy.getStatus() != StatusBookCopy.AVAILABLE) {
+                throw new RuntimeException("Sách (Copy ID: " + copyId + ") hiện không khả dụng để mượn.");
+            }
+
+            // Tính toán số ngày mượn tối đa dựa trên Policy
+            int maxBorrowDays = calculateMaxBorrowDays(library.getLibraryId(), copy);
+
+            // Tạo LoanDetail
+            LoanDetail detail = LoanDetail.builder()
+                    .loan(loan)
+                    .bookCopy(copy)
+                    .dueDate(LocalDateTime.now().plusDays(maxBorrowDays))
+                    .status(StatusLoanDetail.BORROWING)
+                    .build();
+
+            // Cập nhật trạng thái sách
+            copy.setStatus(StatusBookCopy.BORROWED);
+
+            bookCopyRepository.save(copy);
+            loanDetailRepository.save(detail);
+            loan.getLoanDetails().add(detail);
+        }
+
+        return mapToResponse(loan);
+    }
+
+    // Hàm phụ trợ tính số ngày mượn
+    private int calculateMaxBorrowDays(Long libraryId, BookCopy copy) {
+        Long categoryId = copy.getBook().getCategory() != null ? copy.getBook().getCategory().getCategoryId() : null;
+
+        if (categoryId != null) {
+            // Ưu tiên tìm policy riêng cho category này
+            var categoryPolicy = loanPolicyRepository.findByLibrary_LibraryIdAndCategory_CategoryId(libraryId, categoryId);
+            if (categoryPolicy.isPresent() && categoryPolicy.get().getMaxBorrowDays() != null) {
+                return categoryPolicy.get().getMaxBorrowDays();
+            }
+        }
+
+        // Fallback tìm policy chung (category = null) của thư viện
+        var defaultPolicy = loanPolicyRepository.findByLibrary_LibraryIdAndCategoryIsNull(libraryId);
+        if (defaultPolicy.isPresent() && defaultPolicy.get().getMaxBorrowDays() != null) {
+            return defaultPolicy.get().getMaxBorrowDays();
+        }
+
+        //trả về mặc định nếu thư viện chưa cấu hình bất kỳ policy nào
+        return 30;
     }
 
     @Transactional // Đã bỏ readOnly = true để cho phép lưu trạng thái OVERDUE mới phát hiện

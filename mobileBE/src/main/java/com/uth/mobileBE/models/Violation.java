@@ -1,5 +1,6 @@
 package com.uth.mobileBE.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.uth.mobileBE.models.enums.StatusViolation;
 import jakarta.persistence.*;
 import lombok.*;
@@ -21,10 +22,12 @@ public class Violation {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "library_id", nullable = false)
+    @JsonIgnore
     private Library library;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reader_id", nullable = false)
+    @JsonIgnore
     private Reader reader;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -33,6 +36,7 @@ public class Violation {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "loanDetail_id")
+    @JsonIgnore
     private LoanDetail loanDetail;
 
     private String reason;

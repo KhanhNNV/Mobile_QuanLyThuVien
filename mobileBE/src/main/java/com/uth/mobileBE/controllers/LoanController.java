@@ -1,6 +1,7 @@
 package com.uth.mobileBE.controllers;
 
 import com.uth.mobileBE.Utils.SecurityUtils;
+import com.uth.mobileBE.dto.request.CreateLoanWithDetailsRequest;
 import com.uth.mobileBE.dto.request.LoanRequest;
 import com.uth.mobileBE.dto.response.LoanResponse;
 import com.uth.mobileBE.services.LoanService;
@@ -67,5 +68,11 @@ public class LoanController {
     public ResponseEntity<Long> countOverdueLoans() {
         Long libraryId = SecurityUtils.getLibraryId();
         return ResponseEntity.ok(loanService.countOverdueLoans(libraryId));
+    }
+
+    @PostMapping("/create-with-details")
+    public ResponseEntity<?> createLoanWithDetails(@RequestBody CreateLoanWithDetailsRequest request) {
+        LoanResponse response = loanService.createLoanWithDetails(request);
+        return ResponseEntity.ok(response);
     }
 }

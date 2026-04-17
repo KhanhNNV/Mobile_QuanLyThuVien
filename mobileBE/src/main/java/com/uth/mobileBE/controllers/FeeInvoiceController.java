@@ -19,9 +19,6 @@ public class FeeInvoiceController {
     @Autowired
     private FeeInvoiceService feeInvoiceService;
 
-    @Autowired
-    private LoanDetailService loanDetailService;
-
 
     @GetMapping()
     public ResponseEntity<List<FeeInvoiceResponse>> getInvoicesByLibrary() {
@@ -50,11 +47,7 @@ public class FeeInvoiceController {
     public ResponseEntity<FeeInvoiceResponse> updateFeeInvoice(
             @PathVariable Long id,
             @RequestBody FeeInvoiceRequest request) {
-
-        FeeInvoiceResponse response = feeInvoiceService.updateFeeInvoice(id, request);
-        Long loanId=loanDetailService.getLoanIdByLoanDetailId(response.getLoanDetailId());
-        loanDetailService.syncLoanStatus(loanId);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(feeInvoiceService.updateFeeInvoice(id, request));
     }
 
     @DeleteMapping("/{id}")

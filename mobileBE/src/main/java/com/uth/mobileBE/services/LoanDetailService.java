@@ -5,6 +5,7 @@ import com.uth.mobileBE.dto.request.LoanDetailRequest;
 import com.uth.mobileBE.dto.request.UpdateLoanDetailRequest;
 import com.uth.mobileBE.dto.request.ViolationRequest;
 import com.uth.mobileBE.dto.response.LoanDetailResponse;
+import com.uth.mobileBE.events.LoanStatusSyncEvent;
 import com.uth.mobileBE.models.BookCopy;
 import com.uth.mobileBE.models.FeeConfig;
 import com.uth.mobileBE.models.Loan;
@@ -15,6 +16,7 @@ import com.uth.mobileBE.repositories.FeeConfigRepository;
 import com.uth.mobileBE.repositories.LoanDetailRepository;
 import com.uth.mobileBE.repositories.LoanRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +37,12 @@ public class LoanDetailService {
     private final ViolationService violationService;
     private final FeeConfigRepository feeConfigRepository;
     private final FeeInvoiceService feeInvoiceService;
+
+    @EventListener
+    public void handleLoanStatusSyncEvent(LoanStatusSyncEvent event) {
+        // Lấy loanId từ Event và gọi hàm đồng bộ
+        this.syncLoanStatus(event.getLoanId());
+    }
 
     @Transactional
     public List<LoanDetailResponse> getAllDetails() {

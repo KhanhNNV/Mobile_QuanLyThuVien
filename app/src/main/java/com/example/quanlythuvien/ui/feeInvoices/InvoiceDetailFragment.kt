@@ -214,8 +214,6 @@ class InvoiceDetailFragment : Fragment(R.layout.fragment_invoice_detail) {
             val paymentMethod = when (selectedPaymentIndex) {
                 0 -> "CASH"
                 1 -> "BANK_TRANSFER"
-                2 -> "MOMO"
-                3 -> "ZALOPAY"
                 else -> "CASH"
             }
 
