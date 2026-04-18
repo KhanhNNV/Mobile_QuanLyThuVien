@@ -22,4 +22,5 @@ class ReaderRepository (private val apiService: ReaderApiService){
 
     suspend fun extendMembershipExpiry(readerId: Long, request: ExtendMembershipExpiryRequest) = apiService.extendMembershipExpiry(readerId,request)
 
+    suspend fun getAllReaders()= apiService.getAllReaders()
 }

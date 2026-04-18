@@ -2,6 +2,7 @@ package com.example.quanlythuvien.data.remote
 
 import com.example.quanlythuvien.data.model.request.ExtendMembershipExpiryRequest
 import com.example.quanlythuvien.data.model.request.ReaderRequest
+import com.example.quanlythuvien.data.model.response.BookCopyResponse
 import com.example.quanlythuvien.data.model.response.PageResponse
 import com.example.quanlythuvien.data.model.response.ReaderResponse
 import retrofit2.Response
@@ -46,5 +47,9 @@ interface ReaderApiService {
     suspend fun updateReader(
         @Path("id") readerId: Long, @Body request: ReaderRequest
     ): Response<ReaderResponse>
+
+    @GET("api/readers/all")
+    suspend fun getAllReaders(): Response<List<ReaderResponse>>
+
 
 }

@@ -24,4 +24,6 @@ class LoanSharedViewModel : ViewModel() {
             masterLoanList = data.toMutableList()
         }
     }
+
+
 }

@@ -5,6 +5,7 @@ import com.uth.mobileBE.dto.request.LoanDetailRequest;
 import com.uth.mobileBE.dto.request.UpdateLoanDetailRequest;
 import com.uth.mobileBE.dto.request.ViolationRequest;
 import com.uth.mobileBE.dto.response.LoanDetailResponse;
+import com.uth.mobileBE.events.LoanStatusSyncEvent;
 import com.uth.mobileBE.models.BookCopy;
 import com.uth.mobileBE.models.FeeConfig;
 import com.uth.mobileBE.models.Loan;
@@ -19,6 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,6 +41,12 @@ public class LoanDetailService {
     private final ViolationService violationService;
     private final FeeConfigRepository feeConfigRepository;
     private final FeeInvoiceService feeInvoiceService;
+
+    @EventListener
+    public void handleLoanStatusSyncEvent(LoanStatusSyncEvent event) {
+        // Lấy loanId từ Event và gọi hàm đồng bộ
+        this.syncLoanStatus(event.getLoanId());
+    }
 
     @Transactional
     public List<LoanDetailResponse> getAllDetails() {
@@ -258,7 +266,6 @@ public class LoanDetailService {
                     copy.setStatus(StatusBookCopy.LOST);
                     bookCopyRepository.save(copy);
 
-                    createViolationForDetail(detail, "Sách trễ hạn quá 15 ngày, tự động đánh dấu LOST");
                     double basePrice = detail.getBookCopy().getBook().getBasePrice();
                     FeeConfig feeConfig = feeConfigRepository.findByLibrary_LibraryIdAndFeeType(detail.getLoan().getLibrary().getLibraryId(),TypeFeeConfig.LOST_BOOK)
                             .orElseThrow(()-> new RuntimeException("Chưa có phí phạt mất sách cho thư viện này"));

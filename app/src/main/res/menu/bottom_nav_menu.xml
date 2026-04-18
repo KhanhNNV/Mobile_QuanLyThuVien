@@ -17,11 +17,6 @@
         android:title="Mượn/Trả" />
 
     <item
-        android:id="@+id/readerListFragment"
-        android:icon="@drawable/ic_group"
-        android:title="Độc Giả" />
-
-    <item
         android:id="@+id/invoiceListFragment"
         android:icon="@drawable/outline_ballot_24"
         android:title="Hóa đơn" />

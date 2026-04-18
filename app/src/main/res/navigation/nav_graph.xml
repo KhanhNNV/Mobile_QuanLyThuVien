@@ -177,8 +177,8 @@
     </fragment>
 
     <fragment
-        android:id="@+id/loanAddFragment"
-        android:name="com.example.quanlythuvien.ui.borrow_pay.LoanAddFragment"
+        android:id="@+id/createLoanFragment"
+        android:name="com.example.quanlythuvien.ui.borrow_pay.CreateLoanFragment"
         android:label="Thêm phiếu mượn"
         tools:layout="@layout/fragment_loan_add" />
 
@@ -203,7 +203,13 @@
         android:id="@+id/invoiceDetailFragment"
         android:name="com.example.quanlythuvien.ui.feeInvoices.InvoiceDetailFragment"
         android:label="Chi tiết hóa đơn"
-        tools:layout="@layout/fragment_invoice_detail" />
+        tools:layout="@layout/fragment_invoice_detail">
+        <action
+            android:id="@+id/action_invoiceDetail_to_loanDetail"
+            app:destination="@id/loanFragment" />
+
+    </fragment>
+
 
 
 <!--    =========================================Staff=============================================-->

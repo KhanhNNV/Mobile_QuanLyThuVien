@@ -26,4 +26,7 @@ interface BookCopyApiService {
 
     @DELETE("api/book-copies/{copyId}")
     suspend fun deleteBookCopy(@Path("copyId") copyId: Long): Response<ResponseBody>
+
+    @GET("api/book-copies/available")
+    suspend fun getAvailableCopies(): Response<List<BookCopyResponse>>
 }

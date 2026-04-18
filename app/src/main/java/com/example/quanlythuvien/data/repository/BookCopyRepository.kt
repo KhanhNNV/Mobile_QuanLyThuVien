@@ -56,4 +56,6 @@ class BookCopyRepository(private val apiService: BookCopyApiService) {
             Result.failure(exception)
         }
     }
+
+    suspend fun getAvailableCopies() =apiService.getAvailableCopies()
 }

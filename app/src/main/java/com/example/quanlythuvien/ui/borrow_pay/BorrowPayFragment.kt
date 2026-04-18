@@ -118,7 +118,7 @@ class BorrowPayFragment : Fragment() {
     }
 
     private fun setupListeners() {
-        fasAddLoan.setOnClickListener { findNavController().navigate(R.id.loanAddFragment) }
+        fasAddLoan.setOnClickListener { findNavController().navigate(R.id.createLoanFragment) }
 
         autoSearch.addTextChangedListener { applyFilter() }
 

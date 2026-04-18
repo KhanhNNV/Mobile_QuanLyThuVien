@@ -31,7 +31,6 @@ import java.util.Locale
 class InvoiceDetailFragment : Fragment(R.layout.fragment_invoice_detail) {
 
     private lateinit var viewModel: InvoiceViewModel
-    private lateinit var sharedViewModel: InvoiceSharedViewModel
 
     private lateinit var tvDetailInvoiceId: TextView
     private lateinit var tvDetailReader: TextView
@@ -42,11 +41,16 @@ class InvoiceDetailFragment : Fragment(R.layout.fragment_invoice_detail) {
     private lateinit var spinnerPaymentMethod: Spinner
     private lateinit var btnSave: Button
 
+    private lateinit var layoutLoanDetailLink: View
+    private lateinit var tvLoanDetailId: TextView
+
     private var hasLoadedInvoice = false // Flag để tránh load lại nhiều lần
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupHeaderWithBack(view, "Chi tiết hóa đơn")
+
+        val idFromListInvoice = arguments?.getLong("feeInvoiceId") ?: 0L
 
         initViews(view)
         setupViewModels()
@@ -54,8 +58,13 @@ class InvoiceDetailFragment : Fragment(R.layout.fragment_invoice_detail) {
         observeViewModels()
         handleEvents()
 
+        if(idFromListInvoice!= 0L){
+            viewModel.fetchInvoiceDetail(idFromListInvoice)
+        }else {
+            Toast.makeText(requireContext(), "Lỗi: Không tìm thấy mã hóa đơn", Toast.LENGTH_SHORT).show()
+        }
         // Lấy ID từ SharedViewModel và load dữ liệu
-        loadInvoiceFromSharedViewModel()
+        //loadInvoiceFromSharedViewModel()
     }
 
     private fun initViews(view: View) {
@@ -67,6 +76,9 @@ class InvoiceDetailFragment : Fragment(R.layout.fragment_invoice_detail) {
         spinnerStatus = view.findViewById(R.id.spnUpdateStatus)
         spinnerPaymentMethod = view.findViewById(R.id.spnUpdatePaymentMethod)
         btnSave = view.findViewById(R.id.btnSaveInvoice)
+
+        layoutLoanDetailLink = view.findViewById(R.id.layoutLoanDetailLink)
+        tvLoanDetailId = view.findViewById(R.id.tvLoanDetailId)
     }
 
     private fun setupViewModels() {
@@ -81,8 +93,6 @@ class InvoiceDetailFragment : Fragment(R.layout.fragment_invoice_detail) {
         }
         viewModel = ViewModelProvider(this, factory)[InvoiceViewModel::class.java]
 
-        // SharedViewModel để lấy ID được chọn
-        sharedViewModel = ViewModelProvider(requireActivity())[InvoiceSharedViewModel::class.java]
     }
 
     private fun setupSpinners() {
@@ -104,20 +114,6 @@ class InvoiceDetailFragment : Fragment(R.layout.fragment_invoice_detail) {
         )
         paymentAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerPaymentMethod.adapter = paymentAdapter
-    }
-
-    private fun loadInvoiceFromSharedViewModel() {
-        // Lấy ID từ value
-        val invoiceId = sharedViewModel.selectedInvoiceId.value
-
-        if (invoiceId != null && !hasLoadedInvoice) {
-            hasLoadedInvoice = true
-            viewModel.fetchInvoiceDetail(invoiceId)
-        } else if (invoiceId == null) {
-            // Nếu ko có ID, quay về list
-            Toast.makeText(requireContext(), "Không tìm thấy hóa đơn", Toast.LENGTH_SHORT).show()
-            findNavController().popBackStack()
-        }
     }
 
     private fun observeViewModels() {
@@ -143,7 +139,6 @@ class InvoiceDetailFragment : Fragment(R.layout.fragment_invoice_detail) {
                             is InvoiceState.SuccessAction -> {
                                 Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
                                 // Yêu cầu refresh list trước khi quay lại
-                                sharedViewModel.requestRefreshList()
                                 findNavController().popBackStack()
                             }
                             is InvoiceState.Error -> {
@@ -168,6 +163,24 @@ class InvoiceDetailFragment : Fragment(R.layout.fragment_invoice_detail) {
         tvDetailType.text = "Loại hóa đơn: ${getInvoiceTypeDisplay(invoice.type)}"
         tvDetailAmount.text = "Tổng tiền: ${viewModel.formatCurrency(invoice.totalAmount)}"
         tvDetailCreatedAt.text = "Ngày tạo: ${formatDate(invoice.createdAt)}"
+
+
+        // Hiển thị link tới phiếu mượn (nếu có loanDetailId)
+        if (invoice.loanDetailId != null) {
+            layoutLoanDetailLink.visibility = View.VISIBLE
+            tvLoanDetailId.text = "#${invoice.loanId}"
+
+            // Xử lý sự kiện click để chuyển sang màn hình Chi tiết phiếu mượn
+            layoutLoanDetailLink.setOnClickListener {
+                val bundle = Bundle().apply {
+                    putLong("loanId", invoice.loanId!!) // Truyền ID sang trang kia
+                }
+                // Thay 'action_invoiceDetail_to_loanDetail' bằng ID action trong file nav_graph.xml của bạn
+                findNavController().navigate(R.id.action_invoiceDetail_to_loanDetail, bundle)
+            }
+        } else {
+            layoutLoanDetailLink.visibility = View.GONE
+        }
 
         // Set status
         val statusIndex = when (invoice.status) {
@@ -214,8 +227,6 @@ class InvoiceDetailFragment : Fragment(R.layout.fragment_invoice_detail) {
             val paymentMethod = when (selectedPaymentIndex) {
                 0 -> "CASH"
                 1 -> "BANK_TRANSFER"
-                2 -> "MOMO"
-                3 -> "ZALOPAY"
                 else -> "CASH"
             }
 
@@ -244,12 +255,5 @@ class InvoiceDetailFragment : Fragment(R.layout.fragment_invoice_detail) {
         } catch (e: Exception) {
             dateString
         }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        // Clear selected invoice khi fragment bị destroy
-        sharedViewModel.clearSelectedInvoice()
-        hasLoadedInvoice = false
     }
 }

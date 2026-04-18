@@ -63,55 +63,10 @@ public class ViolationService {
         violationRepository.save(violation);
     }
 
+    public List<String> getViolationQuantityAlerts(Long libraryId) {
+        Long count = violationRepository.countByLibrary_LibraryIdAndStatus(libraryId,StatusViolation.ACTIVE);
 
-
-    // --- BỔ SUNG CRUD ---
-
-    public List<ViolationResponse> getAllViolations() {
-        return violationRepository.findAll().stream()
-                                  .map(this::mapToViolationResponse)
-                                  .collect(Collectors.toList());
-    }
-
-    public ViolationResponse getViolationById(Long id) {
-        Violation violation = violationRepository.findById(id)
-                                                 .orElseThrow(() -> new RuntimeException("Không tìm thấy biên bản vi phạm"));
-        return mapToViolationResponse(violation);
-    }
-
-    public List<ViolationResponse> getViolationsByReaderId(Long readerId) {
-        return violationRepository.findByReaderReaderId(readerId).stream()
-                                  .map(this::mapToViolationResponse)
-                                  .collect(Collectors.toList());
-    }
-
-    @Transactional
-    public ViolationResponse updateViolation(Long id, ViolationRequest request) {
-        Violation violation = violationRepository.findById(id)
-                                                 .orElseThrow(() -> new RuntimeException("Không tìm thấy biên bản vi phạm để cập nhật"));
-
-        if (request.getReason() != null) {
-            violation.setReason(request.getReason());
-        }
-
-        if (request.getStatus() != null) {
-            try {
-                violation.setStatus(StatusViolation.valueOf(request.getStatus().toUpperCase()));
-            } catch (IllegalArgumentException e) {
-                throw new RuntimeException("Trạng thái vi phạm không hợp lệ (Chỉ nhận ACTIVE hoặc RESOLVED)");
-            }
-        }
-
-        Violation updated = violationRepository.save(violation);
-        return mapToViolationResponse(updated);
-    }
-
-    @Transactional
-    public void deleteViolation(Long id) {
-        if (!violationRepository.existsById(id)) {
-            throw new RuntimeException("Không tìm thấy biên bản vi phạm để xóa");
-        }
-        violationRepository.deleteById(id);
+        return List.of("Hiện có " + count + " vi phạm chưa được giải quyết");
     }
 
     private ViolationResponse mapToViolationResponse(Violation v) {

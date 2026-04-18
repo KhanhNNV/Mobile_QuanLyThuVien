@@ -85,7 +85,8 @@ public class ReaderService {
     }
 
     public List<ReaderResponse> getAllReaders() {
-        return readerRepository.findAll().stream()
+        Long currentLibraryId = SecurityUtils.getLibraryId();
+        return readerRepository.findByLibrary_LibraryId(currentLibraryId).stream()
                                .map(this::mapToReaderResponse)
                                .collect(Collectors.toList());
     }

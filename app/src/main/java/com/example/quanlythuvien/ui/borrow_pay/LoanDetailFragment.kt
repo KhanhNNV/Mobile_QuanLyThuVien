@@ -2,6 +2,7 @@ package com.example.quanlythuvien.ui.borrow_pay
 
 import android.app.DatePickerDialog
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -64,7 +65,12 @@ class LoanDetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         tokenManager = TokenManager(requireContext())
-        currentLoanId = arguments?.getLong("EXTRA_LOAN_ID") ?: 0L
+
+        val idFromInvoice = arguments?.getLong("loanId") ?: 0L
+        val idFromList = arguments?.getLong("EXTRA_LOAN_ID") ?: 0L
+
+        // Ưu tiên lấy cái nào có giá trị lớn hơn 0
+        currentLoanId = if (idFromInvoice != 0L) idFromInvoice else idFromList
 
         // LOGIC PHÂN QUYỀN
         val role = tokenManager.getRole()
@@ -78,6 +84,8 @@ class LoanDetailFragment : Fragment() {
 
         if (currentLoanId != 0L) {
             viewModel.fetchLoanById(currentLoanId)
+        } else {
+            Toast.makeText(requireContext(), "Lỗi: Không tìm thấy mã phiếu mượn", Toast.LENGTH_SHORT).show()
         }
         viewModel.fetchAvailableBooks()
     }
