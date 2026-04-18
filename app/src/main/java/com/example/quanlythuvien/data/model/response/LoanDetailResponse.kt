@@ -10,6 +10,7 @@ data class LoanDetailResponse(
     @SerializedName("bookTitle") val bookTitle: String?,
     @SerializedName("author") val author: String?,
     @SerializedName("category") val category: String?,
+    @SerializedName("bookBarcode") val bookBarcode: String?,
     @SerializedName("dueDate") val dueDate: String?,
     @SerializedName("returnDate") val returnDate: String?,
     @SerializedName("status") val status: String,

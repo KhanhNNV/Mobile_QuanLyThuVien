@@ -5,6 +5,7 @@ data class  LoanDetailItemData (
     val bookId:Long,
     val title: String,
     val author: String,
+    val bookBarcode:String,
     val categoryName: String,
     var returnDate: String?,
     var dueDate: String,           // Đổi thành var để gia hạn được

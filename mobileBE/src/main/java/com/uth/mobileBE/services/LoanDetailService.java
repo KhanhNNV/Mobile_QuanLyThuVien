@@ -380,6 +380,7 @@ public class LoanDetailService {
                 .loanId(detail.getLoan().getLoanId())
                 .copyId(detail.getBookCopy().getCopyId())
                 .bookTitle(detail.getBookCopy().getBook().getTitle())
+                .bookBarcode(detail.getBookCopy().getBarcode())
                 .dueDate(detail.getDueDate())
                 .returnDate(detail.getReturnDate())
                 .status(detail.getStatus())

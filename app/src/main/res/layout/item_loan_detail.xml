@@ -74,7 +74,7 @@
             app:constraint_referenced_ids="tvAuthorTitle,tvAuthor" />
 
         <TextView
-            android:id="@+id/tvCatetoryTitle"
+            android:id="@+id/tvCategoryTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
@@ -88,7 +88,7 @@
             app:layout_constraintTop_toBottomOf="@+id/barrierAuthor" />
 
         <TextView
-            android:id="@+id/tvCatetory"
+            android:id="@+id/tvCategory"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -97,17 +97,53 @@
             android:text="Kỹ thuật"
             android:textColor="@color/text_secondary"
             android:textSize="14sp"
-            app:layout_constraintBottom_toBottomOf="@+id/tvCatetoryTitle"
+            app:layout_constraintBottom_toBottomOf="@+id/tvCategoryTitle"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/tvCatetoryTitle"
-            app:layout_constraintTop_toTopOf="@+id/tvCatetoryTitle" />
+            app:layout_constraintStart_toEndOf="@+id/tvCategoryTitle"
+            app:layout_constraintTop_toTopOf="@+id/tvCategoryTitle" />
 
         <androidx.constraintlayout.widget.Barrier
             android:id="@+id/barrierCategory"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:barrierDirection="bottom"
-            app:constraint_referenced_ids="tvCatetoryTitle,tvCatetory" />
+            app:constraint_referenced_ids="tvCategoryTitle,tvCategory" />
+
+        <TextView
+            android:id="@+id/tvBarcodeTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_chip_secondary"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="2dp"
+            android:text="Mã sách:"
+            android:textColor="@color/chip_secondary"
+            android:textSize="14sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/barrierCategory" />
+
+        <TextView
+            android:id="@+id/tvBarcode"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="CPY-10023"
+            android:textColor="@color/text_secondary"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="@+id/tvBarcodeTitle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/tvBarcodeTitle"
+            app:layout_constraintTop_toTopOf="@+id/tvBarcodeTitle" />
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/barrierBarcode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="bottom"
+            app:constraint_referenced_ids="tvBarcodeTitle,tvBarcode" />
 
         <View
             android:id="@+id/divider"
@@ -118,7 +154,7 @@
             android:background="@color/text_tertiary"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/barrierCategory" />
+            app:layout_constraintTop_toBottomOf="@+id/barrierBarcode" />
 
         <TextView
             android:id="@+id/tvDetailStatus"
@@ -136,7 +172,7 @@
             app:layout_constraintTop_toBottomOf="@+id/divider" />
 
         <TextView
-            android:id="@+id/tvNgayTraTitle"
+            android:id="@+id/tvReturnDateTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
@@ -158,10 +194,10 @@
             android:text="20/05/2026"
             android:textColor="@color/text_secondary"
             android:textSize="13sp"
-            app:layout_constraintBottom_toBottomOf="@+id/tvNgayTraTitle"
+            app:layout_constraintBottom_toBottomOf="@+id/tvReturnDateTitle"
             app:layout_constraintEnd_toStartOf="@+id/tvDetailStatus"
-            app:layout_constraintStart_toEndOf="@+id/tvNgayTraTitle"
-            app:layout_constraintTop_toTopOf="@+id/tvNgayTraTitle" />
+            app:layout_constraintStart_toEndOf="@+id/tvReturnDateTitle"
+            app:layout_constraintTop_toTopOf="@+id/tvReturnDateTitle" />
 
         <TextView
             android:id="@+id/tvDetailDueDateTitle"
@@ -176,7 +212,7 @@
             android:textColor="@color/chip_secondary"
             android:textSize="13sp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvNgayTraTitle" />
+            app:layout_constraintTop_toBottomOf="@+id/tvReturnDateTitle" />
 
         <TextView
             android:id="@+id/tvDetailDueDate"

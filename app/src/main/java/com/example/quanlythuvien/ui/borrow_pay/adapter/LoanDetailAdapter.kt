@@ -26,10 +26,11 @@ class LoanDetailAdapter(
 
         private val tvTitle: TextView = itemView.findViewById(R.id.tvTitle)
         private val tvAuthor: TextView = itemView.findViewById(R.id.tvAuthor)
-        private val tvCategory: TextView = itemView.findViewById(R.id.tvCatetory)
+        private val tvCategory: TextView = itemView.findViewById(R.id.tvCategory) // Đã sửa ID cho khớp XML
+        private val tvBarcode: TextView = itemView.findViewById(R.id.tvBarcode)   // Khai báo thêm Barcode
         private val tvStatus: TextView = itemView.findViewById(R.id.tvDetailStatus)
         private val ibtSet: ImageButton = itemView.findViewById(R.id.ibtSet)
-        private val tvNgayTraTitle: TextView = itemView.findViewById(R.id.tvNgayTraTitle)
+        private val tvReturnDateTitle: TextView = itemView.findViewById(R.id.tvReturnDateTitle) // Đã sửa ID cho khớp XML
         private val tvReturnDate: TextView = itemView.findViewById(R.id.tvReturnDate)
         private val tvDueDate: TextView = itemView.findViewById(R.id.tvDetailDueDate)
         private val ivWarningOverdue: ImageView = itemView.findViewById(R.id.ivWarningOverdueDetail)
@@ -42,6 +43,7 @@ class LoanDetailAdapter(
             tvAuthor.text = item.author
             tvCategory.text = item.categoryName
             tvDueDate.text = item.dueDate
+            tvBarcode.text = item.bookBarcode
 
             val currentStatus = item.status
 
@@ -62,11 +64,11 @@ class LoanDetailAdapter(
             // 3. Xử lý ẩn hiện Ngày Trả
             val isReturnedState = currentStatus in listOf("RETURNED", "LOST", "DAMAGED")
             if (isReturnedState && !item.returnDate.isNullOrEmpty()) {
-                tvNgayTraTitle.visibility = View.VISIBLE
+                tvReturnDateTitle.visibility = View.VISIBLE
                 tvReturnDate.visibility = View.VISIBLE
                 tvReturnDate.text = item.returnDate
             } else {
-                tvNgayTraTitle.visibility = View.GONE
+                tvReturnDateTitle.visibility = View.GONE
                 tvReturnDate.visibility = View.GONE
             }
 
@@ -101,6 +103,7 @@ class LoanDetailAdapter(
                     tvDueDate.setTextColor(ContextCompat.getColor(context, R.color.text_secondary))
                 }
             }
+
             // ==========================================
             // 5. HIỂN THỊ HOẶC ẨN MENU POPUP (NÚT 3 CHẤM)
             // ==========================================

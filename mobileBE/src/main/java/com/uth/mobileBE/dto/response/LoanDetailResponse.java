@@ -22,6 +22,7 @@ public class LoanDetailResponse {
 
     private String author;
     private String category;
+    private String bookBarcode;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime dueDate;
