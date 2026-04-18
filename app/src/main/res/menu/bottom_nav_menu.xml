@@ -6,9 +6,9 @@
         android:title="Trang chủ" />
 
     <item
-        android:id="@+id/bookListFragment"
+        android:id="@+id/violationFragment"
         android:icon="@android:drawable/ic_menu_agenda"
-        android:title="Kho Sách" />
+        android:title="Vi phạm" />
 
 
     <item

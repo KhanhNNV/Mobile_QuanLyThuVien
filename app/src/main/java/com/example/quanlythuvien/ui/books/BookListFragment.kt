@@ -34,6 +34,7 @@ import com.example.quanlythuvien.data.repository.CategoryRepository
 import com.example.quanlythuvien.utils.BookWarehousePermissions
 import com.example.quanlythuvien.utils.GenericViewModelFactory
 import com.example.quanlythuvien.utils.setupCustomHeader
+import com.example.quanlythuvien.utils.setupHeaderWithBack
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -79,6 +80,12 @@ class BookListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        setupHeaderWithBack(
+            view = view,
+            title = "Kho sách"
+        )
+
         initViews(view)
         applyWarehouseUiPermissions(view)
         setupRecyclerView()

@@ -13,15 +13,23 @@ data class ViolationResponse(
     @SerializedName("readerName")
     val readerName: String,
 
+    @SerializedName("barcode")
+    val barcode: String,
+
     @SerializedName("reason")
     val reason: String,
 
     @SerializedName("status")
     val status: String,
 
+    val loanDetailId: Long?,
+    val loanId: Long?,
+
     @SerializedName("bookTitle")
     val bookTitle: String?,
 
     @SerializedName("createdAt")
-    val createdAt: String
+    val createdAt: String,
+
+    val updatedAt: String?
 )
