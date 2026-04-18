@@ -131,10 +131,14 @@ class LoanDetailFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        bookAdapter = LoanDetailAdapter(checkIsAdmin) { targetBook, action ->
+        // 1. Lấy role trực tiếp từ TokenManager (nếu null thì để chuỗi rỗng)
+        val role = tokenManager.getRole() ?: ""
+
+        // 2. Truyền role vào Adapter thay vì checkIsAdmin
+        bookAdapter = LoanDetailAdapter(role) { targetBook, action ->
             when (action) {
                 "RETURN" -> handleReturnBook(targetBook)
-                "EDIT" -> handleEditBook(targetBook) // <--- THÊM DÒNG NÀY VÀO ĐÂY
+                "EDIT" -> handleEditBook(targetBook)
                 "DELETE" -> if (checkIsAdmin) handleDeleteBook(targetBook)
             }
         }
@@ -182,6 +186,7 @@ class LoanDetailFragment : Fragment() {
                 categoryName = detail.category ?: "Không rõ",
                 dueDate = formatDisplayDate(detail.dueDate).ifEmpty { "Chưa có" },
                 returnDate = formatDisplayDate(detail.returnDate),
+                bookBarcode = detail.bookBarcode ?: "Chưa có mã",
                 status = detail.status
             )
         } ?: emptyList()
@@ -293,51 +298,65 @@ class LoanDetailFragment : Fragment() {
             val newCopyId = if (selectedBookData.copyId == 0L) targetBook.bookId else selectedBookData.copyId
             val formattedDueDate = formatIsoDate(edtDueDate.text.toString())
 
-            // NẾU CHỌN TRẠNG THÁI "RETURNED" -> MỞ DIALOG KIỂM TRA TÌNH TRẠNG
-            if (selectedStatus == "RETURNED") {
-                val displayConditions = arrayOf(
-                    "Mới (NEW) - Sách còn nguyên vẹn",
-                    "Tốt (GOOD) - Có dấu hiệu sử dụng nhẹ",
-                    "Trung bình (FAIR) - Bị nhăn, mòn góc",
-                    "Kém (POOR) - Rách, ướt, không thể tái sử dụng"
-                )
-                val serverConditions = arrayOf("NEW", "GOOD", "FAIR", "POOR") // Thêm mảng này
-                var selectedConditionIndex = 0
-
-                MaterialAlertDialogBuilder(requireContext())
-                    .setTitle("Đánh giá tình trạng sách")
-                    .setSingleChoiceItems(displayConditions, selectedConditionIndex) { _, which ->
-                        selectedConditionIndex = which
+            when (selectedStatus) {
+                "RETURNED" -> {
+                    // Chặn nếu sách đã được trả rồi
+                    if (targetBook.status == "RETURNED") {
+                        Toast.makeText(requireContext(), "Sách này đã được trả từ trước!", Toast.LENGTH_SHORT).show()
+                        return@setOnClickListener
                     }
-                    .setPositiveButton("Xác nhận") { condDialog, _ ->
-                        val finalStatus = if (selectedConditionIndex >= 2) "DAMAGED" else "RETURNED"
-                        val finalCondition = serverConditions[selectedConditionIndex] // Lấy đúng chữ FAIR/POOR
 
-                        val request = UpdateLoanDetailRequest(
-                            copyId = newCopyId,
-                            status = finalStatus,
-                            dueDate = formattedDueDate,
-                            condition = finalCondition // Gửi thêm tình trạng sách xuống Backend
-                        )
-                        viewModel.updateBookInLoan(targetBook.loanDetailId, request, currentLoanId)
-                        condDialog.dismiss()
-                        dialog.dismiss()
-                    }
-                    .setNegativeButton("Hủy bỏ", null)
-                    .show()
+                    val displayConditions = arrayOf(
+                        "Mới (NEW) - Sách còn nguyên vẹn",
+                        "Tốt (GOOD) - Có dấu hiệu sử dụng nhẹ",
+                        "Trung bình (FAIR) - Bị nhăn, mòn góc",
+                        "Kém (POOR) - Rách, ướt, không thể tái sử dụng"
+                    )
+                    val serverConditions = arrayOf("NEW", "GOOD", "FAIR", "POOR")
+                    var selectedConditionIndex = 0
 
-            } else {
-                val request = UpdateLoanDetailRequest(
-                    copyId = newCopyId,
-                    status = selectedStatus,
-                    dueDate = formattedDueDate,
-                    condition = null // Nếu mượn tiếp hoặc làm mất thì không cập nhật condition
-                )
-                viewModel.updateBookInLoan(targetBook.loanDetailId, request, currentLoanId)
-                dialog.dismiss()
+                    MaterialAlertDialogBuilder(requireContext())
+                        .setTitle("Đánh giá tình trạng sách để Trả")
+                        .setSingleChoiceItems(displayConditions, selectedConditionIndex) { _, which ->
+                            selectedConditionIndex = which
+                        }
+                        .setPositiveButton("Xác nhận") { condDialog, _ ->
+                            val condition = serverConditions[selectedConditionIndex]
+
+                            viewModel.returnBook(targetBook.loanDetailId, condition, currentLoanId)
+
+                            condDialog.dismiss()
+                            dialog.dismiss()
+                        }
+                        .setNegativeButton("Hủy bỏ", null)
+                        .show()
+                }
+
+                "LOST" -> {
+                    // Vẫn gọi API Update Admin. Backend hiện tại đã có logic tạo Violation cho LOST ở hàm updateDetailAdmin.
+                    val request = UpdateLoanDetailRequest(
+                        copyId = newCopyId,
+                        status = "LOST",
+                        dueDate = formattedDueDate,
+                        condition = null
+                    )
+                    viewModel.updateBookInLoan(targetBook.loanDetailId, request, currentLoanId)
+                    dialog.dismiss()
+                }
+
+                "BORROWING" -> {
+                    // Mượn tiếp, gia hạn hoặc đổi sách mới
+                    val request = UpdateLoanDetailRequest(
+                        copyId = newCopyId,
+                        status = "BORROWING",
+                        dueDate = formattedDueDate,
+                        condition = null
+                    )
+                    viewModel.updateBookInLoan(targetBook.loanDetailId, request, currentLoanId)
+                    dialog.dismiss()
+                }
             }
         }
-
         btnCancel.setOnClickListener { dialog.dismiss() }
         dialog.show()
     }

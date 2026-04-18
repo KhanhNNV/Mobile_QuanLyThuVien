@@ -12,7 +12,6 @@ data class LoanResponse(
 
     // ĐỔI TÊN: Từ bookDetails thành loanDetails, đổi kiểu dữ liệu thành LoanDetailResponse
     @SerializedName("loanDetails") val loanDetails: List<LoanDetailResponse>?,
-
     @SerializedName("createdAt") val createdAt: String,
     @SerializedName("updateAt") val updateAt: String
 )

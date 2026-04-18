@@ -276,7 +276,7 @@ public class LoanService {
                             // ĐƯA VÀO ĐÂY MỚI ĐÚNG VỊ TRÍ
                             .author(book.getAuthor())
                             .category(book.getCategory() != null ? book.getCategory().getName() : "Chưa cập nhật")
-
+                            .bookBarcode(detail.getBookCopy().getBarcode())
                             .dueDate(detail.getDueDate())
                             .returnDate(detail.getReturnDate())
                             .status(detail.getStatus())

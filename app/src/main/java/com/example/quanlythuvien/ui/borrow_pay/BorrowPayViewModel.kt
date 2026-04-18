@@ -42,6 +42,7 @@ class BorrowPayViewModel(private val repository: LoanRepository) : ViewModel() {
                                 categoryName = "Không rõ", // Backend chưa trả về, tạm gán
                                 returnDate = detail.returnDate,
                                 dueDate = detail.dueDate ?: "Chưa có",
+                                bookBarcode = detail.bookBarcode ?: "Chưa có mã",
                                 status = detail.status
                             )
                         }?.toMutableList() ?: mutableListOf()
