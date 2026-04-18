@@ -9,6 +9,7 @@ import com.example.quanlythuvien.R
 import com.example.quanlythuvien.data.model.response.LoanDetailResponse
 
 class ReaderDetailAdapter(
+    private var list: List<LoanDetailResponse>,
     private val onBookClick: (LoanDetailResponse) -> Unit
 ) : RecyclerView.Adapter<ReaderDetailAdapter.BooKViewHolder>() {
     private var bookList: List<LoanDetailResponse> = listOf()
@@ -47,16 +48,17 @@ class ReaderDetailAdapter(
 
     class BooKViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val tvBookTitle: TextView = itemView.findViewById(R.id.tvBookTitle)
-        private val tvBookAuthor: TextView = itemView.findViewById(R.id.tvBookAuthor)
-        private val tvBookIsbn: TextView = itemView.findViewById(R.id.tvBookIsbn)
+//        private val tvBookAuthor: TextView = itemView.findViewById(R.id.tvBookAuthor)
+//        private val tvBookIsbn: TextView = itemView.findViewById(R.id.tvBookIsbn)
         private val tvBookBorrowDate: TextView = itemView.findViewById(R.id.tvBorrowDate)
         private val tvBookDueDate: TextView = itemView.findViewById(R.id.tvDueDate)
 
         fun bind(book: LoanDetailResponse) {
             tvBookTitle.text = book.bookTitle
-            tvBookAuthor.text = book.author
+ //           tvBookAuthor.text = book.author ?: "Không có tác giả"
             tvBookBorrowDate.text = "Ngày mượn: ${book.dueDate}" // Cần format nếu là String ISO
             tvBookDueDate.text = "Hạn trả: ${book.returnDate}"
+//            tvBookIsbn.text = "ISBN: ${book.isbn ?: "---"}"
 
             // Highlight màu đỏ nếu quá hạn (Giả định có field isOverdue hoặc check logic)
             if (book.status == "OVERDUE") {

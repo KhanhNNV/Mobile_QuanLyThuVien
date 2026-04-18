@@ -161,6 +161,9 @@
         <action
             android:id="@+id/actionReaderDetailToReaderAdd"
             app:destination="@id/readerAddFragment" />
+        <action
+            android:id="@+id/action_readerDetailFragment_to_loanDetailFragment"
+            app:destination="@id/loanFragment" />
 
     </fragment>
 

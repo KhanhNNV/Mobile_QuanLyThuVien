@@ -42,13 +42,14 @@ import kotlinx.coroutines.launch
 import java.math.BigDecimal
 import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Collections.emptyList
 import java.util.Date
 import kotlin.getValue
 
 class ReaderDetailFragment : Fragment(R.layout.fragment_reader_detail) {
 
     private lateinit var bookAdapter: ReaderDetailAdapter
-    private var allDataMockReaderBook: List<LoanDetailRepository> = emptyList()
+
 
     private val loanSharedViewModel: LoanSharedViewModel by activityViewModels()
 
@@ -106,7 +107,7 @@ class ReaderDetailFragment : Fragment(R.layout.fragment_reader_detail) {
 
 
         bindHeader(view, currentReaderName, currentReaderPhone, currentReaderId, currentReaderDebt, currentReaderTotalBorrowBooks,currentReaderTotalOverdueBooks, currentReaderTotalReturnBooks )
-        setupRecycler(view, currentReaderName)
+        setupRecycler(view)
         setupTabs(view)
         observeViewModel(view)
     }
@@ -154,14 +155,25 @@ class ReaderDetailFragment : Fragment(R.layout.fragment_reader_detail) {
         }
     }
 
-    private fun setupRecycler(view: View, readerName: String) {
-        val rvBooks = view.findViewById<RecyclerView>(R.id.rvReaderBooks)
-        bookAdapter = ReaderDetailAdapter { selectedBook ->
-//            loanSharedViewModel.selectedLoanToView.value = selectedBook
-            findNavController().navigate(R.id.loanFragment)
+    private fun setupRecycler(view: View) {
+        val rcvBooks = view.findViewById<RecyclerView>(R.id.rvReaderBooks)
+
+        // Khởi tạo bookAdapter với callback click
+        bookAdapter = ReaderDetailAdapter(emptyList()) { loanDetail ->
+            // Truyền ID qua Bundle
+            val bundle = Bundle().apply {
+                putLong("loanId", loanDetail.loanId)
+            }
+
+            // Điều hướng sử dụng NavController
+            findNavController().navigate(
+                R.id.action_readerDetailFragment_to_loanDetailFragment,
+                bundle
+            )
         }
-        rvBooks.layoutManager = LinearLayoutManager(requireContext())
-        rvBooks.adapter = bookAdapter
+
+        rcvBooks.layoutManager = LinearLayoutManager(requireContext())
+        rcvBooks.adapter = bookAdapter
     }
 
     private fun setupTabs(view: View) {

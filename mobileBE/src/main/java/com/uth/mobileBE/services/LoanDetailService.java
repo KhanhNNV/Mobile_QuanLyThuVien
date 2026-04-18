@@ -385,7 +385,7 @@ public class LoanDetailService {
      * @param status   Trạng thái chi tiết mượn (BORROWING, RETURNED, ...)
      * @param page     Số trang (bắt đầu từ 0)
      * @param size     Số lượng mỗi trang
-     */
+     */@Transactional(readOnly = true)
     public Page<LoanDetailResponse> getReaderLoanDetails(Long readerId, StatusLoanDetail status, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("dueDate").descending());
         Page<LoanDetail> loanDetails = loanDetailRepository.findByLoan_Reader_ReaderIdAndStatus(readerId, status, pageable);

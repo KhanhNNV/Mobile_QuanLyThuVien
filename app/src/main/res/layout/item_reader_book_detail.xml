@@ -52,43 +52,43 @@
                 android:maxLines="1"
                 android:ellipsize="end" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="2dp"
-                android:gravity="bottom">
+<!--            <LinearLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:orientation="horizontal"-->
+<!--                android:layout_marginTop="2dp"-->
+<!--                android:gravity="bottom">-->
 
-                <TextView
-                    android:id="@+id/tvBookAuthor"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Tên tác giả"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="12sp"
-                    android:maxLines="1"
-                    android:ellipsize="end" />
+<!--                <TextView-->
+<!--                    android:id="@+id/tvBookAuthor"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:text="Tên tác giả"-->
+<!--                    android:textColor="@color/text_secondary"-->
+<!--                    android:textSize="12sp"-->
+<!--                    android:maxLines="1"-->
+<!--                    android:ellipsize="end" />-->
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text=" • "
-                    android:textColor="@color/text_secondary"
-                    android:textSize="12sp"
-                    android:layout_marginHorizontal="4dp" />
+<!--                <TextView-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:text=" • "-->
+<!--                    android:textColor="@color/text_secondary"-->
+<!--                    android:textSize="12sp"-->
+<!--                    android:layout_marginHorizontal="4dp" />-->
 
-                <TextView
-                    android:id="@+id/tvBookIsbn"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="ISBN"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="11sp"
-                    android:maxLines="1"
-                    android:ellipsize="end" />
+<!--                <TextView-->
+<!--                    android:id="@+id/tvBookIsbn"-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_weight="1"-->
+<!--                    android:text="ISBN"-->
+<!--                    android:textColor="@color/text_secondary"-->
+<!--                    android:textSize="11sp"-->
+<!--                    android:maxLines="1"-->
+<!--                    android:ellipsize="end" />-->
 
-            </LinearLayout>
+<!--            </LinearLayout>-->
 
             <LinearLayout
                 android:layout_width="wrap_content"
