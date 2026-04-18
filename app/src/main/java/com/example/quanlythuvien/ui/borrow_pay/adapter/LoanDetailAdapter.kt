@@ -18,7 +18,7 @@ import java.util.Calendar
 import java.util.Locale
 
 class LoanDetailAdapter(
-    private val isAdmin: Boolean,
+    private val userRole: String,
     private val onMenuActionClick: (LoanDetailItemData, String) -> Unit
 ) : ListAdapter<LoanDetailItemData, LoanDetailAdapter.BookViewHolder>(BookDiffCallback()) {
 
@@ -101,33 +101,49 @@ class LoanDetailAdapter(
                     tvDueDate.setTextColor(ContextCompat.getColor(context, R.color.text_secondary))
                 }
             }
-// ==========================================
-// 5. HIỂN THỊ MENU POPUP (CHỨA NÚT EDIT)
-// ==========================================
-            ibtSet.setOnClickListener { view ->
-                val popup = PopupMenu(context, view)
+            // ==========================================
+            // 5. HIỂN THỊ HOẶC ẨN MENU POPUP (NÚT 3 CHẤM)
+            // ==========================================
+            val isAdmin = userRole == "ADMIN" || userRole == "ROLE_ADMIN"
+            val isStaff = userRole == "STAFF" || userRole == "ROLE_STAFF"
+            val isBorrowing = currentStatus == "BORROWING"
 
+            // BƯỚC 1: QUYẾT ĐỊNH HIỂN THỊ HAY ẨN NÚT 3 CHẤM
+            if (isAdmin || (isStaff && isBorrowing)) {
+                ibtSet.visibility = View.VISIBLE
 
-                // Nút "Sửa thông tin" (MẶC ĐỊNH CHO TẤT CẢ MỌI NGƯỜI)
-                popup.menu.add(0, 1, 0, "Sửa thông tin")
+                // BƯỚC 2: GÁN SỰ KIỆN CLICK (Chỉ gán 1 lần)
+                ibtSet.setOnClickListener { view ->
+                    val popup = PopupMenu(context, view)
 
-                // Nút "Xóa" (CHỈ DÀNH CHO ADMIN)
-                if (isAdmin) {
-                    popup.menu.add(0, 2, 0, "Xóa chi tiết")
-                }
-
-                // Bắt sự kiện khi click vào menu
-                popup.setOnMenuItemClickListener { menuItem ->
-                    when (menuItem.itemId) {
-                        1 -> onMenuActionClick(item, "EDIT")   // Sửa sách
-                        2 -> onMenuActionClick(item, "DELETE") // Xóa sách
+                    // Thêm lựa chọn "Sửa thông tin"
+                    if (isAdmin || (isStaff && isBorrowing)) {
+                        popup.menu.add(0, 1, 0, "Sửa thông tin")
                     }
-                    true
+
+                    // Thêm lựa chọn "Xóa" (CHỈ DÀNH CHO ADMIN)
+                    if (isAdmin) {
+                        popup.menu.add(0, 2, 0, "Xóa chi tiết")
+                    }
+
+                    // Bắt sự kiện khi click vào menu
+                    popup.setOnMenuItemClickListener { menuItem ->
+                        when (menuItem.title) {
+                            "Sửa thông tin" -> onMenuActionClick(item, "EDIT")
+                            "Xóa chi tiết" -> onMenuActionClick(item, "DELETE")
+                        }
+                        true
+                    }
+                    popup.show()
                 }
-                popup.show()
+            } else {
+                // Nếu là Staff và sách ĐÃ TRẢ / QUÁ HẠN / MẤT... -> Ẩn luôn nút 3 chấm
+                ibtSet.visibility = View.GONE
             }
 
-            // Click vào thẻ sách cũng mở Trả sách nếu chưa trả
+            // ==========================================
+            // 6. XỬ LÝ CLICK VÀO TOÀN BỘ ITEM (TRẢ SÁCH)
+            // ==========================================
             itemView.setOnClickListener {
                 if (currentStatus == "BORROWING" || currentStatus == "OVERDUE") {
                     onMenuActionClick(item, "RETURN")
@@ -135,7 +151,6 @@ class LoanDetailAdapter(
             }
         }
     }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BookViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_loan_detail, parent, false)
         return BookViewHolder(view)

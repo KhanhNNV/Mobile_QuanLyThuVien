@@ -131,10 +131,14 @@ class LoanDetailFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        bookAdapter = LoanDetailAdapter(checkIsAdmin) { targetBook, action ->
+        // 1. Lấy role trực tiếp từ TokenManager (nếu null thì để chuỗi rỗng)
+        val role = tokenManager.getRole() ?: ""
+
+        // 2. Truyền role vào Adapter thay vì checkIsAdmin
+        bookAdapter = LoanDetailAdapter(role) { targetBook, action ->
             when (action) {
                 "RETURN" -> handleReturnBook(targetBook)
-                "EDIT" -> handleEditBook(targetBook) // <--- THÊM DÒNG NÀY VÀO ĐÂY
+                "EDIT" -> handleEditBook(targetBook)
                 "DELETE" -> if (checkIsAdmin) handleDeleteBook(targetBook)
             }
         }
