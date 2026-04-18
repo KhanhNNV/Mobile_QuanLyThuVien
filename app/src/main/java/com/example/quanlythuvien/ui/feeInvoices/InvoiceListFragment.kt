@@ -20,13 +20,9 @@ import com.example.quanlythuvien.R
 import com.example.quanlythuvien.core.api.RetrofitClient
 import com.example.quanlythuvien.data.model.response.FeeInvoiceResponse
 import com.example.quanlythuvien.data.remote.FeeInvoiceApiService
-import com.example.quanlythuvien.data.remote.ReaderApiService
 import com.example.quanlythuvien.data.repository.FeeInvoiceRepository
-import com.example.quanlythuvien.data.repository.ReaderRepository
-
 import com.example.quanlythuvien.utils.GenericViewModelFactory
 import com.example.quanlythuvien.utils.setupCustomHeader
-import com.example.quanlythuvien.utils.setupHeaderWithBack
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -47,20 +43,20 @@ class InvoiceListFragment : Fragment(R.layout.fragment_invoice_list) {
         setupRecyclerView()
         setupSearchAndFilter()
         observeViewModels()
-        viewModel.fetchInvoices()
+
+        viewModel.fetchInvoices(isRefresh = true)
     }
 
     private fun initViews(view: View) {
         recyclerView = view.findViewById(R.id.recyclerViewInvoice)
         autoSearch = view.findViewById(R.id.autoSearchInvoice)
         spinnerStatus = view.findViewById(R.id.spnStatusFilter)
+
     }
 
     private fun setupViewModels() {
         val retrofit = RetrofitClient.getInstance(requireContext())
-
         val invoiceApiService = retrofit.create(FeeInvoiceApiService::class.java)
-
         val invoiceRepository = FeeInvoiceRepository(invoiceApiService)
 
         val factory = GenericViewModelFactory {
@@ -70,21 +66,38 @@ class InvoiceListFragment : Fragment(R.layout.fragment_invoice_list) {
     }
 
     private fun setupRecyclerView() {
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        val layoutManager = LinearLayoutManager(requireContext())
+        recyclerView.layoutManager = layoutManager
         invoiceAdapter = InvoiceAdapter(
             invoiceList = mutableListOf(),
             onItemClick = { invoice ->
-                // Dùng SharedViewModel để lưu ID và chuyển trang
-                val bundle = Bundle().apply {
-                    putLong("feeInvoiceId", invoice.invoiceId!!) // Truyền ID sang trang kia
-                }
-                findNavController().navigate(R.id.action_invoiceList_to_invoiceDetail,bundle)
+                val bundle = Bundle().apply { putLong("feeInvoiceId", invoice.invoiceId!!) }
+                findNavController().navigate(R.id.action_invoiceList_to_invoiceDetail, bundle)
             },
-            onOptionsClick = { invoice, view ->
-                showPopupMenu(invoice, view)
+            onOptionsClick = { invoice, anchorView ->
+                showPopupMenu(invoice, anchorView)
             }
         )
         recyclerView.adapter = invoiceAdapter
+
+        // Lắng nghe sự kiện cuộn xuống cuối danh sách
+        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(rv: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(rv, dx, dy)
+                if (dy > 0) { // Đang cuộn xuống
+                    val visibleItemCount = layoutManager.childCount
+                    val totalItemCount = layoutManager.itemCount
+                    val pastVisibleItems = layoutManager.findFirstVisibleItemPosition()
+
+                    if (!viewModel.isLoading && !viewModel.isLastPage) {
+                        if ((visibleItemCount + pastVisibleItems) >= totalItemCount) {
+                            // Gọi load trang tiếp theo
+                            viewModel.fetchInvoices(isRefresh = false)
+                        }
+                    }
+                }
+            }
+        })
     }
 
     private fun setupSearchAndFilter() {
@@ -111,11 +124,9 @@ class InvoiceListFragment : Fragment(R.layout.fragment_invoice_list) {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                if (s != null && s.length >= 2) {
-                    viewModel.searchInvoices(s.toString())
-                } else if (s.isNullOrEmpty()) {
-                    viewModel.searchInvoices("")
-                }
+                // Tải lại từ đầu (isRefresh = true) với từ khóa mới
+                val keyword = s?.toString()?.trim()?.ifEmpty { null }
+                viewModel.fetchInvoices(isRefresh = true, keyword = keyword)
             }
 
             override fun afterTextChanged(s: android.text.Editable?) {}
@@ -126,7 +137,7 @@ class InvoiceListFragment : Fragment(R.layout.fragment_invoice_list) {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
-                    viewModel.filteredInvoices.collectLatest { invoices ->
+                    viewModel.invoices.collectLatest { invoices ->
                         invoiceAdapter.updateData(invoices)
                     }
                 }
@@ -134,11 +145,6 @@ class InvoiceListFragment : Fragment(R.layout.fragment_invoice_list) {
                 launch {
                     viewModel.state.collectLatest { state ->
                         when (state) {
-                            is InvoiceState.Loading -> {
-                            }
-                            is InvoiceState.SuccessList -> {
-                                // Dữ liệu đã được cập nhật thông qua luồng filteredInvoices
-                            }
                             is InvoiceState.SuccessAction -> {
                                 Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
                             }
@@ -149,26 +155,19 @@ class InvoiceListFragment : Fragment(R.layout.fragment_invoice_list) {
                         }
                     }
                 }
-
             }
         }
     }
-
 
     private fun showPopupMenu(invoice: FeeInvoiceResponse, anchorView: View) {
         val popup = PopupMenu(requireContext(), anchorView)
         popup.menuInflater.inflate(R.menu.menu_invoice_options, popup.menu)
 
-
-
         popup.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.action_view_detail -> {
-                    val bundle = Bundle().apply {
-                        putLong("feeInvoiceId", invoice.invoiceId!!)
-                    }
+                    val bundle = Bundle().apply { putLong("feeInvoiceId", invoice.invoiceId!!) }
                     findNavController().navigate(R.id.action_invoiceList_to_invoiceDetail, bundle)
-
                     true
                 }
                 R.id.action_print -> {

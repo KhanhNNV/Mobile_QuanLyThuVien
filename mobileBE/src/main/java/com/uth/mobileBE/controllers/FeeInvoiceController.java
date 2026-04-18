@@ -3,9 +3,11 @@ package com.uth.mobileBE.controllers;
 import com.uth.mobileBE.Utils.SecurityUtils;
 import com.uth.mobileBE.dto.request.FeeInvoiceRequest;
 import com.uth.mobileBE.dto.response.FeeInvoiceResponse;
+import com.uth.mobileBE.models.enums.StatusFeeInvoice;
 import com.uth.mobileBE.services.FeeInvoiceService;
 import com.uth.mobileBE.services.LoanDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,6 +32,19 @@ public class FeeInvoiceController {
         }
 
         return ResponseEntity.ok(invoices); // Trả về 200 kèm danh sách hóa đơn
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<FeeInvoiceResponse>> searchInvoices(
+            @RequestParam(value = "keyword", required = false) String keyword,
+            @RequestParam(value = "status", required = false) StatusFeeInvoice status,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            @RequestParam(value = "sortBy", defaultValue = "createdAt") String sortBy,
+            @RequestParam(value = "sortDir", defaultValue = "desc") String sortDir
+    ) {
+        Page<FeeInvoiceResponse> responsePage = feeInvoiceService.searchAndPaginateInvoices(keyword, page, size, sortBy, sortDir,status);
+        return ResponseEntity.ok(responsePage);
     }
 
     @PostMapping

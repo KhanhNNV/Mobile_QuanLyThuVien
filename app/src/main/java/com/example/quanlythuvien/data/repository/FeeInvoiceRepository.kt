@@ -12,6 +12,6 @@ class FeeInvoiceRepository(private val apiService: FeeInvoiceApiService) {
     suspend fun updateInvoice(id: Long, request: UpdateInvoiceRequest) =
         apiService.updateInvoice(id, request)
 
-    suspend fun searchInvoices(keyword: String, status: String? = null) =
-        apiService.searchInvoices(keyword, status)
+    suspend fun searchInvoices(keyword: String? = null,status: String?=null, page: Int = 0, size: Int = 10) =
+        apiService.searchInvoices(keyword = keyword,status=status, page = page, size = size)
 }

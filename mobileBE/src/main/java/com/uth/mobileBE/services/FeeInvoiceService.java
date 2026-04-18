@@ -11,6 +11,10 @@ import com.uth.mobileBE.models.enums.StatusViolation;
 import com.uth.mobileBE.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,6 +53,39 @@ public class FeeInvoiceService {
                 .stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public Page<FeeInvoiceResponse> searchAndPaginateInvoices(String keyword, int page, int size, String sortBy, String sortDir,StatusFeeInvoice status) {
+        Long libraryId = SecurityUtils.getLibraryId();
+
+        Long searchId = null;
+        String searchKeyword = null;
+
+        // Tiền xử lý keyword
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            searchKeyword = keyword.trim();
+            try {
+                // Thử ép kiểu keyword sang Long để tìm theo invoiceId
+                searchId = Long.parseLong(searchKeyword);
+            } catch (NumberFormatException e) {
+                // Nếu không phải là số hợp lệ thì bỏ qua searchId, chỉ tìm theo tên
+            }
+        }
+
+        // Cấu hình sắp xếp (Tăng dần / Giảm dần)
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name())
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+
+        // Tạo đối tượng phân trang (page trong Spring Data bắt đầu từ 0)
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        // Gọi Repository
+        Page<FeeInvoice> invoicePage = feeInvoiceRepository.searchInvoicesByLibrary(libraryId,status,searchKeyword, searchId, pageable);
+
+        // Chuyển đổi từ Entity Page sang DTO Page
+        return invoicePage.map(this::mapToResponse);
     }
 
     public FeeInvoiceResponse createFeeInvoice(FeeInvoiceRequest request) {
