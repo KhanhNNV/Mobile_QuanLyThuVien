@@ -298,7 +298,7 @@ class LoanDetailFragment : Fragment() {
             val formattedDueDate = formatIsoDate(edtDueDate.text.toString())
 
             // NẾU CHỌN TRẠNG THÁI "RETURNED" -> MỞ DIALOG KIỂM TRA TÌNH TRẠNG
-            if (selectedStatus == "RETURNED") {
+            if (selectedStatus == "RETURNED" && targetBook.status != "RETURNED") {
                 val displayConditions = arrayOf(
                     "Mới (NEW) - Sách còn nguyên vẹn",
                     "Tốt (GOOD) - Có dấu hiệu sử dụng nhẹ",
