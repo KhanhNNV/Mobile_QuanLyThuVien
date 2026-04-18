@@ -4,29 +4,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quanlythuvien.R
-
-
-// Data class để chứa dữ liệu giả
-data class MockReaderBook(
-    val title: String,
-    val author: String,
-    val isbn: String,
-    val borrowDate: String,
-    val dueDate: String,
-    val isOverdue: Boolean,
-    val isReturned: Boolean // true: Đã trả, false: Đang mượn
-)
-
+import com.example.quanlythuvien.data.model.response.LoanDetailResponse
 
 class ReaderDetailAdapter(
-    private val onBookClick: (MockReaderBook) -> Unit
+    private var list: List<LoanDetailResponse>,
+    private val onBookClick: (LoanDetailResponse) -> Unit
 ) : RecyclerView.Adapter<ReaderDetailAdapter.BooKViewHolder>() {
-    private var bookList: List<MockReaderBook> = listOf()
+    private var bookList: List<LoanDetailResponse> = listOf()
 
-    fun submitList(bookList: List<MockReaderBook>) {
-        this.bookList = bookList
+    fun submitList(bookList: List<LoanDetailResponse>?) {
+        this.bookList = bookList ?: listOf()
         notifyDataSetChanged()
     }
 
@@ -59,27 +49,29 @@ class ReaderDetailAdapter(
 
     class BooKViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val tvBookTitle: TextView = itemView.findViewById(R.id.tvBookTitle)
-        private val tvBookAuthor: TextView = itemView.findViewById(R.id.tvBookAuthor)
-        private val tvBookIsbn: TextView = itemView.findViewById(R.id.tvBookIsbn)
+//        private val tvBookAuthor: TextView = itemView.findViewById(R.id.tvBookAuthor)
+//        private val tvBookIsbn: TextView = itemView.findViewById(R.id.tvBookIsbn)
         private val tvBookBorrowDate: TextView = itemView.findViewById(R.id.tvBorrowDate)
         private val tvBookDueDate: TextView = itemView.findViewById(R.id.tvDueDate)
 
-        fun bind(book: MockReaderBook) {
-            tvBookTitle.text = book.title
-            tvBookAuthor.text = book.author
-            tvBookIsbn.text = book.isbn
-            tvBookBorrowDate.text = "Ngày mượn: ${book.borrowDate}"
-            if (book.isOverdue) {
-                tvBookDueDate.text = "Hạn trả: ${book.dueDate} (Quá hạn)"
-                tvBookDueDate.setTextColor(itemView.context.getColor(R.color.red))
+        fun bind(book: LoanDetailResponse) {
+            tvBookTitle.text = book.bookTitle
+ //           tvBookAuthor.text = book.author ?: "Không có tác giả"
+            tvBookBorrowDate.text = "Ngày mượn: ${book.returnDate}" // Cần format nếu là String ISO
+            tvBookDueDate.text = "Hạn trả: ${book.dueDate}"
+//            tvBookIsbn.text = "ISBN: ${book.isbn ?: "---"}"
+
+            // Highlight màu đỏ nếu quá hạn
+            if (book.status.trim().equals("OVERDUE", ignoreCase = true)) {
+                tvBookDueDate.setTextColor(ContextCompat.getColor(itemView.context, R.color.red))
             } else {
-                tvBookDueDate.text = "Hạn trả: ${book.dueDate}"
-            }
-            if (book.isReturned) {
-                tvBookDueDate.text = "Đã trả: ${book.dueDate}"
-                tvBookDueDate.setTextColor(itemView.context.getColor(R.color.green))
+                tvBookDueDate.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_secondary))
             }
 
+            // Highlight màu đỏ nếu quá hạn
+            if (book.status.trim().equals("RETURNED", ignoreCase = true)) {
+                tvBookDueDate.setTextColor(ContextCompat.getColor(itemView.context, R.color.green))
+            }
         }
     }
 }
