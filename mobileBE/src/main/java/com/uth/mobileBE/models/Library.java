@@ -22,6 +22,11 @@ public class Library {
 
     private String name;
     private String address;
+    @Column(name = "max_loans_quota", nullable = false)
+    private Integer maxLoansQuota=0;
+
+    @Column(name = "max_books_quota", nullable = false)
+    private Integer maxBooksQuota=0;
 
     @Enumerated(EnumType.STRING)
     private StatusLibrary status = StatusLibrary.ACTIVE;

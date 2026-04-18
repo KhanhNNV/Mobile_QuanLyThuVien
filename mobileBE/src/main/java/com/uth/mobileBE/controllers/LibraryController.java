@@ -26,21 +26,27 @@ public class LibraryController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    @GetMapping
-    public ResponseEntity<List<LibraryResponse>> getAllLibraries() {
-        return ResponseEntity.ok(libraryService.getAllLibraries());
+
+
+    @GetMapping()
+    public ResponseEntity<LibraryResponse> getLibraryById() {
+        return ResponseEntity.ok(libraryService.getLibraryById());
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<LibraryResponse> getLibraryById(@PathVariable Long id) {
-        return ResponseEntity.ok(libraryService.getLibraryById(id));
-    }
-
-    @PutMapping("/{id}")
+    @PutMapping()
     public ResponseEntity<LibraryResponse> updateLibrary(
-            @PathVariable Long id,
             @RequestBody LibraryRequest request) {
-        return ResponseEntity.ok(libraryService.updateLibrary(id, request));
+        return ResponseEntity.ok(libraryService.updateLibrary(request));
+    }
+    @PutMapping("/loansQuota")
+    public ResponseEntity<LibraryResponse> updateLibraryLoansQuota(
+            @RequestParam Integer maxLoansQuota) {
+        return ResponseEntity.ok(libraryService.updateMaxLoansQuota(maxLoansQuota));
+    }
+    @PutMapping("/booksQuota")
+    public ResponseEntity<LibraryResponse> updateLibraryBooksQuota(
+            @RequestParam Integer maxBookssQuota) {
+        return ResponseEntity.ok(libraryService.updateMaxBooksQuota(maxBookssQuota));
     }
 
     @DeleteMapping("/{id}")

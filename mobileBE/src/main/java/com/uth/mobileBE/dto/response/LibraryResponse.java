@@ -21,4 +21,6 @@ public class LibraryResponse {
     private StatusLibrary status;
     private LocalDateTime createdAt;
     private LocalDateTime updateAt;
+    private Integer maxLoansQuota;
+    private Integer maxBooksQuota;
 }

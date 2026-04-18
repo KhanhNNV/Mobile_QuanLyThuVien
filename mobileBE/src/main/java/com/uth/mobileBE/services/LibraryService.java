@@ -1,5 +1,6 @@
 package com.uth.mobileBE.services;
 
+import com.uth.mobileBE.Utils.SecurityUtils;
 import com.uth.mobileBE.dto.request.LibraryRequest;
 import com.uth.mobileBE.dto.response.LibraryResponse;
 import com.uth.mobileBE.models.Library;
@@ -25,6 +26,8 @@ public class LibraryService {
                 .name(request.getName())
                 .address(request.getAddress())
                 .status(request.getStatus() != null ? request.getStatus() : StatusLibrary.ACTIVE)
+                .maxLoansQuota(0)
+                .maxBooksQuota(0)
                 .createdAt(now)
                 .updateAt(now)
                 .build();
@@ -40,12 +43,14 @@ public class LibraryService {
                 .collect(Collectors.toList());
     }
 
-    public LibraryResponse getLibraryById(Long id) {
+    public LibraryResponse getLibraryById() {
+        Long id = SecurityUtils.getLibraryId();
         Library library = getLibraryEntityById(id);
         return mapToResponse(library);
     }
 
-    public LibraryResponse updateLibrary(Long id, LibraryRequest request) {
+    public LibraryResponse updateLibrary(LibraryRequest request) {
+        Long id = SecurityUtils.getLibraryId();
         Library existingLibrary = getLibraryEntityById(id);
 
         if (request.getName() != null) {
@@ -69,6 +74,37 @@ public class LibraryService {
         libraryRepository.delete(library);
     }
 
+
+    public LibraryResponse updateMaxLoansQuota(Integer newQuota) {
+        Long id = SecurityUtils.getLibraryId();
+        Library existingLibrary = getLibraryEntityById(id);
+
+        if (newQuota == null || newQuota < 0) {
+            throw new IllegalArgumentException("Hạn ngạch không hợp lệ!");
+        }
+
+        existingLibrary.setMaxLoansQuota(newQuota);
+        existingLibrary.setUpdateAt(LocalDateTime.now());
+
+        Library updatedLibrary = libraryRepository.save(existingLibrary);
+        return mapToResponse(updatedLibrary);
+    }
+
+    public LibraryResponse updateMaxBooksQuota(Integer newQuota) {
+        Long id = SecurityUtils.getLibraryId();
+        Library existingLibrary = getLibraryEntityById(id);
+
+        if (newQuota == null || newQuota < 0) {
+            throw new IllegalArgumentException("Hạn ngạch không hợp lệ!");
+        }
+
+        existingLibrary.setMaxBooksQuota(newQuota);
+        existingLibrary.setUpdateAt(LocalDateTime.now());
+
+        Library updatedLibrary = libraryRepository.save(existingLibrary);
+        return mapToResponse(updatedLibrary);
+    }
+
     // --- CÁC HÀM HỖ TRỢ DÙNG NỘI BỘ ---
 
     private Library getLibraryEntityById(Long id) {
@@ -82,6 +118,8 @@ public class LibraryService {
                 .name(library.getName())
                 .address(library.getAddress())
                 .status(library.getStatus())
+                .maxLoansQuota(library.getMaxLoansQuota())
+                .maxBooksQuota(library.getMaxBooksQuota())
                 .createdAt(library.getCreatedAt())
                 .updateAt(library.getUpdateAt())
                 .build();
