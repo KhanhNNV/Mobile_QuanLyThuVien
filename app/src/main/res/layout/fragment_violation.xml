@@ -2,11 +2,12 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <include
         android:id="@+id/headerDashboard"
-        layout="@layout/layout_header_back"
+        layout="@layout/layout_custom_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent" />
@@ -24,6 +25,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:paddingBottom="16dp"
+            android:paddingHorizontal="16dp"
             android:gravity="center_vertical">
 
             <LinearLayout
@@ -33,6 +35,7 @@
                 android:background="@color/bg_card"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
+
                 <EditText
                     android:id="@+id/etSearch"
                     android:layout_width="0dp"
@@ -42,7 +45,7 @@
                     android:drawableStart="@drawable/ic_search"
                     android:drawablePadding="8dp"
                     android:drawableTint="@color/black"
-                    android:hint="Tìm kiếm..."
+                    android:hint="Tìm kiếm vi phạm..."
                     android:paddingHorizontal="14dp"
                     android:textColor="@color/text_primary"
                     android:textSize="14sp"
@@ -64,6 +67,7 @@
                 app:tint="@color/btn_primary" />
         </LinearLayout>
 
+
         <LinearLayout
             android:id="@+id/llFilterContainer"
             android:layout_width="match_parent"
@@ -72,15 +76,94 @@
             android:background="@drawable/bg_list_container"
             android:paddingHorizontal="20dp"
             android:paddingBottom="16dp"
-            android:visibility="gone">
+            android:visibility="visible">
 
-            <Spinner
-                android:id="@+id/spinnerCategory"
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="Trạng thái:"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary"
+                android:textSize="14sp" />
+
+            <RadioGroup
+                android:id="@+id/rgStatus"
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/rbAll"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Tất cả"
+                    android:textColor="@color/text_primary"
+                    android:checked="true" />
+
+                <RadioButton
+                    android:id="@+id/rbActive"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1.3"
+                    android:textColor="@color/text_primary"
+                    android:text="Đang hoạt động" />
+
+                <RadioButton
+                    android:id="@+id/rbResolved"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textColor="@color/text_primary"
+                    android:text="Đã xử lý" />
+            </RadioGroup>
+
+            <LinearLayout
+                android:id="@+id/layoutDates"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:background="@drawable/bg_list_container"
-                android:paddingHorizontal="12dp" />
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/rgStatus"> <EditText
+                android:id="@+id/edtFromDate"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginEnd="6dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_search"
+                android:clickable="true"
+                android:cursorVisible="false"
+                android:drawablePadding="8dp"
+                android:focusable="false"
+                android:hint="Từ ngày"
+                android:inputType="none"
+                android:paddingHorizontal="12dp"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_tertiary"
+                android:textSize="14sp" />
+
+                <EditText
+                    android:id="@+id/edtToDate"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_marginStart="6dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_search"
+                    android:clickable="true"
+                    android:cursorVisible="false"
+                    android:drawablePadding="8dp"
+                    android:focusable="false"
+                    android:hint="Đến ngày"
+                    android:inputType="none"
+                    android:paddingHorizontal="12dp"
+                    android:textColor="@color/text_primary"
+                    android:textColorHint="@color/text_tertiary"
+                    android:textSize="14sp" />
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -115,12 +198,13 @@
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewBooks"
+        android:id="@+id/recyclerViewViolations"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:clipToPadding="false"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/llTopContent" />
+        app:layout_constraintTop_toBottomOf="@id/llTopContent"
+        tools:listitem="@layout/item_violation"/>
 
     <LinearLayout
         android:id="@+id/layoutEmptyState"
@@ -146,12 +230,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:text="Không có sách phù hợp"
+            android:text="Không có vi phạm phù hợp"
             android:textColor="@color/text_secondary"
             android:textSize="15sp" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnRetryLoadBooks"
+            android:id="@+id/btnRetryLoadViolations"
             style="@style/Widget.MaterialComponents.Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -161,19 +245,5 @@
             app:backgroundTint="@color/btn_primary"
             android:textColor="@color/white" />
     </LinearLayout>
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabAddBook"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="15dp"
-        android:backgroundTint="@color/btn_primary"
-        android:contentDescription="Thêm sách nhập kho"
-        android:src="@drawable/ic_credit_card"
-        android:tint="@color/white"
-        app:elevation="10dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

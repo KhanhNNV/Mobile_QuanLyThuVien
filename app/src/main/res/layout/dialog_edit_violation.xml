@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="20dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="8dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <TextView
+            android:id="@+id/tvDialogTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Cập nhật vi phạm"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/text_primary"
+            android:layout_marginBottom="20dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Lý do vi phạm:"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:textColor="@color/text_primary"
+            android:layout_marginBottom="8dp"/>
+
+        <EditText
+            android:id="@+id/edtReason"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minLines="3"
+            android:gravity="top|start"
+            android:background="@drawable/bg_search"
+            android:padding="12dp"
+            android:hint="Nhập lý do chi tiết..."
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_tertiary"
+            android:textSize="14sp"
+            android:layout_marginBottom="16dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Trạng thái:"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:textColor="@color/text_primary"
+            android:layout_marginBottom="8dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@drawable/bg_search"
+            android:paddingHorizontal="8dp"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="28dp">
+
+            <Spinner
+                android:id="@+id/spinnerStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:spinnerMode="dropdown"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCancel"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Hủy"
+                android:textColor="@color/text_secondary"
+                android:layout_marginEnd="12dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSavePolicy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Lưu thay đổi"
+                app:backgroundTint="@color/btn_primary"
+                android:textColor="@color/white"
+                app:cornerRadius="8dp"/>
+        </LinearLayout>
+
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>
