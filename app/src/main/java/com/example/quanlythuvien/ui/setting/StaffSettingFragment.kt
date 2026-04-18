@@ -4,26 +4,39 @@ import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
-import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import com.example.quanlythuvien.R
+import com.example.quanlythuvien.core.api.RetrofitClient
+import com.example.quanlythuvien.data.model.enums.TypeFeeConfig
+import com.example.quanlythuvien.data.model.response.FeeConfigResponse
+import com.example.quanlythuvien.data.remote.FeeConfigApiService
+import com.example.quanlythuvien.data.repository.FeeConfigRepository
+import com.example.quanlythuvien.utils.GenericViewModelFactory
 import com.example.quanlythuvien.utils.setupCustomHeader
 import com.google.android.material.card.MaterialCardView
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 class StaffSettingFragment : Fragment(R.layout.fragment_staff_setting) {
 
+    private lateinit var cvLoanPolicy: MaterialCardView
     private lateinit var cvCategory: MaterialCardView
     private lateinit var btnLogout: Button
 
-    private lateinit var layoutStudentDiscountContainer: LinearLayout
     private lateinit var tvRegistrationFee: TextView
-    private lateinit var tvStudentDiscount: TextView
     private lateinit var tvLateFee: TextView
     private lateinit var tvLostFeeExtra: TextView
     private lateinit var tvDamageFee: TextView
+
+    private lateinit var viewModel: SettingViewModel
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -34,51 +47,79 @@ class StaffSettingFragment : Fragment(R.layout.fragment_staff_setting) {
         )
 
         initViews(view)
-        handleCardViewCategoryEvent()
-        handleButtonLogOutEvent()
+        setupViewModel()
+        observeViewModel()
+        handleEvents()
 
-        // Hàm giả lập để set dữ liệu sau này
-        loadFeeData()
+        // Gọi API lấy dữ liệu phí khi mở màn hình
+        viewModel.fetchFeeConfigs()
     }
 
     private fun initViews(view: View) {
+        cvLoanPolicy = view.findViewById(R.id.cvLoanPolicy)
         cvCategory = view.findViewById(R.id.cvCategory)
         btnLogout = view.findViewById(R.id.btnLogout)
 
         tvRegistrationFee = view.findViewById(R.id.tvRegistrationFee)
-        layoutStudentDiscountContainer = view.findViewById(R.id.layoutStudentDiscountContainer)
-        tvStudentDiscount = view.findViewById(R.id.tvStudentDiscount)
         tvLateFee = view.findViewById(R.id.tvLateFee)
         tvLostFeeExtra = view.findViewById(R.id.tvLostFeeExtra)
         tvDamageFee = view.findViewById(R.id.tvDamageFee)
     }
 
-    private fun loadFeeData() {
-        // TODO: Sau này làm Backend Spring Boot sẽ gọi API lấy thông tin Policy ở đây
+    private fun setupViewModel() {
+        val retrofit = RetrofitClient.getInstance(requireContext())
+        val apiService = retrofit.create(FeeConfigApiService::class.java)
+        val repository = FeeConfigRepository(apiService)
 
-        // Ví dụ cách hiển thị dữ liệu:
-        // tvRegistrationFee.text = "50.000 VNĐ"
-        // tvLateFee.text = "5.000 VNĐ"
-
-        // Logic hiển thị phần giảm giá sinh viên:
-        // val hasStudentDiscount = true // Giả sử API trả về true
-        // if (hasStudentDiscount) {
-        //     layoutStudentDiscountContainer.visibility = View.VISIBLE
-        //     tvStudentDiscount.text = "10%"
-        // } else {
-        //     layoutStudentDiscountContainer.visibility = View.GONE
-        // }
+        val factory = GenericViewModelFactory {
+            SettingViewModel(repository)
+        }
+        viewModel = ViewModelProvider(this, factory)[SettingViewModel::class.java]
     }
 
-    private fun handleCardViewCategoryEvent(){
-        cvCategory.setOnClickListener {
-            findNavController().navigate(R.id.categoryListFragment)
+    private fun observeViewModel() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.state.collectLatest { state ->
+                    when (state) {
+                        is SettingState.SuccessGetFees -> {
+                            bindDataToUI(state.fees)
+                        }
+                        is SettingState.Error -> {
+                            Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
+                        }
+                        else -> {
+                        }
+                    }
+                }
+            }
         }
     }
 
-    private fun handleButtonLogOutEvent(){
+    private fun bindDataToUI(configs: List<FeeConfigResponse>) {
+        for (config in configs) {
+            val amountFormatted = formatCurrency(config.amount)
+            when (config.feeType) {
+                TypeFeeConfig.REG_NORMAL -> tvRegistrationFee.text = amountFormatted
+                TypeFeeConfig.LATE_PER_DAY -> tvLateFee.text = amountFormatted
+                TypeFeeConfig.LOST_BOOK -> tvLostFeeExtra.text = amountFormatted
+                TypeFeeConfig.DAMAGE_FEE -> tvDamageFee.text = amountFormatted
+            }
+        }
+    }
+
+    // Hàm hỗ trợ format tiền tệ (Ví dụ: 50000 -> "50.000 VNĐ")
+    private fun formatCurrency(amount: Double): String {
+        return "%,.0f VNĐ".format(amount).replace(",", ".")
+    }
+
+    private fun handleEvents() {
+        // Navigation Events
+        cvLoanPolicy.setOnClickListener { findNavController().navigate(R.id.loanPolicyFragment) }
+        cvCategory.setOnClickListener { findNavController().navigate(R.id.categoryListFragment) }
+
+        // Logout Event
         btnLogout.setOnClickListener {
-            // Xóa trạng thái đăng nhập
             val sharedPreferences = requireActivity().getSharedPreferences("LibraryAppPrefs", Context.MODE_PRIVATE)
             sharedPreferences.edit().apply {
                 putBoolean("isLoggedIn", false)
@@ -87,12 +128,8 @@ class StaffSettingFragment : Fragment(R.layout.fragment_staff_setting) {
                 apply()
             }
 
-            // Xóa toàn bộ lịch sử (Back Stack) để không thể back lại
-            val navOptions = NavOptions.Builder()
-                .setPopUpTo(R.id.nav_graph, true)
-                .build()
-
-            // Điều hướng về màn hình Welcome
+            // Xóa backstack và về trang welcome
+            val navOptions = NavOptions.Builder().setPopUpTo(R.id.nav_graph, true).build()
             findNavController().navigate(R.id.welcomeFragment, null, navOptions)
         }
     }

@@ -28,6 +28,7 @@ import com.example.quanlythuvien.data.repository.LibraryRepository
 import com.example.quanlythuvien.data.repository.LoanPolicyRepository
 import com.example.quanlythuvien.ui.LoanPolicy.LoanPolicyAdapter
 import com.example.quanlythuvien.utils.GenericViewModelFactory
+import com.example.quanlythuvien.utils.TokenManager
 import com.example.quanlythuvien.utils.setupHeaderWithBack
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.flow.collectLatest
@@ -41,10 +42,14 @@ class LoanPolicyFragment : Fragment(R.layout.fragment_loan_policy) {
 
     private lateinit var viewModel: LoanPolicyViewModel
     private var categoryList: List<CategoryResponse> = emptyList()
+    private var isAdmin: Boolean = false
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupHeaderWithBack(view, "Quản lý chính sách mượn trả")
+
+        val tokenManager = TokenManager(requireContext())
+        isAdmin = tokenManager.getRole() == "ADMIN"
 
         initViews(view)
         setupViewModel()
@@ -114,6 +119,7 @@ class LoanPolicyFragment : Fragment(R.layout.fragment_loan_policy) {
         rvPolicies.layoutManager = LinearLayoutManager(requireContext())
         policyAdapter = LoanPolicyAdapter(
             policyList = mutableListOf<LoanPolicyResponse>(),
+            isAdmin = isAdmin,
             onEditClick = { selectedPolicy -> showPolicyDialog(selectedPolicy) },
             onDeleteClick = { selectedPolicy, position -> showDeleteConfirmDialog(selectedPolicy) }
         )

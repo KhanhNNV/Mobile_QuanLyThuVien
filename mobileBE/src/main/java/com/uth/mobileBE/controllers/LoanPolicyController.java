@@ -18,8 +18,7 @@ public class LoanPolicyController {
 
     @Autowired
     private LoanPolicyService loanPolicyService;
-
-    @PreAuthorize("hasRole('ADMIN')")
+    
     @GetMapping
     public ResponseEntity<List<LoanPolicyResponse>> getAllPolicies() {
         Long libraryId = SecurityUtils.getLibraryId();
