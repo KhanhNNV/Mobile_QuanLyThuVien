@@ -197,8 +197,8 @@ public class ReaderService {
         return readerRepository.countByLibrary_LibraryId(libraryId);
     }
 
-    private LocalDateTime calculateExpiryDate(Long days){
-        return LocalDateTime.now().plusDays(days);
+    private LocalDateTime calculateExpiryDate(Long months){
+        return LocalDateTime.now().plusMonths(months);
     }
 
 
