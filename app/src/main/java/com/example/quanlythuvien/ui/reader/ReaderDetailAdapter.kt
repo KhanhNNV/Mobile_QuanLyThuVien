@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quanlythuvien.R
 import com.example.quanlythuvien.data.model.response.LoanDetailResponse
@@ -56,15 +57,20 @@ class ReaderDetailAdapter(
         fun bind(book: LoanDetailResponse) {
             tvBookTitle.text = book.bookTitle
  //           tvBookAuthor.text = book.author ?: "Không có tác giả"
-            tvBookBorrowDate.text = "Ngày mượn: ${book.dueDate}" // Cần format nếu là String ISO
-            tvBookDueDate.text = "Hạn trả: ${book.returnDate}"
+            tvBookBorrowDate.text = "Ngày mượn: ${book.returnDate}" // Cần format nếu là String ISO
+            tvBookDueDate.text = "Hạn trả: ${book.dueDate}"
 //            tvBookIsbn.text = "ISBN: ${book.isbn ?: "---"}"
 
-            // Highlight màu đỏ nếu quá hạn (Giả định có field isOverdue hoặc check logic)
-            if (book.status == "OVERDUE") {
-                tvBookDueDate.setTextColor(itemView.context.getColor(R.color.red))
+            // Highlight màu đỏ nếu quá hạn
+            if (book.status.trim().equals("OVERDUE", ignoreCase = true)) {
+                tvBookDueDate.setTextColor(ContextCompat.getColor(itemView.context, R.color.red))
             } else {
-                tvBookDueDate.setTextColor(itemView.context.getColor(R.color.text_secondary))
+                tvBookDueDate.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_secondary))
+            }
+
+            // Highlight màu đỏ nếu quá hạn
+            if (book.status.trim().equals("RETURNED", ignoreCase = true)) {
+                tvBookDueDate.setTextColor(ContextCompat.getColor(itemView.context, R.color.green))
             }
         }
     }
