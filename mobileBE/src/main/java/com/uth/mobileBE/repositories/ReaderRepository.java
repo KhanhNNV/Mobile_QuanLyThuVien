@@ -28,6 +28,9 @@ public interface ReaderRepository extends JpaRepository<Reader, Long> {
     List<Reader> searchReadersByLibraryId(@Param("libraryId") Long libraryId, @Param("query") String query);
 
 
+    // Kiểm tra độc giả có tồn tại trong thư viện này không
+    boolean existsByReaderIdAndLibrary_LibraryId(Long readerId, Long libraryId);
+
     /**
      * Tìm danh sách bạn đọc (Reader) theo ID thư viện với hỗ trợ phân trang.
      *

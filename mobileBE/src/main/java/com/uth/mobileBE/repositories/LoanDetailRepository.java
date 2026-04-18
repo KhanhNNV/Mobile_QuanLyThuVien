@@ -1,6 +1,9 @@
 package com.uth.mobileBE.repositories;
 import com.uth.mobileBE.models.LoanDetail;
+import com.uth.mobileBE.models.enums.StatusLoanDetail;
 import io.lettuce.core.dynamic.annotation.Param;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -24,4 +27,10 @@ public interface LoanDetailRepository extends JpaRepository<LoanDetail, Long> {
                                   @Param("endOfDay") LocalDateTime endOfDay);
 
     List<LoanDetail> findByLoan_LoanId(Long loanId);
+
+    //Tính tổng số sách của 1 reader
+    Integer countByLoan_Reader_ReaderIdAndStatus(Long readerId, StatusLoanDetail status);
+
+    // Tìm danh sách chi tiết mượn trả theo ID độc giả và trạng thái, hỗ trợ phân trang
+    Page<LoanDetail> findByLoan_Reader_ReaderIdAndStatus(Long readerId, StatusLoanDetail status, Pageable pageable);
 }

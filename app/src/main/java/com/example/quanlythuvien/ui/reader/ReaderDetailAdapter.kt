@@ -6,27 +6,15 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quanlythuvien.R
-
-
-// Data class để chứa dữ liệu giả
-data class MockReaderBook(
-    val title: String,
-    val author: String,
-    val isbn: String,
-    val borrowDate: String,
-    val dueDate: String,
-    val isOverdue: Boolean,
-    val isReturned: Boolean // true: Đã trả, false: Đang mượn
-)
-
+import com.example.quanlythuvien.data.model.response.LoanDetailResponse
 
 class ReaderDetailAdapter(
-    private val onBookClick: (MockReaderBook) -> Unit
+    private val onBookClick: (LoanDetailResponse) -> Unit
 ) : RecyclerView.Adapter<ReaderDetailAdapter.BooKViewHolder>() {
-    private var bookList: List<MockReaderBook> = listOf()
+    private var bookList: List<LoanDetailResponse> = listOf()
 
-    fun submitList(bookList: List<MockReaderBook>) {
-        this.bookList = bookList
+    fun submitList(bookList: List<LoanDetailResponse>?) {
+        this.bookList = bookList ?: listOf()
         notifyDataSetChanged()
     }
 
@@ -64,22 +52,18 @@ class ReaderDetailAdapter(
         private val tvBookBorrowDate: TextView = itemView.findViewById(R.id.tvBorrowDate)
         private val tvBookDueDate: TextView = itemView.findViewById(R.id.tvDueDate)
 
-        fun bind(book: MockReaderBook) {
-            tvBookTitle.text = book.title
+        fun bind(book: LoanDetailResponse) {
+            tvBookTitle.text = book.bookTitle
             tvBookAuthor.text = book.author
-            tvBookIsbn.text = book.isbn
-            tvBookBorrowDate.text = "Ngày mượn: ${book.borrowDate}"
-            if (book.isOverdue) {
-                tvBookDueDate.text = "Hạn trả: ${book.dueDate} (Quá hạn)"
+            tvBookBorrowDate.text = "Ngày mượn: ${book.dueDate}" // Cần format nếu là String ISO
+            tvBookDueDate.text = "Hạn trả: ${book.returnDate}"
+
+            // Highlight màu đỏ nếu quá hạn (Giả định có field isOverdue hoặc check logic)
+            if (book.status == "OVERDUE") {
                 tvBookDueDate.setTextColor(itemView.context.getColor(R.color.red))
             } else {
-                tvBookDueDate.text = "Hạn trả: ${book.dueDate}"
+                tvBookDueDate.setTextColor(itemView.context.getColor(R.color.text_secondary))
             }
-            if (book.isReturned) {
-                tvBookDueDate.text = "Đã trả: ${book.dueDate}"
-                tvBookDueDate.setTextColor(itemView.context.getColor(R.color.green))
-            }
-
         }
     }
 }

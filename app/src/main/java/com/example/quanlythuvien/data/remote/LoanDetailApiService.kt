@@ -4,6 +4,7 @@ import com.example.quanlythuvien.data.model.request.LoanDetailRequest
 import com.example.quanlythuvien.data.model.request.UpdateLoanDetailRequest
 import com.example.quanlythuvien.data.model.response.BookCopyResponse
 import com.example.quanlythuvien.data.model.response.LoanDetailResponse
+import com.example.quanlythuvien.data.model.response.PageResponse
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -34,4 +35,13 @@ interface LoanDetailApiService {
         @Path("loanDetailId") loanDetailId: Long,
         @Body request: UpdateLoanDetailRequest
     ): Response<LoanDetailResponse>
+
+    //Show phân trang book cho reader
+    @GET("api/loan-details/reader/{readerId}")
+    suspend fun getReaderLoans(
+        @Path("readerId") readerId: Long,
+        @Query("status") status: String,
+        @Query("page") page: Int,
+        @Query("size") size: Int
+    ): Response<PageResponse<LoanDetailResponse>>
 }

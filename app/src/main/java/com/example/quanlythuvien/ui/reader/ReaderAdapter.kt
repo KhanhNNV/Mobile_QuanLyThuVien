@@ -48,12 +48,17 @@ class ReaderAdapter(
         private val tvReaderStatus: TextView = itemView.findViewById(R.id.tvReaderStatus)
         private val tvAvatar: TextView = itemView.findViewById(R.id.tvAvatar)
 
+        private val tvBorrowedValue: TextView = itemView.findViewById(R.id.tvBorrowedValue)
+        private val tvDebtValue: TextView = itemView.findViewById(R.id.tvDebtValue)
         fun bind(reader: ReaderResponse) {
             tvReaderName.text = reader.fullName
             val barcodeShow = reader.barcode.ifBlank { "—" }
             tvReaderPhone.text = "$barcodeShow · ${reader.phone}"
             tvAvatar.text = reader.fullName.firstOrNull()?.uppercase() ?: ""
-
+            tvBorrowedValue.text = "${reader.totalBorrowedBooks} cuốn"
+            val formatter = java.text.DecimalFormat("#,###")
+            val formattedDebt = formatter.format(reader.totalDebt)
+            tvDebtValue.text = "$formattedDebt VND"
             if (reader.isBlocked) {
                 tvReaderStatus.visibility = View.VISIBLE
                 tvReaderStatus.text = "Đã chặn"

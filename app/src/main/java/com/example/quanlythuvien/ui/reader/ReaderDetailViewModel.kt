@@ -5,11 +5,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.quanlythuvien.data.model.request.ReaderRequest
+import com.example.quanlythuvien.data.model.response.LoanDetailResponse
 import com.example.quanlythuvien.data.model.response.ReaderResponse
+import com.example.quanlythuvien.data.repository.LoanDetailRepository
 import com.example.quanlythuvien.data.repository.ReaderRepository
 import kotlinx.coroutines.launch
 
-class ReaderDetailViewModel(private val repository: ReaderRepository): ViewModel() {
+class ReaderDetailViewModel(private val repository: ReaderRepository, private val loanDetailRepo: LoanDetailRepository): ViewModel() {
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> get() = _isLoading
 
@@ -25,8 +27,8 @@ class ReaderDetailViewModel(private val repository: ReaderRepository): ViewModel
     private val _readerData = MutableLiveData<ReaderResponse>()
     val readerData: LiveData<ReaderResponse> get() = _readerData
 
-
-
+    private val _loanList = MutableLiveData<List<LoanDetailResponse>>()
+    val loanList: LiveData<List<LoanDetailResponse>> get() = _loanList
     fun getReaderDetail(readerId: Long) {
         viewModelScope.launch {
             _isLoading.value = true
@@ -75,6 +77,24 @@ class ReaderDetailViewModel(private val repository: ReaderRepository): ViewModel
                     _deleteSuccess.value = true
                 } else {
                     _error.value = "Không thể xóa: ${reponse.code()}"
+                }
+            } catch (e: Exception) {
+                _error.value = "Lỗi kết nối: ${e.message}"
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    fun fetchReaderLoans(readerId: Long, status: String, page: Int = 0) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+                val response = loanDetailRepo.getReaderLoans(readerId, status, page, 20)
+                if (response.isSuccessful) {
+                    _loanList.value = response.body()?.content ?: emptyList()
+                } else {
+                    _error.value = "Lỗi lấy danh sách sách: ${response.code()}"
                 }
             } catch (e: Exception) {
                 _error.value = "Lỗi kết nối: ${e.message}"
