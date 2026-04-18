@@ -16,6 +16,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.example.quanlythuvien.R
 import com.example.quanlythuvien.core.api.RetrofitClient
+import com.example.quanlythuvien.data.model.response.FeeInvoiceResponse
 import com.example.quanlythuvien.data.remote.FeeInvoiceApiService
 import com.example.quanlythuvien.data.remote.ReaderApiService
 import com.example.quanlythuvien.data.repository.FeeInvoiceRepository
@@ -63,8 +64,6 @@ class InvoiceDetailFragment : Fragment(R.layout.fragment_invoice_detail) {
         }else {
             Toast.makeText(requireContext(), "Lỗi: Không tìm thấy mã hóa đơn", Toast.LENGTH_SHORT).show()
         }
-        // Lấy ID từ SharedViewModel và load dữ liệu
-        //loadInvoiceFromSharedViewModel()
     }
 
     private fun initViews(view: View) {
@@ -157,7 +156,7 @@ class InvoiceDetailFragment : Fragment(R.layout.fragment_invoice_detail) {
         }
     }
 
-    private fun updateUI(invoice: com.example.quanlythuvien.data.model.response.FeeInvoiceResponse) {
+    private fun updateUI(invoice: FeeInvoiceResponse) {
         tvDetailInvoiceId.text = "Mã hóa đơn: ${invoice.invoiceId}"
         tvDetailReader.text = "Độc giả: ${invoice.readerName}"
         tvDetailType.text = "Loại hóa đơn: ${getInvoiceTypeDisplay(invoice.type)}"

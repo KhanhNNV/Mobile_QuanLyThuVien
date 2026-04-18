@@ -41,6 +41,8 @@ public class ViolationService {
                 .reader(reader)
                 .library(library)
                 .reason(request.getReason())
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
                 .status(StatusViolation.ACTIVE);
 
         // Chỉ tìm và gắn Loan nếu loanId được gửi lên

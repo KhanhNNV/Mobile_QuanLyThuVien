@@ -214,11 +214,17 @@
     </fragment>
 
 
+
     <fragment
         android:id="@+id/violationFragment"
         android:name="com.example.quanlythuvien.ui.violation.ViolationFragment"
         android:label="Vi phạm "
-        tools:layout="@layout/fragment_violation"/>
+        tools:layout="@layout/fragment_violation">
+        <action
+            android:id="@+id/action_violation_to_loanDetail"
+            app:destination="@id/loanFragment" />
+
+    </fragment>
 
 
 <!--    =========================================Staff=============================================-->

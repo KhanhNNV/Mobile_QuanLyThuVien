@@ -15,6 +15,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quanlythuvien.R
@@ -23,6 +24,7 @@ import com.example.quanlythuvien.data.model.response.ViolationResponse
 import com.example.quanlythuvien.data.remote.ViolationApiService
 import com.example.quanlythuvien.data.repository.ViolationRepository
 import com.example.quanlythuvien.utils.GenericViewModelFactory
+import com.example.quanlythuvien.utils.TokenManager
 import com.example.quanlythuvien.utils.setupHeaderWithBack
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -60,9 +62,15 @@ class ViolationFragment : Fragment(R.layout.fragment_violation) {
     private val apiDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
     private val uiDateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
 
+    private var isAdmin: Boolean = false
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupHeaderWithBack(view, "Quản lý vi phạm")
+
+        val tokenManager = TokenManager(requireContext())
+        val role = tokenManager.getRole()
+        isAdmin = (role == "ADMIN")
 
         initViews(view)
         setupViewModel()
@@ -108,10 +116,14 @@ class ViolationFragment : Fragment(R.layout.fragment_violation) {
         rvViolations.layoutManager = layoutManager
         violationAdapter = ViolationAdapter(
             violationList = mutableListOf(),
+            isAdmin=isAdmin,
             onEditClick = { violation -> showEditDialog(violation) },
             onDeleteClick = { violation -> showDeleteConfirmDialog(violation) },
             onViewLoanClick = { loanId ->
-                Toast.makeText(requireContext(), "Mở phiếu mượn ID: $loanId", Toast.LENGTH_SHORT).show()
+                val bundle = Bundle().apply {
+                    putLong("loanId", loanId)
+                }
+                findNavController().navigate(R.id.action_violation_to_loanDetail, bundle)
             }
         )
         rvViolations.adapter = violationAdapter

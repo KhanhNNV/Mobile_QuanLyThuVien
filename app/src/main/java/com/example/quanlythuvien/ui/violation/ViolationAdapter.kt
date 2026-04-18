@@ -13,6 +13,7 @@ import com.example.quanlythuvien.data.model.response.ViolationResponse
 
 class ViolationAdapter(
     private var violationList: MutableList<ViolationResponse>,
+    private val isAdmin: Boolean,
     private val onEditClick: (ViolationResponse) -> Unit,
     private val onDeleteClick: (ViolationResponse) -> Unit,
     private val onViewLoanClick: (Long) -> Unit
@@ -79,8 +80,16 @@ class ViolationAdapter(
             }
 
             // Nút sửa và xóa
-            btnEdit.setOnClickListener { onEditClick(violation) }
-            btnDelete.setOnClickListener { onDeleteClick(violation) }
+            if (isAdmin) {
+                btnEdit.visibility = View.VISIBLE
+                btnDelete.visibility = View.VISIBLE
+
+                btnEdit.setOnClickListener { onEditClick(violation) }
+                btnDelete.setOnClickListener { onDeleteClick(violation) }
+            } else {
+                btnEdit.visibility = View.GONE
+                btnDelete.visibility = View.GONE
+            }
         }
     }
 }
