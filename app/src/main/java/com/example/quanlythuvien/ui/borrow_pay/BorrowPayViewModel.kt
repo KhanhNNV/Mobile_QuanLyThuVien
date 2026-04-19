@@ -38,8 +38,8 @@ class BorrowPayViewModel(private val repository: LoanRepository) : ViewModel() {
                                 loanDetailId = detail.loanDetailId, // Gán ID mới
                                 bookId = detail.bookId ?: 0L,
                                 title = detail.bookTitle ?: "Không rõ",
-                                author = "Không rõ", // Backend chưa trả về, tạm gán
-                                categoryName = "Không rõ", // Backend chưa trả về, tạm gán
+                                author = detail.author?:"Không rõ",
+                                categoryName = detail.category?:"Không rõ",
                                 returnDate = detail.returnDate,
                                 dueDate = detail.dueDate ?: "Chưa có",
                                 bookBarcode = detail.bookBarcode ?: "Chưa có mã",

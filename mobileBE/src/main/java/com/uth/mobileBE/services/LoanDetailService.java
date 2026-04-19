@@ -271,6 +271,7 @@ public class LoanDetailService {
         return mapToResponse(detail);
     }
 
+    //Hàm này dùng để tính quá hạn
     public void evaluateAndApplyOverdue(LoanDetail detail) {
         if (detail.getStatus() == StatusLoanDetail.BORROWING && detail.getDueDate() != null) {
             LocalDateTime now = LocalDateTime.now();
@@ -312,6 +313,8 @@ public class LoanDetailService {
         }
     }
 
+
+    //Tạo biên bản vi phạm
     private void createViolationForDetail(LoanDetail detail, String reason) {
         ViolationRequest vReq = ViolationRequest.builder()
                 .readerId(detail.getLoan().getReader().getReaderId())
@@ -325,6 +328,7 @@ public class LoanDetailService {
         violationService.createViolation(vReq);
     }
 
+    //Đồng bộ trạng với Loan
     public void syncLoanStatus(Long loanId) {
         Loan loan = loanRepository.findById(loanId).orElse(null);
         if (loan != null) {
@@ -371,6 +375,8 @@ public class LoanDetailService {
                 .collect(Collectors.toList());
     }
 
+
+    //Taoh hóa đơn cho phiếu vi phạm
     private void createPenaltyInvoice(LoanDetail detail, double amount, String description) {
         FeeInvoiceRequest invoiceReq = FeeInvoiceRequest.builder()
                 .loanDetailId(detail.getLoanDetailId())

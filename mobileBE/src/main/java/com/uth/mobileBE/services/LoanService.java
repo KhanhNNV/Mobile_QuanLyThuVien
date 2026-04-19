@@ -260,7 +260,7 @@ public class LoanService {
     private LoanResponse mapToResponse(Loan loan) {
         StatusLoan finalStatus = loan.getStatus();
 
-        // 1. Logic tính toán trạng thái ưu tiên theo thời gian thực (Giống Specification)
+        // 1. Logic tính toán trạng thái ưu tiên theo thời gian thực
         if (finalStatus == StatusLoan.ACTIVE && loan.getLoanDetails() != null) {
             LocalDateTime now = LocalDateTime.now();
 
@@ -290,15 +290,12 @@ public class LoanService {
                             .copyId(detail.getBookCopy().getCopyId())
                             .bookId(book.getBookId()) // Giả sử model Book của bạn có getBookId()
                             .bookTitle(book.getTitle())
-
-                            // ĐƯA VÀO ĐÂY MỚI ĐÚNG VỊ TRÍ
                             .author(book.getAuthor())
                             .category(book.getCategory() != null ? book.getCategory().getName() : "Chưa cập nhật")
                             .bookBarcode(detail.getBookCopy().getBarcode())
                             .dueDate(detail.getDueDate())
                             .returnDate(detail.getReturnDate())
                             .status(detail.getStatus())
-                            // .penaltyAmount(detail.getPenaltyAmount()) // Bỏ comment nếu model có trường này
                             .createdAt(detail.getCreatedAt())
                             .updateAt(detail.getUpdateAt())
                             .build();
