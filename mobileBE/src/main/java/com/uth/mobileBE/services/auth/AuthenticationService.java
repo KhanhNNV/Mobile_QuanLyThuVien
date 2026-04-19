@@ -59,6 +59,8 @@ public class AuthenticationService {
                 .name(request.getLibraryName())
                 .address(request.getAddress())
                 .status(StatusLibrary.ACTIVE)
+                .maxBooksQuota(0)
+                .maxLoansQuota(0)
                 .createdAt(LocalDateTime.now())
                 .build();
 
