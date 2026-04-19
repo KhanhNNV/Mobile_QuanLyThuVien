@@ -18,7 +18,9 @@ import com.example.quanlythuvien.core.api.RetrofitClient
 import com.example.quanlythuvien.data.model.enums.TypeFeeConfig
 import com.example.quanlythuvien.data.model.response.FeeConfigResponse
 import com.example.quanlythuvien.data.remote.FeeConfigApiService
+import com.example.quanlythuvien.data.remote.LibraryApiService
 import com.example.quanlythuvien.data.repository.FeeConfigRepository
+import com.example.quanlythuvien.data.repository.LibraryRepository
 import com.example.quanlythuvien.utils.GenericViewModelFactory
 import com.example.quanlythuvien.utils.setupCustomHeader
 import com.google.android.material.card.MaterialCardView
@@ -71,8 +73,11 @@ class StaffSettingFragment : Fragment(R.layout.fragment_staff_setting) {
         val apiService = retrofit.create(FeeConfigApiService::class.java)
         val repository = FeeConfigRepository(apiService)
 
+        val libraryApiService = retrofit.create(LibraryApiService::class.java)
+        val libraryRepository = LibraryRepository(libraryApiService)
+
         val factory = GenericViewModelFactory {
-            SettingViewModel(repository)
+            SettingViewModel(repository,libraryRepository)
         }
         viewModel = ViewModelProvider(this, factory)[SettingViewModel::class.java]
     }
