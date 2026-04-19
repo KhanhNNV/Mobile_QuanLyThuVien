@@ -24,4 +24,9 @@ interface FeeInvoiceApiService {
         @Query("keyword") keyword: String,
         @Query("status") status: String? = null
     ): Response<List<FeeInvoiceResponse>>
+
+    @GET("api/fee-invoices/loan-detail/{loanDetailId}")
+    suspend fun getInvoiceByLoanDetailId(
+        @Path("loanDetailId") loanDetailId: Long
+    ): Response<FeeInvoiceResponse>
 }

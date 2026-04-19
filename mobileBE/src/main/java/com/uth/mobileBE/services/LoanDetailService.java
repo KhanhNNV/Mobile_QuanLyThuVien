@@ -94,10 +94,27 @@ public class LoanDetailService {
             currentCopy.setStatus(StatusBookCopy.LOST);
             detail.setReturnDate(null);
             createViolationForDetail(detail, "Khách làm mất sách");
+
+            //TẠO HÓA ĐƠN PHẠT MẤT SÁCH
+            double basePrice = currentCopy.getBook().getBasePrice();
+            FeeConfig feeConfig = feeConfigRepository.findByLibrary_LibraryIdAndFeeType(
+                            detail.getLoan().getLibrary().getLibraryId(), TypeFeeConfig.LOST_BOOK)
+                    .orElseThrow(()-> new RuntimeException("Chưa cấu hình phí phạt mất sách"));
+            double lostFee = basePrice * feeConfig.getAmount();
+            createPenaltyInvoice(detail, lostFee, "Phạt mất sách do admin xác nhận");
+
         } else if (newStatus == StatusLoanDetail.DAMAGED) {
             detail.setReturnDate(LocalDateTime.now());
             currentCopy.setStatus(StatusBookCopy.DAMAGED);
             createViolationForDetail(detail, "Sách bị hư hỏng");
+
+            //TẠO HÓA ĐƠN PHẠT HƯ HỎNG
+            double basePrice = currentCopy.getBook().getBasePrice();
+            FeeConfig feeConfig = feeConfigRepository.findByLibrary_LibraryIdAndFeeType(
+                            detail.getLoan().getLibrary().getLibraryId(), TypeFeeConfig.DAMAGE_FEE)
+                    .orElseThrow(()-> new RuntimeException("Chưa cấu hình phí phạt hư hỏng"));
+            double damageFee = basePrice + feeConfig.getAmount();
+            createPenaltyInvoice(detail, damageFee, "Phạt sách hư hỏng do admin xác nhận");
         } else if (newStatus == StatusLoanDetail.RETURNED) {
             detail.setReturnDate(LocalDateTime.now());
             currentCopy.setStatus(StatusBookCopy.AVAILABLE);

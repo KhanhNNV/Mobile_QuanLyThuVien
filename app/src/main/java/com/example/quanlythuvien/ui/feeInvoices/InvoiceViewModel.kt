@@ -53,6 +53,29 @@ class InvoiceViewModel(
             }
         }
     }
+    fun fetchInvoiceByLoanDetailId(loanDetailId: Long) {
+        viewModelScope.launch {
+            _state.value = InvoiceState.Loading // Bật trạng thái loading
+            try {
+                val response = invoiceRepository.getInvoiceByLoanDetailId(loanDetailId)
+
+                if (response.isSuccessful && response.body() != null) {
+                    // Nếu gọi thành công -> gán data vào selectedInvoice để UI tự động vẽ ra
+                    _selectedInvoice.value = response.body()
+                    _state.value = InvoiceState.SuccessDetail(response.body()!!)
+                } else {
+                    // Xử lý lỗi (ví dụ Backend trả về 404 Not Found)
+                    if (response.code() == 404) {
+                        _state.value = InvoiceState.Error("Lỗi 404: Không tìm thấy hóa đơn cho chi tiết mượn này.")
+                    } else {
+                        _state.value = InvoiceState.Error("Lỗi tải dữ liệu: Mã ${response.code()}")
+                    }
+                }
+            } catch (e: Exception) {
+                _state.value = InvoiceState.Error("Lỗi kết nối mạng: ${e.localizedMessage}")
+            }
+        }
+    }
 
 
     fun fetchInvoiceDetail(id: Long) {
