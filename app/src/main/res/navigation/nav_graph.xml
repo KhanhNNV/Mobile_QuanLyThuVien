@@ -116,8 +116,13 @@
         android:id="@+id/loanFragment"
         android:name="com.example.quanlythuvien.ui.borrow_pay.LoanDetailFragment"
         android:label="Chi tiết phiếu mượn"
-        tools:layout="@layout/fragment_loan_detail" />
+        tools:layout="@layout/fragment_loan_detail">
 
+        <action
+            android:id="@+id/action_loanDetail_to_invoiceDetail"
+            app:destination="@id/invoiceDetailFragment" />
+
+    </fragment>
     <fragment
         android:id="@+id/readerListFragment"
         android:name="com.example.quanlythuvien.ui.reader.ReaderListFragment"

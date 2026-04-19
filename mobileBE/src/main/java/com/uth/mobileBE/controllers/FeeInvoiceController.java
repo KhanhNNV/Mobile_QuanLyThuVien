@@ -21,6 +21,14 @@ public class FeeInvoiceController {
     @Autowired
     private FeeInvoiceService feeInvoiceService;
 
+    //API tìm kiếm hóa đơn chi tiết cho phiếu vi phạm
+    @GetMapping("/loan-detail/{loanDetailId}")
+    public ResponseEntity<FeeInvoiceResponse> getInvoiceByLoanDetailId(
+            @PathVariable("loanDetailId") Long loanDetailId
+    ) {
+        return ResponseEntity.ok(feeInvoiceService.getInvoiceByLoanDetailId(loanDetailId));
+    }
+
 
     @GetMapping()
     public ResponseEntity<List<FeeInvoiceResponse>> getInvoicesByLibrary() {

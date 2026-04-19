@@ -140,6 +140,14 @@ class LoanDetailFragment : Fragment() {
                 "RETURN" -> handleReturnBook(targetBook)
                 "EDIT" -> handleEditBook(targetBook)
                 "DELETE" -> if (checkIsAdmin) handleDeleteBook(targetBook)
+                // THÊM LUỒNG NÀY:
+                "VIEW_INVOICE" -> {
+                    val bundle = Bundle().apply {
+                        // Truyền loanDetailId sang màn hình hóa đơn
+                        putLong("loanDetailId", targetBook.loanDetailId)
+                    }
+                    findNavController().navigate(R.id.action_loanDetail_to_invoiceDetail, bundle)
+                }
             }
         }
         rvBooks.layoutManager = LinearLayoutManager(requireContext())

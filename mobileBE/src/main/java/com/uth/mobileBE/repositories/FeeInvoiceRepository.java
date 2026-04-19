@@ -12,10 +12,14 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface FeeInvoiceRepository extends JpaRepository<FeeInvoice, Long> {
     List<FeeInvoice> findByLibrary_LibraryId(Long libraryId);
+  
+   //Tìm kiếm hóa đơn của phiếu vi phạm theo LoanDetailId
+    Optional<FeeInvoice> findFirstByLoanDetail_LoanDetailIdOrderByCreatedAtDesc(Long loanDetailId);
 
     //Tổng tiền nợ dự vào readerId và Status
     @Query("SELECT SUM(f.totalAmount) FROM FeeInvoice f " +

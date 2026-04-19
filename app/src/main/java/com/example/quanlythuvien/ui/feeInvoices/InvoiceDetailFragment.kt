@@ -52,6 +52,7 @@ class InvoiceDetailFragment : Fragment(R.layout.fragment_invoice_detail) {
         setupHeaderWithBack(view, "Chi tiết hóa đơn")
 
         val idFromListInvoice = arguments?.getLong("feeInvoiceId") ?: 0L
+        val idFromLoanDetail = arguments?.getLong("loanDetailId") ?: 0L
 
         initViews(view)
         setupViewModels()
@@ -61,8 +62,11 @@ class InvoiceDetailFragment : Fragment(R.layout.fragment_invoice_detail) {
 
         if(idFromListInvoice!= 0L){
             viewModel.fetchInvoiceDetail(idFromListInvoice)
-        }else {
-            Toast.makeText(requireContext(), "Lỗi: Không tìm thấy mã hóa đơn", Toast.LENGTH_SHORT).show()
+        }else if (idFromLoanDetail != 0L) {
+            // GỌI HÀM MỚI Ở ĐÂY
+            viewModel.fetchInvoiceByLoanDetailId(idFromLoanDetail)
+        } else {
+            Toast.makeText(requireContext(), "Lỗi: Không tìm thấy dữ liệu hóa đơn", Toast.LENGTH_SHORT).show()
         }
     }
 

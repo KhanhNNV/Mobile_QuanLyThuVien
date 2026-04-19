@@ -1,7 +1,9 @@
 package com.example.quanlythuvien.data.repository
 
 import com.example.quanlythuvien.data.model.request.UpdateInvoiceRequest
+import com.example.quanlythuvien.data.model.response.FeeInvoiceResponse
 import com.example.quanlythuvien.data.remote.FeeInvoiceApiService
+import retrofit2.Response
 
 class FeeInvoiceRepository(private val apiService: FeeInvoiceApiService) {
 
@@ -14,4 +16,8 @@ class FeeInvoiceRepository(private val apiService: FeeInvoiceApiService) {
 
     suspend fun searchInvoices(keyword: String? = null,status: String?=null, page: Int = 0, size: Int = 10) =
         apiService.searchInvoices(keyword = keyword,status=status, page = page, size = size)
+        
+          suspend fun getInvoiceByLoanDetailId(loanDetailId: Long): Response<FeeInvoiceResponse> {
+        return apiService.getInvoiceByLoanDetailId(loanDetailId)
+    }
 }

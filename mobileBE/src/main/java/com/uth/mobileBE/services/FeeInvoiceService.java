@@ -48,6 +48,13 @@ public class FeeInvoiceService {
     }
 
     @Transactional
+    public FeeInvoiceResponse getInvoiceByLoanDetailId(Long loanDetailId) {
+        FeeInvoice invoice = feeInvoiceRepository.findFirstByLoanDetail_LoanDetailIdOrderByCreatedAtDesc(loanDetailId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy hóa đơn cho chi tiết mượn này"));
+        return mapToResponse(invoice);
+    }
+
+    @Transactional
     public List<FeeInvoiceResponse> getInvoicesByLibrary(Long libraryId) {
         return feeInvoiceRepository.findByLibrary_LibraryId(libraryId)
                 .stream()

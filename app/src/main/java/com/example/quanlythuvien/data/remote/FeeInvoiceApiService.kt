@@ -7,7 +7,14 @@ import retrofit2.Response
 import retrofit2.http.*
 
 interface FeeInvoiceApiService {
-
+  
+  
+@GET("api/fee-invoices/loan-detail/{loanDetailId}")
+    suspend fun getInvoiceByLoanDetailId(
+        @Path("loanDetailId") loanDetailId: Long
+    ): Response<FeeInvoiceResponse>
+  
+  
     @GET("api/fee-invoices")
     suspend fun getInvoicesByLibrary(): Response<List<FeeInvoiceResponse>>
 

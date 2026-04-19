@@ -145,11 +145,12 @@ class LoanDetailAdapter(
             }
 
             // ==========================================
-            // 6. XỬ LÝ CLICK VÀO TOÀN BỘ ITEM (TRẢ SÁCH)
+            // 6. XỬ LÝ CLICK VÀO TOÀN BỘ ITEM
             // ==========================================
             itemView.setOnClickListener {
-                if (currentStatus == "BORROWING" || currentStatus == "OVERDUE") {
-                    onMenuActionClick(item, "RETURN")
+                when (currentStatus) {
+                    "BORROWING", "OVERDUE" -> onMenuActionClick(item, "RETURN")
+                    "DAMAGED", "LOST" -> onMenuActionClick(item, "VIEW_INVOICE")
                 }
             }
         }
