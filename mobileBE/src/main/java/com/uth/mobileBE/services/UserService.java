@@ -177,6 +177,34 @@ public class UserService {
         }
     }
 
+    @Transactional
+    public UserResponse getMyProfile() {
+        String username = SecurityUtils.getUsername();
+        User currentUser = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy thông tin cá nhân"));
+
+        return mapToUserResponse(currentUser);
+    }
+
+    @Transactional
+    public UserResponse updateMyProfile(UserRequest request) {
+        String username = SecurityUtils.getUsername();
+        User currentUser = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy thông tin cá nhân"));
+
+        // Chỉ cho phép cập nhật Fullname và Password
+        if (request.getFullname() != null && !request.getFullname().trim().isEmpty()) {
+            currentUser.setFullname(request.getFullname());
+        }
+
+        if (request.getPassword() != null && !request.getPassword().trim().isEmpty()) {
+            currentUser.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+        }
+
+        User updatedUser = userRepository.save(currentUser);
+        return mapToUserResponse(updatedUser);
+    }
+
     private void validateSameLibrary(User user) {
         Long currentLibraryId = SecurityUtils.getLibraryId();
         if (!user.getLibrary().getLibraryId().equals(currentLibraryId)) {
@@ -187,6 +215,9 @@ public class UserService {
     private UserResponse mapToUserResponse(User user) {
         return UserResponse.builder()
                 .userId(user.getUserId())
+                .libraryId(user.getLibrary().getLibraryId())
+                .libraryName(user.getLibrary().getName())
+                .address(user.getLibrary().getAddress())
                 .username(user.getUsername())
                 .fullname(user.getFullname())
                 .role(user.getRole())

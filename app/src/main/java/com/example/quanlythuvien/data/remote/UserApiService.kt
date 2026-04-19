@@ -1,5 +1,6 @@
 package com.example.quanlythuvien.data.remote
 
+import com.example.quanlythuvien.data.model.request.UpdateProfileRequest
 import com.example.quanlythuvien.data.model.request.UpdateUserRequest
 import com.example.quanlythuvien.data.model.request.UserRequest
 import com.example.quanlythuvien.data.model.response.UserResponse
@@ -28,4 +29,10 @@ interface UserApiService {
 
     @POST("api/users")
     suspend fun createUser(@Body request: UserRequest): Response<UserResponse>
+
+    @GET("api/users/profile/me")
+    suspend fun getMyProfile(): Response<UserResponse>
+
+    @PUT("api/users/profile/me")
+    suspend fun updateMyProfile(@Body request: UpdateProfileRequest): Response<UserResponse>
 }

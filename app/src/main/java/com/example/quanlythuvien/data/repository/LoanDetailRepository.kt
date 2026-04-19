@@ -38,4 +38,7 @@ class LoanDetailRepository(private val apiService: LoanDetailApiService) {
     ): Response<LoanDetailResponse> {
         return apiService.updateLoanDetailAdmin(loanDetailId, request)
     }
+
+    suspend fun getReaderLoans(readerId: Long, status: String, page: Int, size: Int) =
+        apiService.getReaderLoans(readerId, status, page, size)
 }

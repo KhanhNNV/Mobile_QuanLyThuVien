@@ -11,16 +11,9 @@ import com.uth.mobileBE.models.FeeInvoice;
 import com.uth.mobileBE.models.Library;
 import com.uth.mobileBE.models.Reader;
 import com.uth.mobileBE.models.User;
-import com.uth.mobileBE.models.enums.Role;
-import com.uth.mobileBE.models.enums.StatusLibrary;
-import com.uth.mobileBE.models.enums.StatusFeeInvoice;
-import com.uth.mobileBE.models.enums.TypeFeeConfig;
-import com.uth.mobileBE.models.enums.TypeFeeInvoice;
-import com.uth.mobileBE.repositories.FeeConfigRepository;
-import com.uth.mobileBE.repositories.FeeInvoiceRepository;
-import com.uth.mobileBE.repositories.LibraryRepository;
-import com.uth.mobileBE.repositories.ReaderRepository;
-import com.uth.mobileBE.repositories.UserRepository;
+import com.uth.mobileBE.models.enums.*;
+import com.uth.mobileBE.repositories.*;
+import com.uth.mobileBE.services.auth.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -28,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -41,6 +35,7 @@ public class ReaderService {
     private final UserRepository userRepository;
     private final FeeInvoiceRepository feeInvoiceRepository;
     private final FeeConfigRepository feeConfigRepository;
+    private final LoanDetailRepository loanDetailRepository;
 
     //Tạo người độc giả
     @Transactional
@@ -103,9 +98,19 @@ public class ReaderService {
     public Page<ReaderResponse> getReadersPaginated(int page, int size) {
         Long libraryId = SecurityUtils.getLibraryId();
         Pageable pageable = PageRequest.of(page, size);
-        return readerRepository.findByLibrary_LibraryId(libraryId, pageable)
-                               .map(this::mapToReaderResponse);
+        Page<Reader> readers = readerRepository.findByLibrary_LibraryId(libraryId,pageable);
 
+        return readers.map(reader->{
+            ReaderResponse response = mapToReaderResponse(reader);
+
+            // Chỉ thực hiện tính toán ở đây để tối ưu hiệu năng
+            response.setTotalBorrowedBooks(getTotalBorrowedBooks(reader.getReaderId()));
+            response.setTotalOverdueBooks(getOverdueBooksCount(reader.getReaderId()));
+            response.setTotalReturnBooks(getReturnBooksCount(reader.getReaderId()));
+            response.setTotalDebt(getTotalUnpaidDebt(reader.getReaderId()));
+
+            return response;
+    });
     }
     //Tìm lọc độc giả
     public ReaderResponse getReaderById(Long id) {
@@ -192,12 +197,12 @@ public class ReaderService {
         return readerRepository.countByLibrary_LibraryId(libraryId);
     }
 
-    private LocalDateTime calculateExpiryDate(Long days){
-        return LocalDateTime.now().plusDays(days);
+    private LocalDateTime calculateExpiryDate(Long months){
+        return LocalDateTime.now().plusMonths(months);
     }
 
 
-
+    //Hàm này của Thông hình mục đích để gia hạn
     @Transactional
     public ReaderResponse renewMembership(Long pathReaderId, RenewReaderMembershipRequest request) {
         Long currentLibraryId = SecurityUtils.getLibraryId();
@@ -279,6 +284,36 @@ public class ReaderService {
 
         return mapToReaderResponse(saved);
     }
+    /*
+     * Lấy tổng số sách đã mượn (tất cả các lần) của một độc giả.
+     */
+    public Integer getTotalBorrowedBooks(Long readerId) {
+        return loanDetailRepository.countByLoan_Reader_ReaderIdAndStatus(readerId, StatusLoanDetail.BORROWING);
+    }
+    /*
+     * Lấy tổng số sách đang quá hạn (tất cả các lần) của một độc giả.
+     */
+    public Integer getOverdueBooksCount(Long readerId) {
+        return loanDetailRepository.countByLoan_Reader_ReaderIdAndStatus(readerId, StatusLoanDetail.OVERDUE);
+    }
+    /*
+     * Lấy tổng số sách đã mượn (tất cả các lần) của một độc giả.
+     */
+    public Integer getReturnBooksCount(Long readerId) {
+        return loanDetailRepository.countByLoan_Reader_ReaderIdAndStatus(readerId, StatusLoanDetail.RETURNED);
+    }
+
+
+    /*
+     * Lấy tổng số tiền nợ hiện tại (các hóa đơn chưa thanh toán) của độc giả.
+     * Trả về BigDecimal để đảm bảo độ chính xác tiền tệ.
+     */
+    public BigDecimal getTotalUnpaidDebt(Long readerId) {
+        BigDecimal debt = feeInvoiceRepository.sumTotalAmountByReaderIdAndStatus(readerId,StatusFeeInvoice.UNPAID);
+        return (debt != null) ? debt : BigDecimal.ZERO;
+    }
+
+
     private ReaderResponse mapToReaderResponse(Reader reader) {
         return ReaderResponse.builder()
                              .readerId(reader.getReaderId())

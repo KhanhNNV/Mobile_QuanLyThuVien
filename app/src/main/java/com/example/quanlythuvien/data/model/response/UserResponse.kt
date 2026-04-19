@@ -6,6 +6,15 @@ data class UserResponse(
     @SerializedName("userId")
     val userId: Long,
 
+    @SerializedName("libraryId")
+    val libraryId: Long,
+
+    @SerializedName("libraryName")
+    val libraryName: String,
+
+    @SerializedName("address")
+    val address: String,
+
     @SerializedName("username")
     val username: String,
 

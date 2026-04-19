@@ -89,6 +89,24 @@ public class LoanService {
             throw new RuntimeException("Độc giả này đang bị khóa tài khoản.");
         }
 
+        if (library.getMaxLoansQuota() != null && library.getMaxLoansQuota() > 0) {
+            // Đếm số lượng phiếu mượn đang ACTIVE của độc giả này
+            long currentActiveLoans = loanRepository.countByReader_ReaderIdAndStatus(
+                    reader.getReaderId(), StatusLoan.ACTIVE);
+
+            if (currentActiveLoans >= library.getMaxLoansQuota()) {
+                throw new RuntimeException("Độc giả đã đạt giới hạn mượn của thư viện. (Tối đa: "
+                        + library.getMaxLoansQuota() + " phiếu mượn đang hoạt động).");
+            }
+        }
+        if (library.getMaxBooksQuota() != null && library.getMaxBooksQuota() > 0) {
+           int count = request.getCopyIds().size();
+            if (count > library.getMaxBooksQuota()) {
+                throw new RuntimeException("Độc giả đã đạt giới hạn mượn của thư viện. (Tối đa: "
+                        + library.getMaxLoansQuota() + " quyển sách được mượn).");
+            }
+        }
+
         Loan loan = Loan.builder()
                 .library(library)
                 .reader(reader)

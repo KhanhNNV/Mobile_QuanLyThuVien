@@ -28,6 +28,8 @@ import com.example.quanlythuvien.data.model.request.ExtendMembershipExpiryReques
 import com.example.quanlythuvien.data.remote.ReaderApiService
 import com.example.quanlythuvien.data.repository.ReaderRepository
 import com.example.quanlythuvien.core.api.RetrofitClient
+import com.example.quanlythuvien.data.remote.LoanDetailApiService
+import com.example.quanlythuvien.data.repository.LoanDetailRepository
 import com.example.quanlythuvien.ui.borrow_pay.data.LoanItemData
 import com.example.quanlythuvien.utils.GenericViewModelFactory
 import com.example.quanlythuvien.utils.TokenManager
@@ -37,23 +39,37 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import kotlinx.coroutines.launch
+import java.math.BigDecimal
 import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Collections.emptyList
 import java.util.Date
 import kotlin.getValue
 
 class ReaderDetailFragment : Fragment(R.layout.fragment_reader_detail) {
 
     private lateinit var bookAdapter: ReaderDetailAdapter
-    private var allDataMockReaderBook: List<MockReaderBook> = emptyList()
+
 
     private val loanSharedViewModel: LoanSharedViewModel by activityViewModels()
 
     private val detailViewModel: ReaderDetailViewModel by viewModels {
         GenericViewModelFactory {
             val app = requireContext().applicationContext as Application
-            val apiService = RetrofitClient.getInstance(app).create(ReaderApiService::class.java)
-            ReaderDetailViewModel(ReaderRepository(apiService))
+
+            // Dùng chung instance của RetrofitClient theo ý "lãnh đạo"
+            val retrofit = RetrofitClient.getInstance(app)
+
+            // Nhưng tạo ra 2 ApiService riêng biệt
+            val readerApi = retrofit.create(ReaderApiService::class.java)
+            val loanDetailApi = retrofit.create(LoanDetailApiService::class.java)
+
+            // Khởi tạo các Repository tương ứng
+            val readerRepo = ReaderRepository(readerApi)
+            val loanDetailRepo = LoanDetailRepository(loanDetailApi)
+
+            // Cuối cùng truyền cả 2 vào ViewModel
+            ReaderDetailViewModel(readerRepo, loanDetailRepo)
         }
     }
 
@@ -67,7 +83,12 @@ class ReaderDetailFragment : Fragment(R.layout.fragment_reader_detail) {
     private var currentReaderId = -1L
     private var currentMembershipExpiry: String = ""
 
+    private var currentReaderTotalBorrowBooks = 0
+    private var currentReaderTotalReturnBooks = 0
+    private var currentReaderTotalOverdueBooks = 0
+    private var currentReaderDebt = BigDecimal.ZERO
     private var currentReaderBarcode = ""
+
     private val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.getDefault())
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -78,10 +99,15 @@ class ReaderDetailFragment : Fragment(R.layout.fragment_reader_detail) {
         currentReaderPhone = arguments?.getString("readerPhone").orEmpty()
         currentMembershipExpiry = arguments?.getString("membershipExpiry") ?: ""
         currentReaderBarcode = arguments?.getString("readerBarcode")?: ""
+        currentReaderDebt = (arguments?.getSerializable("readerDebt") as? BigDecimal) ?: BigDecimal.ZERO
+        currentReaderTotalBorrowBooks = arguments?.getInt("readerTotalBorrowBooks")?: 0
+        currentReaderTotalOverdueBooks = arguments?.getInt("readerTotalOverdueBooks")?: 0
+        currentReaderTotalReturnBooks = arguments?.getInt("readerTotalReturnBooks")?: 0
 
 
-        bindHeader(view, currentReaderName, currentReaderPhone, currentReaderId)
-        setupRecycler(view, currentReaderName)
+
+        bindHeader(view, currentReaderName, currentReaderPhone, currentReaderId, currentReaderDebt, currentReaderTotalBorrowBooks,currentReaderTotalOverdueBooks, currentReaderTotalReturnBooks )
+        setupRecycler(view)
         setupTabs(view)
         observeViewModel(view)
     }
@@ -97,12 +123,22 @@ class ReaderDetailFragment : Fragment(R.layout.fragment_reader_detail) {
         view: View,
         readerName: String,
         readerPhone: String,
-        readerId: Long
+        readerId: Long,
+        readerDebt: BigDecimal,
+        readerTotalBorrowBooks: Int,
+        readerTotalOverdueBooks: Int,
+        readerTotalReturnBooks: Int
     ) {
         view.findViewById<TextView>(R.id.tvReaderName).text = readerName
         view.findViewById<TextView>(R.id.tvReaderPhone).text = readerPhone
         view.findViewById<TextView>(R.id.tvAvatar).text = readerName.firstOrNull()?.uppercase() ?: ""
         view.findViewById<TextView>(R.id.tvHeaderTitle).text = "Chi tiết độc giả"
+        view.findViewById<TextView>(R.id.tvDebtAmount).text = readerDebt.toString() + "VNĐ"
+        view.findViewById<TextView>(R.id.tvStatBorrowing).text = readerTotalBorrowBooks.toString()
+        view.findViewById<TextView>(R.id.tvTotalBorrowed).text = readerTotalReturnBooks.toString()
+        view.findViewById<TextView>(R.id.tvStatOverdue).text = readerTotalOverdueBooks.toString()
+
+
 
         view.findViewById<View>(R.id.btnBack).setOnClickListener {
             findNavController().navigateUp()
@@ -119,35 +155,39 @@ class ReaderDetailFragment : Fragment(R.layout.fragment_reader_detail) {
         }
     }
 
-    private fun setupRecycler(view: View, readerName: String) {
-        setupMockData()
+    private fun setupRecycler(view: View) {
+        val rcvBooks = view.findViewById<RecyclerView>(R.id.rvReaderBooks)
 
-        val rvBooks = view.findViewById<RecyclerView>(R.id.rvReaderBooks)
-        bookAdapter = ReaderDetailAdapter { selectedBook ->
-            val mockLoan = LoanItemData(
-                loanId = 12345,
-                readerName = readerName.ifBlank { "Độc giả" },
-                borrowDate = selectedBook.borrowDate,
-                overallStatus = if (selectedBook.isReturned) "RETURNED" else "BORROWING",
-                borrowedBooks = mutableListOf()
+        // Khởi tạo bookAdapter với callback click
+        bookAdapter = ReaderDetailAdapter(emptyList()) { loanDetail ->
+            // Truyền ID qua Bundle
+            val bundle = Bundle().apply {
+                putLong("loanId", loanDetail.loanId)
+            }
+
+            // Điều hướng sử dụng NavController
+            findNavController().navigate(
+                R.id.action_readerDetailFragment_to_loanDetailFragment,
+                bundle
             )
-            loanSharedViewModel.selectedLoanToView.value = mockLoan
-            findNavController().navigate(R.id.loanFragment)
         }
 
-        rvBooks.layoutManager = LinearLayoutManager(requireContext())
-        rvBooks.adapter = bookAdapter
+        rcvBooks.layoutManager = LinearLayoutManager(requireContext())
+        rcvBooks.adapter = bookAdapter
     }
 
     private fun setupTabs(view: View) {
         val tabLayout = view.findViewById<TabLayout>(R.id.tabLayout)
         tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
-                when (tab?.position) {
-                    0 -> filterBooks(0) // đang mượn
-                    1 -> filterBooks(1) // đã trả
-                    2 -> filterBooks(2) // quá hạn
+                val statusString = when (tab?.position) {
+                    0 -> "BORROWING"
+                    1 -> "RETURNED"
+                    2 -> "OVERDUE"
+                    else -> "BORROWING"
                 }
+                // Gọi API thông qua ViewModel
+                detailViewModel.fetchReaderLoans(currentReaderId, statusString)
             }
 
             override fun onTabUnselected(tab: TabLayout.Tab?) = Unit
@@ -375,6 +415,7 @@ class ReaderDetailFragment : Fragment(R.layout.fragment_reader_detail) {
     }
 
     private fun observeViewModel(rootView: View) {
+
         detailViewModel.isLoading.observe(viewLifecycleOwner) { loading ->
             rootView.findViewById<View>(R.id.ivMoreOption).isEnabled = !loading
         }
@@ -390,6 +431,11 @@ class ReaderDetailFragment : Fragment(R.layout.fragment_reader_detail) {
                 Toast.makeText(requireContext(), "Đã xóa độc giả", Toast.LENGTH_SHORT).show()
                 findNavController().popBackStack()
             }
+        }
+
+        detailViewModel.loanList.observe(viewLifecycleOwner) { loans ->
+            // Cập nhật Adapter với danh sách từ API thay vì Mock
+            bookAdapter.submitList(loans)
         }
 
         detailViewModel.readerData.observe(viewLifecycleOwner) { data ->
@@ -435,23 +481,16 @@ class ReaderDetailFragment : Fragment(R.layout.fragment_reader_detail) {
         }
     }
 
-    private fun setupMockData() {
-        allDataMockReaderBook = listOf(
-            MockReaderBook("Lập trình Java căn bản", "Trần Văn B", "978-111", "01/10/2025", "15/10/2025", isOverdue = true, isReturned = false),
-            MockReaderBook("Kotlin Coroutines", "JetBrains", "978-222", "10/10/2025", "24/10/2025", isOverdue = false, isReturned = false),
-            MockReaderBook("Cấu trúc dữ liệu & Giải thuật", "Nguyễn C", "978-333", "01/09/2025", "15/09/2025", isOverdue = false, isReturned = true),
-            MockReaderBook("Clean Code", "Robert C. Martin", "978-444", "15/08/2025", "30/08/2025", isOverdue = false, isReturned = true)
-        )
-    }
 
-    private fun filterBooks(status: Int) {
-        val filtered = when (status) {
-            0 -> allDataMockReaderBook.filter { !it.isReturned && !it.isOverdue }
-            1 -> allDataMockReaderBook.filter { it.isReturned }
-            2 -> allDataMockReaderBook.filter { !it.isReturned && it.isOverdue }
-            else -> allDataMockReaderBook
+    private fun filterBooks(tabPosition: Int) {
+        val statusString = when (tabPosition) {
+            0 -> "BORROWING"
+            1 -> "RETURNED"
+            2 -> "OVERDUE"
+            else -> "BORROWING"
         }
-        bookAdapter.submitList(filtered)
+        // Gọi ViewModel để lấy dữ liệu thật từ Server
+        detailViewModel.fetchReaderLoans(currentReaderId, statusString)
     }
 
     //HÀM TẠO VÀ LƯU PDF

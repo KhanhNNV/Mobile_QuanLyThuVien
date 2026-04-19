@@ -16,6 +16,10 @@ import com.uth.mobileBE.repositories.FeeConfigRepository;
 import com.uth.mobileBE.repositories.LoanDetailRepository;
 import com.uth.mobileBE.repositories.LoanRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -390,6 +394,22 @@ public class LoanDetailService {
 
         return loanDetail.getLoan().getLoanId();
     }
+
+    /**
+     * Lấy danh sách phân trang sách đã mượn của độc giả theo trạng thái.
+     *
+     * @param readerId ID độc giả
+     * @param status   Trạng thái chi tiết mượn (BORROWING, RETURNED, ...)
+     * @param page     Số trang (bắt đầu từ 0)
+     * @param size     Số lượng mỗi trang
+     */@Transactional(readOnly = true)
+    public Page<LoanDetailResponse> getReaderLoanDetails(Long readerId, StatusLoanDetail status, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("dueDate").descending());
+        Page<LoanDetail> loanDetails = loanDetailRepository.findByLoan_Reader_ReaderIdAndStatus(readerId, status, pageable);
+
+        return loanDetails.map(this::mapToResponse);
+    }
+
 
     private LoanDetailResponse mapToResponse(LoanDetail detail) {
         return LoanDetailResponse.builder()

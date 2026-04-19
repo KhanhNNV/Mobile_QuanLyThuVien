@@ -15,6 +15,9 @@ import java.time.LocalDateTime;
 @Builder
 public class UserResponse {
     private Long userId;
+    private Long libraryId;
+    private String libraryName;
+    private String address;
     private String username;
     private String fullname;
     private Role role;

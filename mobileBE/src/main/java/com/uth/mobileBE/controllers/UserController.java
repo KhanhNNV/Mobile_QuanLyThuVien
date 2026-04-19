@@ -58,4 +58,16 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }
 
+    @GetMapping("/profile/me")
+    public ResponseEntity<UserResponse> getMyProfile() {
+        UserResponse user = userService.getMyProfile();
+        return ResponseEntity.ok(user);
+    }
+
+    @PutMapping("/profile/me")
+    public ResponseEntity<UserResponse> updateMyProfile(@RequestBody UserRequest request) {
+        UserResponse user = userService.updateMyProfile(request);
+        return ResponseEntity.ok(user);
+    }
+
 }

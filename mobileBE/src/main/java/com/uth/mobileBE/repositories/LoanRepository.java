@@ -10,4 +10,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface LoanRepository extends JpaRepository<Loan, Long>, JpaSpecificationExecutor<Loan> {
     long countByLibrary_LibraryIdAndStatus(Long libraryId, StatusLoan status);
+
+    long countByReader_ReaderIdAndStatus(Long readerId, StatusLoan status);
 }

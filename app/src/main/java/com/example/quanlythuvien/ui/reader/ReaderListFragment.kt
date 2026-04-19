@@ -60,6 +60,10 @@ class ReaderListFragment : Fragment(R.layout.fragment_reader_list) {
                 putString("readerName", reader.fullName)
                 putString("readerPhone", reader.phone)
                 putString("readerBarcode", reader.barcode)
+                putSerializable("readerDebt", reader.totalDebt)
+                putInt("readerTotalBorrowBooks",reader.totalBorrowedBooks)
+                putInt("readerTotalReturnBooks",reader.totalReturnBook)
+                putInt("readerTotalOverdueBooks",reader.totalOverdueBooks)
             }
             findNavController().navigate(R.id.readerDetailFragment, bundle)
         }

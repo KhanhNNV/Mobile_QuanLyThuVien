@@ -12,6 +12,7 @@ import com.example.quanlythuvien.data.model.response.LoanPolicyResponse
 
 class LoanPolicyAdapter(
     private var policyList: MutableList<LoanPolicyResponse>,
+    private val isAdmin: Boolean,
     private val onEditClick: (LoanPolicyResponse) -> Unit,
     private val onDeleteClick: (LoanPolicyResponse, Int) -> Unit
 ) : RecyclerView.Adapter<LoanPolicyAdapter.PolicyViewHolder>() {
@@ -36,12 +37,15 @@ class LoanPolicyAdapter(
         holder.tvLoanExp.text = "${policy.maxBorrowDays} ngày"
 
 
-        holder.btnEditPolicy.setOnClickListener {
-            onEditClick(policy)
-        }
+        if (isAdmin) {
+            holder.btnEditPolicy.visibility = View.VISIBLE
+            holder.btnDelete.visibility = View.VISIBLE
 
-        holder.btnDelete.setOnClickListener {
-            onDeleteClick(policy, position)
+            holder.btnEditPolicy.setOnClickListener { onEditClick(policy) }
+            holder.btnDelete.setOnClickListener { onDeleteClick(policy, position) }
+        } else {
+            holder.btnEditPolicy.visibility = View.GONE
+            holder.btnDelete.visibility = View.GONE
         }
     }
 

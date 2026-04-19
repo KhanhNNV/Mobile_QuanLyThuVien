@@ -5,9 +5,11 @@ import com.uth.mobileBE.dto.request.LoanDetailRequest;
 import com.uth.mobileBE.dto.request.UpdateLoanDetailRequest;
 import com.uth.mobileBE.dto.response.LoanDetailResponse;
 import com.uth.mobileBE.models.enums.ConditionBookCopy;
+import com.uth.mobileBE.models.enums.StatusLoanDetail;
 import com.uth.mobileBE.services.LoanDetailService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -59,5 +61,14 @@ public class LoanDetailController {
     public ResponseEntity<List<String>> getDueTodayAlerts() {
         Long libraryId = SecurityUtils.getLibraryId();
         return ResponseEntity.ok(loanDetailService.getDueTodayAlerts(libraryId));
+    }
+
+    @GetMapping("/reader/{readerId}")
+    public ResponseEntity<Page<LoanDetailResponse>> getByReader(
+            @PathVariable Long readerId,
+            @RequestParam StatusLoanDetail status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(loanDetailService.getReaderLoanDetails(readerId, status, page, size));
     }
 }
