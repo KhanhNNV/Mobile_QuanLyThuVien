@@ -33,7 +33,6 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
     private lateinit var cvManageStaff: MaterialCardView
     private lateinit var cvLoanPolicy: MaterialCardView
     private lateinit var cvCategory: MaterialCardView
-    private lateinit var btnLogout: Button
 
     private lateinit var layoutFeeHeader: LinearLayout
     private lateinit var cardFeeContainer: View
@@ -68,7 +67,6 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
         cvManageStaff = view.findViewById(R.id.cvManageStaff)
         cvLoanPolicy = view.findViewById(R.id.cvLoanPolicy)
         cvCategory = view.findViewById(R.id.cvCategory)
-        btnLogout = view.findViewById(R.id.btnLogout)
 
         layoutFeeHeader = view.findViewById(R.id.layoutFeeHeader)
         cardFeeContainer = view.findViewById(R.id.cardFeeContainer)
@@ -147,20 +145,6 @@ class SettingFragment : Fragment(R.layout.fragment_setting) {
 
         // Save Fees Event
         handleBtnSaveEvent()
-
-        // Logout Event
-        btnLogout.setOnClickListener {
-            val sharedPreferences = requireActivity().getSharedPreferences("LibraryAppPrefs", Context.MODE_PRIVATE)
-            sharedPreferences.edit().apply {
-                putBoolean("isLoggedIn", false)
-                remove("username")
-                remove("userRole")
-                apply()
-            }
-
-            val navOptions = NavOptions.Builder().setPopUpTo(R.id.nav_graph, true).build()
-            findNavController().navigate(R.id.welcomeFragment, null, navOptions)
-        }
     }
 
     private fun openLayoutFeeHeaderEvent(){

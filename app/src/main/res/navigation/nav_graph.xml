@@ -102,12 +102,6 @@
         tools:layout="@layout/fragment_reader_add" />
 
     <fragment
-        android:id="@+id/notificationFragment"
-        android:name="com.example.quanlythuvien.ui.notifications.NotificationFragment"
-        android:label="Thông Báo"
-        tools:layout="@layout/fragment_notification"/>
-
-    <fragment
         android:id="@+id/borrowPayListFragment"
         android:name="com.example.quanlythuvien.ui.borrow_pay.BorrowPayFragment"
         android:label="Mượn Trả"
@@ -225,6 +219,12 @@
             app:destination="@id/loanFragment" />
 
     </fragment>
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.example.quanlythuvien.ui.profile.ProfileFragment"
+        android:label="Thông tin cá nhân"
+        tools:layout="@layout/fragment_profile"/>
 
 
 <!--    =========================================Staff=============================================-->

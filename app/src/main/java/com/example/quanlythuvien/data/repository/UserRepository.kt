@@ -1,5 +1,6 @@
 package com.example.quanlythuvien.data.repository
 
+import com.example.quanlythuvien.data.model.request.UpdateProfileRequest
 import com.example.quanlythuvien.data.model.request.UpdateUserRequest
 import com.example.quanlythuvien.data.model.request.UserRequest
 import com.example.quanlythuvien.data.remote.UserApiService
@@ -17,5 +18,9 @@ class UserRepository(private val apiService: UserApiService) {
     suspend fun deleteUser(id: Long) = apiService.deleteUser(id)
 
     suspend fun createUser(request: UserRequest) = apiService.createUser(request)
+
+    // Thêm 2 dòng này vào UserRepository
+    suspend fun getMyProfile() = apiService.getMyProfile()
+    suspend fun updateMyProfile(request: UpdateProfileRequest) = apiService.updateMyProfile(request)
 
 }
