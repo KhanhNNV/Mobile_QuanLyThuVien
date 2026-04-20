@@ -36,7 +36,7 @@ class InvoiceListFragment : Fragment(R.layout.fragment_invoice_list) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupCustomHeader(view, "Quản lý hóa đơn","*số lượng hóa đơn")
+        setupCustomHeader(view, "Quản lý hóa đơn","Quản lý hóa đơn của độc giả")
 
         initViews(view)
         setupViewModels()

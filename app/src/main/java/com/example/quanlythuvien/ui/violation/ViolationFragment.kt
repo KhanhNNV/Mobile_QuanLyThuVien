@@ -25,6 +25,7 @@ import com.example.quanlythuvien.data.remote.ViolationApiService
 import com.example.quanlythuvien.data.repository.ViolationRepository
 import com.example.quanlythuvien.utils.GenericViewModelFactory
 import com.example.quanlythuvien.utils.TokenManager
+import com.example.quanlythuvien.utils.setupCustomHeader
 import com.example.quanlythuvien.utils.setupHeaderWithBack
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -66,7 +67,7 @@ class ViolationFragment : Fragment(R.layout.fragment_violation) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupHeaderWithBack(view, "Quản lý vi phạm")
+        setupCustomHeader(view, "Quản lý vi phạm","Các vi phạm của độc giả")
 
         val tokenManager = TokenManager(requireContext())
         val role = tokenManager.getRole()
