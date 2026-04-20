@@ -129,8 +129,15 @@ public class ReaderService {
         }
         Long libraryId = SecurityUtils.getLibraryId();
         List<Reader> listReader = readerRepository.searchReadersByLibraryId(libraryId, request.trim());
-        return listReader.stream().map(reader -> mapToReaderResponse(reader))
-                                   .collect(Collectors.toList());
+        return listReader.stream().map(reader -> {
+            ReaderResponse response = mapToReaderResponse(reader);
+            response.setTotalBorrowedBooks(getTotalBorrowedBooks(reader.getReaderId()));
+            response.setTotalOverdueBooks(getOverdueBooksCount(reader.getReaderId()));
+            response.setTotalReturnBooks(getReturnBooksCount(reader.getReaderId()));
+            response.setTotalDebt(getTotalUnpaidDebt(reader.getReaderId()));
+
+            return response;
+        }).collect(Collectors.toList());
     }
 
     /**

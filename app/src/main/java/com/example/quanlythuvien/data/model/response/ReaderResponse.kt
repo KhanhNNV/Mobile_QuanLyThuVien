@@ -13,5 +13,5 @@ data class ReaderResponse(
     val totalBorrowedBooks: Int,
     val totalReturnBook:Int,
     val totalOverdueBooks: Int,
-    val  totalDebt: BigDecimal
+    val  totalDebt: BigDecimal?
 )
