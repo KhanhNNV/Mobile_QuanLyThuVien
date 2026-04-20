@@ -38,7 +38,14 @@ fun Fragment.setupCustomHeader(view: View, title: String, subtitle: String = "")
                         true
                     }
                     R.id.action_logout -> {
-                        val sharedPreferences = requireActivity().getSharedPreferences("LibraryAppPrefs", Context.MODE_PRIVATE)
+                        // Xóa token
+                        val tokenManager = TokenManager(requireContext())
+                        tokenManager.clearTokens()
+
+                        // Xóa trạng thái login UI
+                        val sharedPreferences = requireActivity()
+                            .getSharedPreferences("LibraryAppPrefs", Context.MODE_PRIVATE)
+
                         sharedPreferences.edit().apply {
                             putBoolean("isLoggedIn", false)
                             remove("username")
@@ -46,7 +53,11 @@ fun Fragment.setupCustomHeader(view: View, title: String, subtitle: String = "")
                             apply()
                         }
 
-                        val navOptions = NavOptions.Builder().setPopUpTo(R.id.nav_graph, true).build()
+                        // Xóa toàn bộ back stack và quay về welcome
+                        val navOptions = NavOptions.Builder()
+                            .setPopUpTo(R.id.nav_graph, true)
+                            .build()
+
                         findNavController().navigate(R.id.welcomeFragment, null, navOptions)
                         true
                     }

@@ -31,6 +31,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final LibraryRepository libraryRepository;
 
+    @Transactional
     public List<UserResponse> getAllUsersByCurrentLibrary() {
         Long libraryId = SecurityUtils.getLibraryId();
         List<User> users = userRepository.findByLibrary_LibraryId(libraryId);
@@ -39,6 +40,7 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public UserResponse getUserById(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy user với ID: " + userId));
